@@ -502,9 +502,9 @@ body.notes-on .notes{transform:none}
       </section>
 
       <!-- ============ 2 ============ -->
-      <section class="slide" data-t="Eleven request paths">
-        <p class="eyebrow">02 · Coverage</p>
-        <h1 class="claim">Eleven ways to request - Only one is automated.</h1>
+      <section class="slide" data-t="Ten request paths">
+        <p class="eyebrow">02 · In practice</p>
+        <h1 class="claim">Ten request paths. One provisions without a human.</h1>
         <p class="dek">Click a row. Click a column.</p>
 
         <div class="matwrap"><table class="mat" id="mat">
@@ -526,7 +526,7 @@ body.notes-on .notes{transform:none}
 
         <div class="readout" id="ro2" style="margin-top:14px">
           <span class="step">Detail</span>
-          <p class="txt">Two systems provision with no human step: Delta and Hydro.</p>
+          <p class="txt">Delta, on the ACCESS lane. Every other path has a person in it.</p>
         </div>
 
         <div class="kicker"><p>One of them revokes. That engine was built for a compliance enclave and never generalized.</p></div>
@@ -733,7 +733,7 @@ body.notes-on .notes{transform:none}
             <path class="sv-line" d="M 565 136 C 620 136, 640 162, 700 161" marker-end="url(#ar2)"/>
             <path class="sv-line" d="M 565 150 C 620 150, 640 198, 700 197" marker-end="url(#ar2)"/>
 
-            <rect class="sv-box" x="700" y="38" width="440" height="30" rx="3"/><text x="714" y="58" font-size="13" fill="var(--ink)">Delta · DeltaAI · Hydro: Slurm accounts, QoS, budgets</text>
+            <rect class="sv-box" x="700" y="38" width="440" height="30" rx="3"/><text x="714" y="58" font-size="13" fill="var(--ink)">Delta · DeltaAI: Slurm accounts, QoS, budgets</text>
             <rect class="sv-box" x="700" y="74" width="440" height="30" rx="3"/><text x="714" y="94" font-size="13" fill="var(--ink)">Radiant · Nightingale · Campus Cluster queues</text>
             <rect class="sv-box" x="700" y="110" width="440" height="30" rx="3"/><text x="714" y="130" font-size="13" fill="var(--ink)">Taiga · Granite · Jade · Harbor: storage entitlements</text>
             <rect class="sv-box" x="700" y="146" width="440" height="30" rx="3"/><text x="714" y="166" font-size="13" fill="var(--ink)">Illinois HTC · HAL · ISL · TGI RAILS</text>
@@ -1021,15 +1021,13 @@ var S={a:["auto","automated"], m:["manual","manual"], b:["gone","absent"], n:["n
 var COLS=["Request","Award to IDDS","Provisioned","Entitlement","Usage returns","Lifecycle end"];
 var LANES=[
   {n:"Delta, ACCESS", s:"XRAS → CDB → AMIE", c:["a","a","a","a","a","m"],
-   d:"The only one drawn to completion: inactivated in IDDS, acctd, a semi-manual step, 30 day grace."},
+   d:"The only path where an approval becomes a running project with no human step, and the only one drawn to completion: inactivated in IDDS, acctd, a semi-manual step, 30 day grace."},
   {n:"Delta, NAIRR", s:"NAIRR XRAS → CDB", c:["m","a","a","a","a","b"],
    d:"Provisioning automated. Intake partly manual, with mappings recorded by hand. AMIE stalled at NCSA in July 2026 on illegal characters. No lifecycle end."},
   {n:"Delta, Illinois Computes", s:"IC Form → Jira → XRAS", c:["m","a","a","a","a","b"],
    d:"A form into Jira. A second intake path creates a guest XRAS user when the requester has no known NCSA identity. No lifecycle end."},
   {n:"DeltaAI", s:"multiple front doors", c:["m","a","a","a","a","b"],
    d:"704,210 approved GPU hours, 37 allocations. Allocation authority switches between Illinois Computes and ACCESS at 11,250 GPU hours, with no recorded policy basis."},
-  {n:"Hydro", s:"NCSA XRAS", c:["m","a","a","a","a","n"],
-   d:"With Delta, one of two systems where an approval becomes a project with no human step. 442,310 approved SU, 57 allocations."},
   {n:"Radiant", s:"NCSA XRAS → IDDS", c:["m","a","b","m","n","b"],
    d:"acctd run by hand. A hand-issued four letter project code. Inactivation through NAPS with no automated path. Adjustments entered as deltas from an ldapsearch, because XRAS cannot show current values. Bills until asked to stop."},
   {n:"Campus Cluster IC Queue", s:"NetID / campus AD", c:["m","a","m","m","n","b"],
@@ -1066,7 +1064,7 @@ Array.prototype.forEach.call(mat.querySelectorAll("th.col"),function(th){
     var ci=+th.dataset.c, was=th.classList.contains("act");
     Array.prototype.forEach.call(mat.querySelectorAll("th.col"),function(x){x.classList.remove("act")});
     Array.prototype.forEach.call(mat.querySelectorAll("td.cell"),function(x){x.classList.remove("csel")});
-    if(was){ mat.classList.remove("colsel"); setRO2("Detail","Two systems provision with no human step: Delta and Hydro."); return; }
+    if(was){ mat.classList.remove("colsel"); setRO2("Detail","Delta, on the ACCESS lane. Every other path has a person in it."); return; }
     th.classList.add("act"); mat.classList.add("colsel");
     Array.prototype.forEach.call(mat.querySelectorAll('td.cell[data-c="'+ci+'"]'),function(x){x.classList.add("csel")});
     var t={a:0,m:0,b:0,n:0};
@@ -1208,8 +1206,9 @@ var NOTES=[
   o:["Greg may correct a box. Take it out loud."]},
  {h:"Two clicks, then stop talking",
   p:["Click Lifecycle end: 1 automated, 1 manual, 8 absent, 1 no data.",
+     "If someone clicks Provisioned and sees 4 automated, that is not a contradiction with the headline. acctd provisions on four paths once the award lands in IDDS. Only one gets that far without a person touching the request.",
      "Then Nightingale: dual approval, cascading deauthorization, scoped to one enclave. A capability to generalize, not invent.",
-     "Hydro is on the list on purpose even though it is decommissioned. If someone asks, the answer is that it was short lived and they still got acctd auto-provisioning working, which is the common thread with Delta and nowhere else."],
+     "Delta is the only path that gets from approval to a running project with nobody touching it. The common thread is that acctd auto-provisioning was actually wired up there."],
   o:["“Row X is wrong.” Ask which cell and what the right value is."]},
  {h:"The calculators do the arguing",
   p:["Type a real SU number into the first box. The chain shows the x60 x1000 scaling and the GrpTRESMins value. Say that the scaling is undone in three places with no detector.",
@@ -1341,6 +1340,6 @@ go(0);
   a.className="tbtn"; a.textContent="Open full screen \u2197"; bar.appendChild(a);
 })();
 </script>
-   
+
 </body>
 </html>
