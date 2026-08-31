@@ -15,7 +15,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* base */
 html{color-scheme:light dark;-webkit-text-size-adjust:100%}
 img,svg{max-width:100%}
 [hidden]{display:none!important}
@@ -234,8 +233,16 @@ input[type=range]{accent-color:var(--identity);width:100%;height:20px}
 .chain .k.end{border-color:var(--auto);background:var(--auto-bg);color:var(--auto);font-weight:500}
 .chain .op{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);padding:0 9px;white-space:nowrap}
 .calcnote{margin-top:10px;font-size:12.5px;color:var(--ink-3);line-height:1.45}
+.hint2{text-transform:none;letter-spacing:0;color:var(--identity);font-weight:400}
+.jr{display:grid;grid-template-columns:60px 1fr 46px;gap:8px 10px;align-items:center}
+.jl{font-family:var(--f-mono);font-size:11px;color:var(--ink-2)}
+.jv{font-family:var(--f-mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.wrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:12px;padding-top:11px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3)}
+.wrow input[type=number]{width:64px;font-size:12px;padding:3px 6px}
+.tres2{display:grid;grid-template-columns:34px 112px 1fr;gap:7px 10px;align-items:center;margin-top:12px}
+.te{font-family:var(--f-mono);font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--ink-2)}
 .tres{display:grid;grid-template-columns:64px 1fr 74px;gap:9px 12px;align-items:center;margin-top:4px}
-.tres .tl{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-2)}
+.tres .tl,.tres2 .tl{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-2)}
 .tres .tv{font-family:var(--f-mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
 .tbar{height:9px;background:var(--surface-2);border-radius:2px;overflow:hidden;position:relative}
 .tbar i{display:block;height:9px;background:var(--ink-3);border-radius:2px;transition:width .2s ease}
@@ -256,7 +263,6 @@ svg.corron .corr-hubtx{fill:var(--identity)}
 
 /* cost fan */
 .fanrow,.fanpath{transition:opacity .18s}
-svg.fanhover .fanrow:not(.hot),svg.fanhover .fanpath:not(.hot){opacity:.18}
 
 /* overlays */
 .ov{position:fixed;inset:0;background:rgba(10,13,18,.58);backdrop-filter:blur(3px);z-index:60;display:none;padding:6vh 5vw}
@@ -303,11 +309,9 @@ body.notes-on .notes{transform:none}
   .stage{padding:20px 18px 86px}
 }
 
-/* print: flatten to a linear document */
 @media print{
   .topbar,.prog,.rail,.foot,.notes,.ov,.ctrls,.readout{display:none!important}
-  .app{display:block;height:auto}
-  .main{display:block}
+  .app{display:block;height:auto}.main{display:block}
   .stage{overflow:visible;padding:0;height:auto}
   .slide{display:block!important;max-width:none;margin:0 0 30px;page-break-after:always}
   .slide:last-child{page-break-after:auto}
@@ -315,8 +319,7 @@ body.notes-on .notes{transform:none}
   .card,.calc{box-shadow:none;break-inside:avoid}
   .term{background:#fff;color:#1a1a1a;border:1px solid #bbb}
   .term .p,.term .c,.term .o,.term .cm{color:#1a1a1a}
-  .term .hl{color:#8a3b00;font-weight:600}
-  .cur{display:none}
+  .term .hl{color:#8a3b00;font-weight:600}.cur{display:none}
 }
 </style>
 </head>
@@ -341,10 +344,10 @@ body.notes-on .notes{transform:none}
       <section class="slide" data-t="An award is not access">
         <p class="eyebrow">01 · The model</p>
         <h1 class="claim">An award is not access.</h1>
-        <p class="dek">Five facts. Five owners. Run one through.</p>
+        <p class="dek">Different systems own each step. Run a request through and watch where it stops.</p>
 
         <div class="ctrls">
-          <div class="cgroup"><b>Lane</b>
+          <div class="cgroup"><b>Path</b>
             <button class="pill lane" data-lane="access" aria-pressed="true">ACCESS</button>
             <button class="pill lane" data-lane="nairr" aria-pressed="false">NAIRR</button>
             <button class="pill lane" data-lane="local" aria-pressed="false">Illinois Computes</button>
@@ -371,7 +374,7 @@ body.notes-on .notes{transform:none}
 
         <div class="readout" id="ro">
           <span class="step" id="ro-step">Ready</span>
-          <p class="txt" id="ro-txt">Run a lane, isolate a layer, or inspect one project at each stage.</p>
+          <p class="txt" id="ro-txt">Run a request, isolate a layer, or inspect one project at each stage.</p>
         </div>
 
         <div id="recwrap" style="display:none;margin-top:11px">
@@ -499,14 +502,14 @@ body.notes-on .notes{transform:none}
       </section>
 
       <!-- ============ 2 ============ -->
-      <section class="slide" data-t="Eleven lanes, two automated">
+      <section class="slide" data-t="Eleven ways in">
         <p class="eyebrow">02 · Coverage</p>
-        <h1 class="claim">Eleven lanes run that model.</h1>
-        <p class="dek">Click a lane. Click a column.</p>
+        <h1 class="claim">Eleven ways in. One of them finishes.</h1>
+        <p class="dek">Click a row. Click a column.</p>
 
         <div class="matwrap"><table class="mat" id="mat">
           <thead><tr>
-            <th class="lane">Lane</th>
+            <th class="lane">Request path</th>
             <th class="col" data-c="0">Request</th><th class="col" data-c="1">Award to IDDS</th>
             <th class="col" data-c="2">Provisioned</th><th class="col" data-c="3">Entitlement</th>
             <th class="col" data-c="4">Usage returns</th><th class="col" data-c="5">Lifecycle end</th>
@@ -526,7 +529,7 @@ body.notes-on .notes{transform:none}
           <p class="txt">Two systems provision with no human step: Delta and Hydro.</p>
         </div>
 
-        <div class="kicker"><p>One lane revokes. That engine was built for a compliance enclave and never generalized.</p></div>
+        <div class="kicker"><p>One of them revokes. That engine was built for a compliance enclave and never generalized.</p></div>
       </section>
 
       <!-- ============ 3 ============ -->
@@ -536,15 +539,15 @@ body.notes-on .notes{transform:none}
 
         <div class="grid g3">
           <div class="card">
-            <h4>Three pieces</h4>
+            <h4>How it is built</h4>
             <p>Service on <code>idds-prod</code> hands out work. <code>acct.pl</code> on each resource polls over SSH. Plugins execute locally, and all resource-specific behavior lives there.</p>
           </div>
           <div class="card">
-            <h4>Six verbs</h4>
-            <p><code>project</code> · <code>account</code> · <code>user</code>, each activate and inactivate. A charge group is the unit of authorization. No second grant path.</p>
+            <h4>What it does</h4>
+            <p>Six functions: activate and inactivate, at <code>project</code>, <code>account</code> and <code>user</code> level. A charge group is the unit of authorization. No second grant path.</p>
           </div>
           <div class="card">
-            <h4>Two things it cannot do</h4>
+            <h4>What it cannot do</h4>
             <p>Refunds cannot execute in Slurm, so a human adds SUs back. Partial deactivation has no interface: a stored procedure by hand, per tuple.</p>
           </div>
         </div>
@@ -552,7 +555,7 @@ body.notes-on .notes{transform:none}
         <h2 class="sec">The charging model, live</h2>
         <div class="grid g2">
           <div class="calc">
-            <h4>SU award to GrpTRESMins</h4>
+            <h4>SU award to GrpTRESMins <span style="text-transform:none;letter-spacing:0;color:var(--identity)">type a number</span></h4>
             <div class="calcrow">
               <label for="su">SU awarded</label>
               <input type="number" id="su" value="150000" min="1" step="1000">
@@ -567,24 +570,35 @@ body.notes-on .notes{transform:none}
           </div>
 
           <div class="calc">
-            <h4>MAX_TRES billing, per job</h4>
-            <div class="tres">
-              <span class="tl">CPU</span><input type="range" id="t-cpu" min="0" max="100" value="24"><span class="tv" id="v-cpu">24</span>
-              <span class="tl">Memory</span><input type="range" id="t-mem" min="0" max="100" value="16"><span class="tv" id="v-mem">16</span>
-              <span class="tl">GPU</span><input type="range" id="t-gpu" min="0" max="100" value="72"><span class="tv" id="v-gpu">72</span>
+            <h4>What a job actually costs <span class="hint2">illustrative weights, drag anything</span></h4>
+            <div class="jr">
+              <span class="jl">cores</span><input type="range" id="q-cpu" min="1" max="128" value="8"><span class="jv" id="n-cpu">8</span>
+              <span class="jl">GB RAM</span><input type="range" id="q-mem" min="2" max="512" step="2" value="32"><span class="jv" id="n-mem">32</span>
+              <span class="jl">GPUs</span><input type="range" id="q-gpu" min="0" max="8" value="1"><span class="jv" id="n-gpu">1</span>
             </div>
-            <div class="tres" style="margin-top:9px">
-              <span class="tl"></span><div class="tbar" id="b-cpu"><i></i></div><span></span>
-              <span class="tl"></span><div class="tbar" id="b-mem"><i></i></div><span></span>
-              <span class="tl"></span><div class="tbar" id="b-gpu"><i></i></div><span></span>
+            <div class="wrow">
+              <span><code style="background:none;padding:0">TRESBillingWeights</code>, site config, per partition:</span>
+              <span>cpu <input type="number" id="w-cpu" value="1" step="0.25" min="0"></span>
+              <span>mem <input type="number" id="w-mem" value="0.25" step="0.25" min="0"></span>
+              <span>gpu <input type="number" id="w-gpu" value="12" step="1" min="0"></span>
+            </div>
+            <div class="tres2">
+              <span class="tl">cpu</span><span class="te" id="e-cpu"></span><div class="tbar" id="b-cpu"><i></i></div>
+              <span class="tl">mem</span><span class="te" id="e-mem"></span><div class="tbar" id="b-mem"><i></i></div>
+              <span class="tl">gpu</span><span class="te" id="e-gpu"></span><div class="tbar" id="b-gpu"><i></i></div>
             </div>
             <div class="tout">
-              <div><span class="v" id="o-sum">112</span><span class="l">sum of components</span></div>
-              <div><span class="v win" id="o-max">72</span><span class="l">actually charged</span></div>
-              <div><span class="v" id="o-free" style="color:var(--ink-3)">40</span><span class="l">billed at zero</span></div>
+              <div><span class="v" id="o-sum">28</span><span class="l">what you requested</span></div>
+              <div><span class="v win" id="o-max">12</span><span class="l">what you are billed</span></div>
+              <div><span class="v" id="o-free">16</span><span class="l">billed at zero</span></div>
             </div>
-            <p class="calcnote">Per-partition <code>TRESBillingWeights</code> with <code>PriorityFlags=MAX_TRES</code>. The largest single component sets the charge. Everything under it is free, which is why a job's cost is not the sum of what it asked for.</p>
+            <p class="calcnote" id="tresnote"></p>
           </div>
+        </div>
+
+        <div class="card bad" style="margin-top:16px">
+          <h4>Slurm is the source of authority on usage</h4>
+          <p>If the charge is the largest component and never the sum, reported usage is rounded down by design.</p>
         </div>
 
         <h2 class="sec">Latency is not one number</h2>
@@ -604,7 +618,7 @@ body.notes-on .notes{transform:none}
           <span class="chip">direct LDAP writes: "temporary" since Mar 2022</span>
         </div>
 
-        <div class="kicker"><p>The verb contract is right. The batch trigger and the missing documentation are not.</p></div>
+        <div class="kicker"><p>The design is sound. It runs as an undocumented batch job, and the usage it reports does not reconcile.</p></div>
       </section>
 
       <!-- ============ 4 ============ -->
@@ -613,14 +627,12 @@ body.notes-on .notes{transform:none}
         <h1 class="claim">One researcher, five credentials, no join.</h1>
 
         <div class="ctrls" style="border-bottom:0;padding-bottom:2px">
-          <div class="cgroup"><b>Directory</b>
+          <div class="cgroup"><b>Diagram</b>
             <button class="pill" id="corrbtn" aria-pressed="false">Populate voPersonExternalID</button>
           </div>
-          <div class="cgroup"><b>Query</b>
-            <button class="pill insp q" data-q="0">count all</button>
-            <button class="pill insp q" data-q="1">voPersonExternalID</button>
-            <button class="pill insp q" data-q="2">voPersonID</button>
-            <button class="pill insp q" data-q="3">eduPerson</button>
+          <div class="cgroup"><b>Directory</b>
+            <button class="pill insp q" data-q="0">count all accounts</button>
+            <button class="pill insp q" data-q="1">count correlation values</button>
           </div>
         </div>
 
@@ -659,7 +671,7 @@ body.notes-on .notes{transform:none}
 
         <p style="margin-top:16px;font-size:15.5px">The 158 duplicate-email clusters and 40 duplicate-UID cases are string matches on <code>mail</code> and <code>uidNumber</code>. There is no identifier to match on.</p>
 
-        <div class="kicker"><p>CILogon, COmanage and identity correlation are one decision, not three.</p></div>
+        <div class="kicker"><p>voPersonExternalID is already in the schema. Populating it is the fix.</p></div>
       </section>
 
       <!-- ============ 5 ============ -->
@@ -688,7 +700,7 @@ body.notes-on .notes{transform:none}
           </div>
         </div>
 
-        <h2 class="sec">Where the cost belongs. Hover a program.</h2>
+        <h2 class="sec">All six programs allocate through the same NCSA infrastructure</h2>
         <figure style="margin-top:2px">
           <div class="figwrap">
           <svg id="fan" viewBox="0 0 1160 250" role="img" aria-label="Six separately funded programs, ACCESS, NAIRR, Illinois Computes, Campus Cluster and ICCP, Nightingale and ACHE, and Mayo and mForge era work, all depend on one shared write path, acctd plus NCSA LDAP, which provisions every allocated NCSA resource.">
@@ -862,9 +874,9 @@ var RUNS={
     access:[{cap:"Project inactivated in IDDS.", node:"n-idds", rv:true},
             {cap:"Semi-manual step in acctd.", rail:"r-poll", node:"n-acctd", manual:"n-acctd", wait:W_MANUAL, rv:true},
             {cap:"Charge group removed. 30 day grace period.", rail:"r-write", nodes:["n-ldap","n-chip"], rv:true},
-            {done:"Removed on this lane.", sub:"The only lane with a designed end. The identity and Duo enrollment persist.", state:"warn", flash:["n-ident"]}],
+            {done:"Removed on this lane.", sub:"The only path with a designed end. The identity and Duo enrollment persist.", state:"warn", flash:["n-ident"]}],
     nairr:[{cap:"Nothing fires.", blocked:true, stale:["n-delta","n-chip"], wait:W_BLOCK},
-           {done:"No inactivation event exists on this lane.", sub:"Access persists.", state:"bad"}],
+           {done:"No inactivation event exists on this path.", sub:"Access persists.", state:"bad"}],
     local:[{cap:"Nothing fires.", blocked:true, stale:["n-delta","n-chip"], wait:W_BLOCK},
            {done:"No inactivation event exists on this lane.", sub:"Radiant bills until asked to stop. XRAS end dates drive nothing.", state:"bad"}]
   }
@@ -968,7 +980,7 @@ Array.prototype.forEach.call(document.querySelectorAll(".pill.lane"),function(b)
     Array.prototype.forEach.call(document.querySelectorAll(".pill.lane"),function(x){x.setAttribute("aria-pressed","false")});
     b.setAttribute("aria-pressed","true");
     lane=b.dataset.lane; gen++; running=false; clearRun(); setRunEnabled(true);
-    setRO("Ready","Grant, then revoke the same lane.");
+    setRO("Ready","Grant, then revoke the same path.");
   });
 });
 document.getElementById("run-grant").addEventListener("click",function(){ play(RUNS.grant[lane]); });
@@ -1009,7 +1021,7 @@ var S={a:["auto","automated"], m:["manual","manual"], b:["gone","absent"], n:["n
 var COLS=["Request","Award to IDDS","Provisioned","Entitlement","Usage returns","Lifecycle end"];
 var LANES=[
   {n:"Delta, ACCESS", s:"XRAS → CDB → AMIE", c:["a","a","a","a","a","m"],
-   d:"The only lane drawn to completion: inactivated in IDDS, acctd, a semi-manual step, 30 day grace."},
+   d:"The only one drawn to completion: inactivated in IDDS, acctd, a semi-manual step, 30 day grace."},
   {n:"Delta, NAIRR", s:"NAIRR XRAS → CDB", c:["m","a","a","a","a","b"],
    d:"Provisioning automated. Intake partly manual, with mappings recorded by hand. AMIE stalled at NCSA in July 2026 on illegal characters. No lifecycle end."},
   {n:"Delta, Illinois Computes", s:"IC Form → Jira → XRAS", c:["m","a","a","a","a","b"],
@@ -1025,7 +1037,7 @@ var LANES=[
   {n:"Taiga + Granite", s:"NCSA XRAS", c:["m","a","n","m","a","b"],
    d:"477 allocations and 3,097 TB on Taiga. 62 and 1,307 TB on Granite. Storage usage does reach IDDS. Resource groups mirrored by a separate script, not acctd."},
   {n:"Nightingale", s:"NCSA XRAS + ACHE vetting", c:["m","a","m","a","a","a"],
-   d:"The only lane that revokes: dual approval, daily out of band change detection with alerting, cascading deauthorization, six year retention. Scoped to one enclave. 18 allocations, 307,080 SU."},
+   d:"The only one that revokes: dual approval, daily out of band change detection with alerting, cascading deauthorization, six year retention. Scoped to one enclave. 18 allocations, 307,080 SU."},
   {n:"Illinois HTC", s:"Google Form + XRAS", c:["m","a","m","m","b","b"],
    d:"15 allocations, 300,012 units, awarded through XRAS while running HTCondor outside the Slurm-only metering chain. No usage returns to IDDS."},
   {n:"ICCP", s:"campus investor portal", c:["m","b","b","m","n","b"],
@@ -1079,21 +1091,37 @@ function calcSU(){
 }
 suIn.addEventListener("input",calcSU); calcSU();
 
-var tIds=["cpu","mem","gpu"];
+var TK=["cpu","mem","gpu"];
+var TLABEL={cpu:"cores",mem:"memory",gpu:"the GPU request"};
+function num(id){ var v=parseFloat(document.getElementById(id).value); return isFinite(v)&&v>=0?v:0; }
 function calcTRES(){
-  var vals=tIds.map(function(k){ return +document.getElementById("t-"+k).value; });
-  var max=Math.max.apply(null,vals), sum=vals.reduce(function(a,b){return a+b;},0);
-  tIds.forEach(function(k,i){
-    document.getElementById("v-"+k).textContent=vals[i];
-    var bar=document.getElementById("b-"+k);
-    bar.querySelector("i").style.width=(max?(vals[i]/max*100):0)+"%";
-    bar.classList.toggle("win", vals[i]===max && max>0);
+  var req={cpu:num("q-cpu"), mem:num("q-mem"), gpu:num("q-gpu")};
+  var wt ={cpu:num("w-cpu"), mem:num("w-mem"), gpu:num("w-gpu")};
+  var bill={}, sum=0, max=0, winner=null;
+  TK.forEach(function(k){
+    bill[k]=req[k]*wt[k]; sum+=bill[k];
+    document.getElementById("n-"+k).textContent=req[k];
+    document.getElementById("e-"+k).textContent=req[k]+" x "+wt[k]+" = "+(+bill[k].toFixed(2));
   });
-  document.getElementById("o-sum").textContent=sum;
-  document.getElementById("o-max").textContent=max;
-  document.getElementById("o-free").textContent=sum-max;
+  TK.forEach(function(k){ if(bill[k]>max){ max=bill[k]; winner=k; } });
+  TK.forEach(function(k){
+    var bar=document.getElementById("b-"+k);
+    bar.querySelector("i").style.width=(max?(bill[k]/max*100):0)+"%";
+    bar.classList.toggle("win", k===winner && max>0);
+  });
+  document.getElementById("o-sum").textContent=+sum.toFixed(2);
+  document.getElementById("o-max").textContent=+max.toFixed(2);
+  document.getElementById("o-free").textContent=+(sum-max).toFixed(2);
+  var note="";
+  if(max<=0){ note="Nothing requested, nothing billed."; }
+  else { note="Billed on "+TLABEL[winner]+". Everything under it is billed at zero."; }
+  document.getElementById("tresnote").innerHTML=note+
+    " The weights above are illustrative, not any resource's real configuration: set them all to 1 and memory usually wins."+
+    " Delta also charges different rates by GPU type, which this model does not show.";
 }
-tIds.forEach(function(k){ document.getElementById("t-"+k).addEventListener("input",calcTRES); });
+["q-cpu","q-mem","q-gpu","w-cpu","w-mem","w-gpu"].forEach(function(id){
+  document.getElementById(id).addEventListener("input",calcTRES);
+});
 calcTRES();
 
 /* ===================== slide 4 ===================== */
@@ -1127,9 +1155,7 @@ var QUERIES=[
   {c:'ldapsearch -x -LLL "(voPersonExternalID=*)" dn | grep -c "^dn:"',
    o:'85', note:'0.22% of the directory. the attribute exists, the data does not.'},
   {c:'ldapsearch -x -LLL "(voPersonID=*)" dn | grep -c "^dn:"',
-   o:'0', note:'no internal voPerson identifier anywhere'},
-  {c:'ldapsearch -x -LLL "(eduPersonPrincipalName=*)" dn | grep -c "^dn:"',
-   o:'0', note:'no eduPerson attributes populated at all'}
+   o:'0', note:'and no other correlation attribute is populated either'}
 ];
 var lgen=0;
 function termIdle(){
@@ -1170,23 +1196,6 @@ Array.prototype.forEach.call(document.querySelectorAll(".pill.q"),function(b){
 });
 termIdle();
 
-/* ===================== slide 5 ===================== */
-var fan=document.getElementById("fan");
-Array.prototype.forEach.call(fan.querySelectorAll(".fanrow"),function(g){
-  function on(){
-    fan.classList.add("fanhover"); g.classList.add("hot");
-    var p=fan.querySelector('.fanpath[data-i="'+g.dataset.i+'"]');
-    if(p) p.classList.add("hot");
-  }
-  function off(){
-    fan.classList.remove("fanhover");
-    Array.prototype.forEach.call(fan.querySelectorAll(".hot"),function(x){x.classList.remove("hot")});
-  }
-  g.addEventListener("mouseenter",on); g.addEventListener("mouseleave",off);
-  g.addEventListener("focus",on); g.addEventListener("blur",off);
-  g.setAttribute("tabindex","0");
-});
-
 /* ===================== deck ===================== */
 var NOTES=[
  {h:"Run it, don't describe it",
@@ -1199,25 +1208,27 @@ var NOTES=[
   o:["Greg may correct a box. Take it out loud."]},
  {h:"Two clicks, then stop talking",
   p:["Click Lifecycle end: 1 automated, 1 manual, 8 absent, 1 no data.",
-     "Then Nightingale: dual approval, cascading deauthorization, scoped to one enclave. A capability to generalize, not invent."],
+     "Then Nightingale: dual approval, cascading deauthorization, scoped to one enclave. A capability to generalize, not invent.",
+     "Hydro is on the list on purpose even though it is decommissioned. If someone asks, the answer is that it was short lived and they still got acctd auto-provisioning working, which is the common thread with Delta and nowhere else."],
   o:["“Row X is wrong.” Ask which cell and what the right value is."]},
  {h:"The calculators do the arguing",
   p:["Type a real SU number into the first box. The chain shows the x60 x1000 scaling and the GrpTRESMins value. Say that the scaling is undone in three places with no detector.",
-     "Then drag the GPU slider on the second panel. Sum against charged: the largest component sets the price and everything under it is free. That is the part people get wrong when they model cost.",
+     "Second panel: set cores 1, RAM 2, GPUs 1. That is a real sbatch request and the GPU obviously wins. Now drag cores to 64 and it flips. The weights are site configuration, not something a user sees or controls.",
+     "Then set the mem weight to 1. Memory takes over. On Campus Cluster every weight was observed at 1, which is why nobody can predict what a job costs.",
+     "The line under the panels is the consequence, and it is the only sentence on this slide about reporting. Say it once.",
+     "Keep the evidence verbal: a dashboard total was reproduced to the digit only by using CPUTimeRaw instead of ElapsedRaw and dividing by 6 instead of 60. On Campus Cluster the billing weights were all observed at 1 and usage still diverged. Attribute that to Mark and Joao if it comes up, and do not present it as settled.",
      "Latency: four numbers, one observed.",
      "The red chips are the ask in one row."],
-  o:["“Aren't you criticizing acctd?” The verb contract is right and I want to keep it."]},
+  o:["“Aren't you criticizing acctd?” No. The design is right and I want to keep it. The way it runs is the problem."]},
  {h:"Run the queries",
-  p:["Start with count all: 38,650.",
-     "Then voPersonExternalID: 85. Let the number sit.",
-     "Then voPersonID and eduPerson: zero and zero.",
+  p:["Count all accounts: 38,650. Then count correlation values: 85.",
      "Now toggle Populate on the diagram. The edges draw. That is the target state in one click."],
   o:["“So we have it already?” The attribute. 0.22% populated.",
      "“Cost?” $16,547 Essential, $38,610 Full, internal rates for U of I."]},
  {h:"Commitments, then the ask",
   p:["Read the six titles. Do not elaborate unless asked.",
      "Then the ask in one sentence, and the four deliverables.",
-     "Hover the programs on the cost diagram, then say the line under it once. Do not say Illinois Computes should not pay. The diagram says it.",
+     "The cost figure is static on purpose. Read the headline once, then stop. Do not say Illinois Computes should not pay. The figure says it.",
      "Press 0 if anyone challenges a number."],
   o:["“How much time, and whose?” Have the percentage and the window ready.",
      "“Isn't LDAP already ISF funded?” ISF funds running it. Its roadmap is servers, OS and configuration management. Nothing in it covers acctd."]}
@@ -1312,17 +1323,22 @@ go(0);
 </script>
 
 <script>
-/* Presenter notes are private. They load only when the URL ends in #present */
 (function(){
-  var on = /present/i.test(location.hash) || /present/i.test(location.search);
-  if(on) return;
+  var on=/present/i.test(location.hash)||/present/i.test(location.search); if(on) return;
   var b=document.getElementById("nbtn"); if(b&&b.parentNode) b.parentNode.removeChild(b);
   var a=document.querySelector("aside.notes"); if(a&&a.parentNode) a.parentNode.removeChild(a);
   var h=document.querySelector(".foot .hint");
   if(h) h.innerHTML='<kbd>\u2190</kbd><kbd>\u2192</kbd> move \u00b7 <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> run \u00b7 <kbd>0</kbd> numbers \u00b7 <kbd>J</kbd> jump';
-  document.addEventListener("keydown",function(e){
-    if(e.key==="n"||e.key==="N"){ e.stopImmediatePropagation(); }
-  }, true);
+  document.addEventListener("keydown",function(e){ if(e.key==="n"||e.key==="N"){ e.stopImmediatePropagation(); } },true);
+})();
+</script>
+<script>
+(function(){
+  try{ if(window.self===window.top) return; }catch(e){}
+  var bar=document.querySelector(".topbar"); if(!bar) return;
+  var a=document.createElement("a");
+  a.href=location.href; a.target="_blank"; a.rel="noopener";
+  a.className="tbtn"; a.textContent="Open full screen \u2197"; bar.appendChild(a);
 })();
 </script>
 
