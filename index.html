@@ -1,0 +1,1330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Request to Access</title>
+<meta name="description" content="Current state of allocation, identity and provisioning at NCSA: how an approved award becomes access, where it stops, and what to fund next.">
+<meta name="author" content="NCSA">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F5F6F9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F131A" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181F'/%3E%3Cpath d='M8 16h16' stroke='%23E8EBF1' stroke-width='1.8'/%3E%3Ccircle cx='8' cy='16' r='3.2' fill='%23E8EBF1'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='%23E8EBF1'/%3E%3Ccircle cx='24' cy='16' r='3.2' fill='%236EBC94'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* base */
+html{color-scheme:light dark;-webkit-text-size-adjust:100%}
+img,svg{max-width:100%}
+[hidden]{display:none!important}
+button,input{font:inherit}
+
+/* Whiteboard convention: black for the approval path, blue for identity,
+   orange for what is not authoritative. Miro stickies: green auto, yellow manual, red absent. */
+:root{
+  --ground:#F5F6F9; --surface:#FFFFFF; --surface-2:#E9ECF1;
+  --ink:#14181F; --ink-2:#4B5462; --ink-3:#7C8695;
+  --rule:rgba(20,24,31,.13); --rule-2:rgba(20,24,31,.30);
+  --path:#14181F; --identity:#2B5EA8; --open:#AE561A;
+  --auto:#2C6A4E; --manual:#8C6A12; --break:#9F2A2A;
+  --identity-bg:rgba(43,94,168,.09); --open-bg:rgba(174,86,26,.10);
+  --auto-bg:rgba(44,106,78,.11); --manual-bg:rgba(140,106,18,.12); --break-bg:rgba(159,42,42,.10);
+  --shadow:0 1px 2px rgba(20,24,31,.05), 0 8px 28px -18px rgba(20,24,31,.28);
+  --f-display:"Spectral",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F131A; --surface:#171C25; --surface-2:#212833;
+    --ink:#E8EBF1; --ink-2:#A9B2C0; --ink-3:#79838F;
+    --rule:rgba(232,235,241,.15); --rule-2:rgba(232,235,241,.32);
+    --path:#E8EBF1; --identity:#83ACE9; --open:#E59559;
+    --auto:#6EBC94; --manual:#D9B75F; --break:#E6837B;
+    --identity-bg:rgba(131,172,233,.14); --open-bg:rgba(229,149,89,.14);
+    --auto-bg:rgba(110,188,148,.15); --manual-bg:rgba(217,183,95,.15); --break-bg:rgba(230,131,123,.15);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F131A; --surface:#171C25; --surface-2:#212833;
+  --ink:#E8EBF1; --ink-2:#A9B2C0; --ink-3:#79838F;
+  --rule:rgba(232,235,241,.15); --rule-2:rgba(232,235,241,.32);
+  --path:#E8EBF1; --identity:#83ACE9; --open:#E59559;
+  --auto:#6EBC94; --manual:#D9B75F; --break:#E6837B;
+  --identity-bg:rgba(131,172,233,.14); --open-bg:rgba(229,149,89,.14);
+  --auto-bg:rgba(110,188,148,.15); --manual-bg:rgba(217,183,95,.15); --break-bg:rgba(230,131,123,.15);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--identity);outline-offset:2px;border-radius:2px}
+
+.app{display:grid;grid-template-rows:auto auto 1fr;height:100vh}
+.topbar{display:flex;align-items:center;gap:16px;padding:0 20px;height:52px;border-bottom:1px solid var(--rule);background:var(--surface)}
+.brand{font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:-.01em;white-space:nowrap}
+.topbar .meta{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.spacer{flex:1}
+.prog{height:2px;background:var(--surface-2)}
+.prog i{display:block;height:2px;background:var(--ink);width:0;transition:width .3s ease}
+.tbtn{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:1px solid var(--rule-2);color:var(--ink-2);padding:5px 10px;border-radius:3px;cursor:pointer;white-space:nowrap}
+.tbtn:hover{background:var(--surface-2);color:var(--ink)}
+.tbtn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.tbtn kbd{font-family:var(--f-mono);opacity:.55;margin-left:5px;font-size:10px}
+
+.main{display:grid;grid-template-columns:206px 1fr;min-height:0}
+.rail{border-right:1px solid var(--rule);background:var(--surface);overflow-y:auto;padding:16px 0 24px}
+.rail h3{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0 0 8px;padding:0 16px;font-weight:500}
+.railitem{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:baseline;width:100%;text-align:left;background:none;border:0;cursor:pointer;padding:8px 16px;color:var(--ink-2);font-family:var(--f-body);font-size:13.5px;line-height:1.3;border-left:2px solid transparent}
+.railitem .n{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.railitem:hover{background:var(--surface-2);color:var(--ink)}
+.railitem[aria-current="true"]{color:var(--ink);font-weight:600;border-left-color:var(--ink);background:var(--surface-2)}
+.railitem[aria-current="true"] .n{color:var(--ink)}
+
+.stage{position:relative;overflow-y:auto;overflow-x:hidden;padding:26px 44px 86px}
+.slide{display:none;max-width:1180px;margin:0 auto}
+.slide.on{display:block;animation:rise .3s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.on{animation:none}}
+
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 10px}
+.eyebrow b{color:var(--open);font-weight:500}
+h1.claim{font-family:var(--f-display);font-weight:700;font-size:clamp(32px,3.5vw,46px);line-height:1.06;letter-spacing:-.02em;margin:0 0 10px;text-wrap:balance;max-width:28ch}
+.dek{font-size:16.5px;line-height:1.45;color:var(--ink-2);max-width:56ch;margin:0 0 16px}
+h2.sec{font-family:var(--f-mono);font-size:10.5px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 10px}
+p{max-width:68ch}
+
+.kicker{margin-top:24px;border-top:2px solid var(--ink);padding-top:13px}
+.kicker p{margin:0;font-family:var(--f-display);font-size:20px;line-height:1.38;max-width:62ch;font-weight:600}
+
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+@media (max-width:1080px){.g3,.g4{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:14px 15px;box-shadow:var(--shadow)}
+.card h4{margin:0 0 5px;font-size:13.5px;font-weight:600;line-height:1.3}
+.card p{margin:0;font-size:13px;line-height:1.45;color:var(--ink-2);max-width:none}
+.card.hi{border-left:3px solid var(--open)}
+.card.ask{border-top:3px solid var(--ink)}
+
+.stat{font-family:var(--f-display);font-weight:700;font-size:30px;line-height:1;letter-spacing:-.02em;display:block;margin-bottom:5px;font-variant-numeric:tabular-nums}
+.stat.orange{color:var(--open)}
+.statlbl{font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);display:block;line-height:1.4}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.chip{font-family:var(--f-mono);font-size:11.5px;background:var(--surface);border:1px solid var(--rule-2);border-radius:3px;padding:6px 11px;color:var(--ink-2)}
+.chip.bad{border-color:var(--break);color:var(--break);background:var(--break-bg)}
+
+code,.mono{font-family:var(--f-mono);font-size:.885em;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+
+/* controls */
+.ctrls{display:flex;flex-wrap:wrap;gap:9px 20px;align-items:center;padding:10px 0 11px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.cgroup{display:flex;align-items:center;gap:7px}
+.cgroup > b{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin-right:2px}
+.pill{font-family:var(--f-body);font-size:12.5px;font-weight:500;background:var(--surface);border:1px solid var(--rule-2);color:var(--ink-2);padding:5px 11px;border-radius:14px;cursor:pointer;white-space:nowrap;transition:background .14s,color .14s,border-color .14s}
+.pill:hover{border-color:var(--ink);color:var(--ink)}
+.pill[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.pill.run{border-radius:4px;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px}
+.pill.run.go{background:var(--auto);border-color:var(--auto);color:#fff}
+.pill.run.rv{background:var(--open);border-color:var(--open);color:#fff}
+.pill.run.ex{background:var(--break);border-color:var(--break);color:#fff}
+.pill.run:hover{filter:brightness(1.08)}
+.pill[disabled]{opacity:.42;cursor:default;filter:none}
+.pill.stop,.pill.insp{border-radius:4px;font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:6px 10px}
+
+/* readout */
+.readout{margin-top:11px;display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:start;background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--ink-3);border-radius:4px;padding:11px 16px;min-height:56px}
+.readout.ok{border-left-color:var(--auto)}
+.readout.warn{border-left-color:var(--open)}
+.readout.bad{border-left-color:var(--break)}
+.readout .step{font-family:var(--f-mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);padding-top:4px;line-height:1.35}
+.readout .txt{font-family:var(--f-display);font-size:18px;line-height:1.35;margin:0;max-width:80ch}
+.readout.bad .txt,.readout.warn .txt{font-weight:600}
+.readout.bad .txt{color:var(--break)}
+.readout.warn .txt{color:var(--open)}
+.readout .sub{display:block;font-family:var(--f-body);font-size:13px;line-height:1.4;color:var(--ink-2);margin-top:5px;font-weight:400}
+
+/* terminal */
+.term{background:#0D1117;border:1px solid rgba(255,255,255,.09);border-radius:5px;padding:13px 16px;font-family:var(--f-mono);font-size:12.5px;line-height:1.62;color:#C2CCD8;overflow-x:auto;white-space:pre;tab-size:4}
+.term .p{color:#6EBC94}
+.term .c{color:#EEF2F7}
+.term .o{color:#98A5B4}
+.term .hl{color:#E9975C;font-weight:500}
+.term .cm{color:#5C6B7C}
+.cur{display:inline-block;width:7px;height:13px;background:#6EBC94;vertical-align:-2px;animation:blink 1.05s steps(2,start) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.cur{animation:none}}
+
+/* svg */
+figure{margin:12px 0 0}
+figure svg{width:100%;height:auto;display:block;color:var(--path)}
+.figwrap{overflow-x:auto}
+svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.sv-box{fill:var(--surface);stroke:currentColor;stroke-width:1.5;transition:stroke .25s,stroke-width .25s,fill .25s}
+.sv-name{font-family:"Spectral",Georgia,serif;font-weight:600;font-size:17px;fill:var(--ink)}
+.sv-sub{font-size:10.5px;fill:var(--ink-3)}
+.sv-hdr{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.09em;fill:var(--ink-3);text-transform:uppercase}
+.sv-lab{font-family:"IBM Plex Mono",monospace;font-size:10.5px;fill:var(--ink-2)}
+.sv-line{stroke:currentColor;stroke-width:1.5;fill:none;transition:stroke .25s,stroke-width .25s}
+.sv-arc{stroke:currentColor;stroke-width:2;fill:none;transition:stroke .25s,stroke-width .25s}
+.sv-ident{stroke:var(--identity);stroke-width:1.5;fill:none}
+.sv-identbox{fill:var(--identity-bg);stroke:var(--identity);stroke-width:1.5}
+.sv-open{stroke:var(--open);stroke-width:1.5;fill:none;stroke-dasharray:5 4}
+.sv-openbox{fill:var(--open-bg);stroke:var(--open);stroke-width:1.5;stroke-dasharray:5 4}
+.sv-chip{fill:var(--surface-2);stroke:var(--rule-2);stroke-width:1;transition:fill .25s,stroke .25s}
+.sv-chiptx{font-family:"IBM Plex Mono",monospace;font-size:10px;fill:var(--ink-2);letter-spacing:.03em}
+.node.probe{cursor:pointer}
+.node.probe:hover .sv-box{stroke:var(--identity)}
+
+.node .sv-box.lit,.node .sv-chip.lit{stroke:var(--auto);stroke-width:2.5;fill:var(--auto-bg)}
+.node .sv-box.man,.node .sv-chip.man{stroke:var(--manual);stroke-width:2.5;fill:var(--manual-bg)}
+.node .sv-box.stale,.node .sv-chip.stale{stroke:var(--break);stroke-width:2.5;stroke-dasharray:6 4;fill:var(--break-bg)}
+.rail-p.act{stroke:var(--auto);stroke-width:2.5}
+.rail-p.pulse{stroke:var(--manual);stroke-width:2.5;stroke-dasharray:6 5;animation:march 1.4s linear infinite}
+@keyframes march{to{stroke-dashoffset:-22}}
+.token{fill:var(--auto);stroke:var(--surface);stroke-width:2;opacity:0}
+.token.rv{fill:var(--open)}
+.flash{animation:flash .9s ease 3}
+@keyframes flash{50%{opacity:.2}}
+@media (prefers-reduced-motion:reduce){.rail-p.pulse,.flash{animation:none}}
+
+.lay{transition:opacity .28s ease}
+svg.iso .lay{opacity:.1}
+svg.iso .lay.sel{opacity:1}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:11px;align-items:center}
+.legend span{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-2);display:flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:2px;display:inline-block}
+
+/* matrix */
+.matwrap{overflow-x:auto;margin-top:2px}
+table.mat{border-collapse:collapse;width:100%;min-width:840px;font-size:13px}
+table.mat th{font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:500;text-align:center;padding:0 4px 9px;vertical-align:bottom}
+table.mat th.col{cursor:pointer}
+table.mat th.col:hover{color:var(--ink)}
+table.mat th.col.act{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+table.mat th.lane{text-align:left;padding-left:0;width:200px}
+table.mat td{padding:0;border-top:1px solid var(--rule)}
+table.mat tr.lrow{cursor:pointer}
+table.mat tr.lrow:hover td,table.mat tr.lrow.act td{background:var(--surface-2)}
+table.mat tr.lrow.act td.lname{box-shadow:inset 3px 0 0 var(--ink)}
+td.lname{padding:9px 10px 9px 8px;font-weight:500;line-height:1.25}
+td.lname small{display:block;font-family:var(--f-mono);font-size:10px;color:var(--ink-3);font-weight:400;margin-top:2px}
+td.cell{text-align:center;padding:9px 4px;transition:opacity .2s}
+table.mat.colsel td.cell:not(.csel){opacity:.26}
+.pip{display:inline-block;min-width:70px;padding:3px 7px;border-radius:3px;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:500}
+.pip.auto{background:var(--auto-bg);color:var(--auto)}
+.pip.manual{background:var(--manual-bg);color:var(--manual)}
+.pip.gone{background:var(--break-bg);color:var(--break)}
+.pip.nd{background:var(--surface-2);color:var(--ink-3)}
+
+/* calculators */
+.calc{background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:15px 16px;box-shadow:var(--shadow)}
+.calc h4{margin:0 0 11px;font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.calcrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.calcrow label{font-family:var(--f-mono);font-size:11px;color:var(--ink-2);letter-spacing:.03em}
+input[type=number]{font-family:var(--f-mono);font-size:14px;width:118px;padding:5px 8px;border:1px solid var(--rule-2);border-radius:3px;background:var(--ground);color:var(--ink)}
+input[type=range]{accent-color:var(--identity);width:100%;height:20px}
+.chain{display:flex;align-items:center;gap:0;margin-top:12px;flex-wrap:wrap}
+.chain .k{font-family:var(--f-mono);font-size:15px;padding:8px 12px;border:1px solid var(--rule-2);border-radius:3px;background:var(--ground);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chain .k.end{border-color:var(--auto);background:var(--auto-bg);color:var(--auto);font-weight:500}
+.chain .op{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);padding:0 9px;white-space:nowrap}
+.calcnote{margin-top:10px;font-size:12.5px;color:var(--ink-3);line-height:1.45}
+.tres{display:grid;grid-template-columns:64px 1fr 74px;gap:9px 12px;align-items:center;margin-top:4px}
+.tres .tl{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-2)}
+.tres .tv{font-family:var(--f-mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.tbar{height:9px;background:var(--surface-2);border-radius:2px;overflow:hidden;position:relative}
+.tbar i{display:block;height:9px;background:var(--ink-3);border-radius:2px;transition:width .2s ease}
+.tbar.win i{background:var(--open)}
+.tout{display:flex;gap:26px;margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);flex-wrap:wrap}
+.tout div span{display:block}
+.tout .v{font-family:var(--f-display);font-size:26px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.tout .v.win{color:var(--open)}
+.tout .l{font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-top:5px}
+
+/* correlation */
+.corr-edge{stroke:var(--identity);stroke-width:1.75;fill:none;transition:stroke-dashoffset .9s ease}
+.corr-hub{fill:var(--surface);stroke:var(--rule-2);stroke-width:1.5;stroke-dasharray:5 4;transition:stroke .35s,fill .35s}
+svg.corron .corr-hub{stroke:var(--identity);stroke-dasharray:none;fill:var(--identity-bg)}
+.corr-hubtx{fill:var(--ink-3);transition:fill .35s}
+svg.corron .corr-hubtx{fill:var(--identity)}
+@media (prefers-reduced-motion:reduce){.corr-edge{transition:none}}
+
+/* cost fan */
+.fanrow,.fanpath{transition:opacity .18s}
+svg.fanhover .fanrow:not(.hot),svg.fanhover .fanpath:not(.hot){opacity:.18}
+
+/* overlays */
+.ov{position:fixed;inset:0;background:rgba(10,13,18,.58);backdrop-filter:blur(3px);z-index:60;display:none;padding:6vh 5vw}
+body.jump-on #jump{display:block}
+body.nums-on #nums{display:block}
+.ov .panel{max-width:1000px;margin:0 auto;background:var(--surface);border-radius:6px;padding:24px 30px 30px;box-shadow:0 30px 80px -30px rgba(0,0,0,.6);max-height:88vh;overflow-y:auto}
+.ov h4{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0 0 14px;font-weight:500}
+.jgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+@media (max-width:820px){.jgrid{grid-template-columns:repeat(2,1fr)}}
+.jgrid button{text-align:left;background:var(--ground);border:1px solid var(--rule);border-radius:4px;padding:12px 13px;cursor:pointer;color:var(--ink);font-family:var(--f-body)}
+.jgrid button:hover{border-color:var(--ink);background:var(--surface-2)}
+.jgrid .n{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3);display:block;margin-bottom:3px}
+.jgrid .t{font-size:14px;font-weight:600;line-height:1.25;display:block}
+
+table.num{border-collapse:collapse;width:100%;font-size:13px}
+table.num th{text-align:left;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500;padding:0 12px 8px 0;border-bottom:1px solid var(--rule-2)}
+table.num td{padding:9px 12px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.42}
+table.num td.f{font-family:var(--f-mono);font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
+table.num td.c{color:var(--ink-2);font-size:12.5px}
+
+.notes{position:fixed;right:0;top:54px;bottom:0;width:372px;max-width:88vw;background:var(--surface);border-left:1px solid var(--rule-2);box-shadow:-14px 0 40px -26px rgba(0,0,0,.5);transform:translateX(100%);transition:transform .22s ease;z-index:40;display:flex;flex-direction:column}
+body.notes-on .notes{transform:none}
+@media (prefers-reduced-motion:reduce){.notes{transition:none}}
+.notes header{padding:13px 18px;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:10px}
+.notes header b{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.notes .body{padding:18px;overflow-y:auto}
+.notes h5{font-family:var(--f-display);font-size:16px;margin:0 0 10px;font-weight:600}
+.notes p{font-size:14px;line-height:1.55;margin:0 0 11px;max-width:none}
+.notes .obj{border-top:1px solid var(--rule);padding-top:11px;margin-top:13px}
+.notes .obj em{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--break);font-style:normal;display:block;margin-bottom:5px}
+
+.foot{position:fixed;left:206px;right:0;bottom:0;height:40px;background:var(--surface);border-top:1px solid var(--rule);display:flex;align-items:center;gap:14px;padding:0 20px;z-index:20}
+@media (max-width:900px){.foot{left:0}}
+.dots{display:flex;gap:6px;align-items:center}
+.dots button{width:9px;height:9px;padding:0;border-radius:50%;border:1px solid var(--rule-2);background:transparent;cursor:pointer}
+.dots button.on{background:var(--ink);border-color:var(--ink)}
+.foot .pos{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.foot .hint{font-family:var(--f-mono);font-size:10px;letter-spacing:.05em;color:var(--ink-3);margin-left:auto}
+.foot .hint kbd{border:1px solid var(--rule-2);border-radius:2px;padding:1px 4px;margin:0 1px}
+
+@media (max-width:900px){
+  .main{grid-template-columns:1fr}
+  .rail{display:none}
+  .stage{padding:20px 18px 86px}
+}
+
+/* print: flatten to a linear document */
+@media print{
+  .topbar,.prog,.rail,.foot,.notes,.ov,.ctrls,.readout{display:none!important}
+  .app{display:block;height:auto}
+  .main{display:block}
+  .stage{overflow:visible;padding:0;height:auto}
+  .slide{display:block!important;max-width:none;margin:0 0 30px;page-break-after:always}
+  .slide:last-child{page-break-after:auto}
+  body{background:#fff;color:#000}
+  .card,.calc{box-shadow:none;break-inside:avoid}
+  .term{background:#fff;color:#1a1a1a;border:1px solid #bbb}
+  .term .p,.term .c,.term .o,.term .cm{color:#1a1a1a}
+  .term .hl{color:#8a3b00;font-weight:600}
+  .cur{display:none}
+}
+</style>
+</head>
+<body>
+<noscript><p style="max-width:60ch;margin:48px auto;font:16px/1.6 system-ui,sans-serif">This page is an interactive walkthrough and needs JavaScript enabled.</p></noscript>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">Request to Access</div>
+    <div class="meta">Current state · CI Directors · 3 Sep 2026</div>
+    <div class="spacer"></div>
+    <button class="tbtn" id="numbtn">Numbers<kbd>0</kbd></button>
+    <button class="tbtn" id="nbtn" aria-pressed="false">Notes<kbd>N</kbd></button>
+    <button class="tbtn" id="jbtn">Jump<kbd>J</kbd></button>
+  </header>
+  <div class="prog"><i id="progi"></i></div>
+
+  <div class="main">
+    <nav class="rail" id="rail" aria-label="Chapters"></nav>
+    <main class="stage" id="stage">
+
+      <!-- ============ 1 ============ -->
+      <section class="slide" data-t="An award is not access">
+        <p class="eyebrow">01 · The model</p>
+        <h1 class="claim">An award is not access.</h1>
+        <p class="dek">Five facts. Five owners. Run one through.</p>
+
+        <div class="ctrls">
+          <div class="cgroup"><b>Lane</b>
+            <button class="pill lane" data-lane="access" aria-pressed="true">ACCESS</button>
+            <button class="pill lane" data-lane="nairr" aria-pressed="false">NAIRR</button>
+            <button class="pill lane" data-lane="local" aria-pressed="false">Illinois Computes</button>
+          </div>
+          <div class="cgroup"><b>Run</b>
+            <button class="pill run go" id="run-grant">▶ Grant</button>
+            <button class="pill run rv" id="run-revoke">↺ Revoke</button>
+            <button class="pill run ex" id="run-exit">✕ Staff exit</button>
+            <button class="pill stop" id="run-reset">Reset</button>
+          </div>
+          <div class="cgroup"><b>Isolate</b>
+            <button class="pill lyr" data-layer="approval">Approval</button>
+            <button class="pill lyr" data-layer="identity">Identity</button>
+            <button class="pill lyr" data-layer="entitlement">Entitlement</button>
+            <button class="pill lyr" data-layer="provisioning">Provisioning</button>
+            <button class="pill lyr" data-layer="enforcement">Enforcement</button>
+          </div>
+          <div class="cgroup"><b>Inspect</b>
+            <button class="pill insp" data-rec="idds">IDDS row</button>
+            <button class="pill insp" data-rec="ldap">LDAP entry</button>
+            <button class="pill insp" data-rec="slurm">Slurm assoc</button>
+          </div>
+        </div>
+
+        <div class="readout" id="ro">
+          <span class="step" id="ro-step">Ready</span>
+          <p class="txt" id="ro-txt">Run a lane, isolate a layer, or inspect one project at each stage.</p>
+        </div>
+
+        <div id="recwrap" style="display:none;margin-top:11px">
+          <div class="term" id="rec"></div>
+        </div>
+
+        <figure>
+          <div class="figwrap">
+          <svg id="model" viewBox="0 0 1200 520" role="img" aria-label="Five stage model. Three request lanes converge on the IDDS allocations database. acctd polls IDDS in batch, writes charge groups into NCSA LDAP, and in parallel acct.pl builds the Slurm account on the resource. The resource checks LDAP group membership at login. Identity is a separate track with no correlation service.">
+            <defs>
+              <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="currentColor"/></marker>
+              <marker id="arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="var(--identity)"/></marker>
+              <marker id="aro" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="var(--open)"/></marker>
+            </defs>
+
+            <text class="sv-hdr" x="145" y="22" text-anchor="middle">1 · Approval</text>
+            <text class="sv-hdr" x="400" y="22" text-anchor="middle">2 · Allocation of record</text>
+            <text class="sv-hdr" x="635" y="22" text-anchor="middle">3 · Provisioning</text>
+            <text class="sv-hdr" x="872" y="22" text-anchor="middle">4 · Entitlement</text>
+            <text class="sv-hdr" x="1096" y="22" text-anchor="middle">5 · Enforcement</text>
+            <line class="sv-line" x1="20" y1="36" x2="1180" y2="36" stroke-width="1" opacity=".3"/>
+
+            <g class="lay" data-layer="provisioning">
+              <path id="r-arc" class="sv-arc rail-p" d="M 635 217 C 700 118, 950 86, 1093 212" marker-end="url(#ar)"/>
+              <text class="sv-lab" x="836" y="70" text-anchor="middle">acct.pl + plugins run ON the machine:</text>
+              <text class="sv-lab" x="836" y="86" text-anchor="middle">Slurm account · QoS · SU budget</text>
+            </g>
+
+            <g class="lay" data-layer="approval">
+              <g class="node" id="b-local">
+                <rect class="sv-box" x="30" y="150" width="230" height="58" rx="3"/>
+                <text class="sv-name" x="44" y="174" font-size="15">Illinois Computes</text>
+                <text class="sv-sub" x="44" y="193">IC Form → Jira → NCSA XRAS</text>
+              </g>
+              <g class="node" id="b-access">
+                <rect class="sv-box" x="30" y="222" width="230" height="58" rx="3"/>
+                <text class="sv-name" x="44" y="246" font-size="15">ACCESS</text>
+                <text class="sv-sub" x="44" y="265">ACCESS XRAS → CDB</text>
+              </g>
+              <g class="node" id="b-nairr">
+                <rect class="sv-box" x="30" y="294" width="230" height="58" rx="3"/>
+                <text class="sv-name" x="44" y="318" font-size="15">NAIRR</text>
+                <text class="sv-sub" x="44" y="337">NAIRR XRAS → CDB</text>
+              </g>
+              <path id="r-local" class="sv-line rail-p" d="M 260 179 H 297 V 235 H 330" marker-end="url(#ar)"/>
+              <path id="r-access" class="sv-line rail-p" d="M 260 251 H 330" marker-end="url(#ar)"/>
+              <path id="r-nairr" class="sv-line rail-p" d="M 260 323 H 297 V 267 H 330" marker-end="url(#ar)"/>
+              <text class="sv-lab" x="303" y="172">XRAS</text>
+              <text class="sv-lab" x="295" y="244" text-anchor="middle">AMIE</text>
+              <text class="sv-lab" x="303" y="334">AMIE ?</text>
+              <g class="node probe" id="n-idds" data-rec="idds" tabindex="0" role="button" aria-label="Inspect the IDDS row">
+                <rect class="sv-box" x="330" y="217" width="140" height="68" rx="3"/>
+                <text class="sv-name" x="400" y="248" text-anchor="middle">IDDS</text>
+                <text class="sv-sub" x="400" y="267" text-anchor="middle">what was awarded</text>
+              </g>
+            </g>
+
+            <g class="lay" data-layer="provisioning">
+              <path id="r-poll" class="sv-line rail-p" d="M 470 251 H 570" marker-end="url(#ar)"/>
+              <text class="sv-lab" x="520" y="204" text-anchor="middle">batch poll</text>
+              <g class="node" id="n-acctd">
+                <rect class="sv-box" x="570" y="217" width="130" height="68" rx="3"/>
+                <text class="sv-name" x="635" y="248" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16">acctd</text>
+                <text class="sv-sub" x="635" y="267" text-anchor="middle">batch, poll-driven</text>
+              </g>
+            </g>
+
+            <g class="lay" data-layer="entitlement">
+              <path id="r-write" class="sv-line rail-p" d="M 700 251 H 800" marker-end="url(#ar)"/>
+              <text class="sv-lab" x="750" y="204" text-anchor="middle">writes charge groups</text>
+              <g class="node probe" id="n-ldap" data-rec="ldap" tabindex="0" role="button" aria-label="Inspect the LDAP entry">
+                <rect class="sv-box" x="800" y="217" width="145" height="68" rx="3"/>
+                <text class="sv-name" x="872" y="245" text-anchor="middle" font-size="16">NCSA LDAP</text>
+                <text class="sv-sub" x="872" y="264" text-anchor="middle">entitlement of record</text>
+                <text class="sv-sub" x="872" y="277" text-anchor="middle" font-style="italic">de facto</text>
+              </g>
+              <g class="node" id="n-chip">
+                <rect class="sv-chip" x="800" y="294" width="145" height="22" rx="3"/>
+                <text class="sv-chiptx" x="872" y="309" text-anchor="middle">charge groups</text>
+              </g>
+            </g>
+
+            <g class="lay" data-layer="enforcement">
+              <path id="r-check" class="sv-line rail-p" d="M 945 251 H 1015" marker-end="url(#ar)"/>
+              <text class="sv-lab" x="980" y="204" text-anchor="middle" font-size="9.5">group check</text>
+              <g class="node probe" id="n-delta" data-rec="slurm" tabindex="0" role="button" aria-label="Inspect the Slurm association">
+                <rect class="sv-box" x="1015" y="217" width="163" height="68" rx="3"/>
+                <text class="sv-name" x="1096" y="245" text-anchor="middle">Delta</text>
+                <text class="sv-sub" x="1096" y="264" text-anchor="middle" font-size="9.5">Kerberos + Duo · LDAP group</text>
+                <text class="sv-sub" x="1096" y="277" text-anchor="middle" font-size="9.5">· Slurm refuses over budget</text>
+              </g>
+            </g>
+
+            <g class="lay" data-layer="identity">
+              <g class="node" id="n-ident">
+                <rect class="sv-identbox" x="700" y="392" width="478" height="94" rx="3"/>
+                <text x="716" y="416" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="0.09em" fill="var(--identity)">IDENTITY: A SEPARATE TRACK</text>
+                <text x="716" y="441" font-size="13.5" fill="var(--ink)">NCSA identity · NetID · ACCESS ID · campus AD · Globus</text>
+                <text x="716" y="466" font-size="13.5" font-weight="600" fill="var(--identity)">No correlation service.</text>
+              </g>
+              <line class="sv-ident" x1="872" y1="392" x2="872" y2="322" marker-end="url(#arb)"/>
+              <line class="sv-ident" x1="1096" y1="392" x2="1096" y2="291" marker-end="url(#arb)"/>
+              <text class="sv-lab" x="872" y="376" text-anchor="middle" fill="var(--identity)">an account must exist first</text>
+              <text class="sv-lab" x="1096" y="376" text-anchor="middle" fill="var(--identity)">authN at login</text>
+            </g>
+
+            <g class="lay" data-layer="surfaces">
+              <g class="node" id="s-surf">
+                <rect class="sv-openbox" x="30" y="392" width="430" height="94" rx="3"/>
+                <text x="46" y="416" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="0.09em" fill="var(--open)">INTERACTION SURFACES</text>
+                <text x="46" y="441" font-size="13" fill="var(--ink)">identity.ncsa · Group Management · IC Form · Savannah</text>
+                <text x="46" y="466" font-size="13" fill="var(--open)">They write. They decide nothing.</text>
+              </g>
+              <path id="r-pi" class="sv-open rail-p" d="M 400 392 V 291" marker-end="url(#aro)"/>
+              <text class="sv-lab" x="408" y="346" fill="var(--open)">PI adds member</text>
+            </g>
+
+            <circle id="tok" class="token" r="7.5" cx="0" cy="0"/>
+            <circle id="tok2" class="token" r="7.5" cx="0" cy="0"/>
+          </svg>
+          </div>
+        </figure>
+
+        <div class="kicker"><p>Four systems write entitlement. None of them owns it.</p></div>
+      </section>
+
+      <!-- ============ 2 ============ -->
+      <section class="slide" data-t="Eleven lanes, two automated">
+        <p class="eyebrow">02 · Coverage</p>
+        <h1 class="claim">Eleven lanes run that model.</h1>
+        <p class="dek">Click a lane. Click a column.</p>
+
+        <div class="matwrap"><table class="mat" id="mat">
+          <thead><tr>
+            <th class="lane">Lane</th>
+            <th class="col" data-c="0">Request</th><th class="col" data-c="1">Award to IDDS</th>
+            <th class="col" data-c="2">Provisioned</th><th class="col" data-c="3">Entitlement</th>
+            <th class="col" data-c="4">Usage returns</th><th class="col" data-c="5">Lifecycle end</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table></div>
+
+        <div class="legend">
+          <span><i style="background:var(--auto)"></i>automated</span>
+          <span><i style="background:var(--manual)"></i>manual</span>
+          <span><i style="background:var(--break)"></i>absent</span>
+          <span><i style="background:var(--ink-3)"></i>no data</span>
+        </div>
+
+        <div class="readout" id="ro2" style="margin-top:14px">
+          <span class="step">Detail</span>
+          <p class="txt">Two systems provision with no human step: Delta and Hydro.</p>
+        </div>
+
+        <div class="kicker"><p>One lane revokes. That engine was built for a compliance enclave and never generalized.</p></div>
+      </section>
+
+      <!-- ============ 3 ============ -->
+      <section class="slide" data-t="Inside acctd">
+        <p class="eyebrow">03 · The mechanism</p>
+        <h1 class="claim">acctd is the only path from award to running job.</h1>
+
+        <div class="grid g3">
+          <div class="card">
+            <h4>Three pieces</h4>
+            <p>Service on <code>idds-prod</code> hands out work. <code>acct.pl</code> on each resource polls over SSH. Plugins execute locally, and all resource-specific behavior lives there.</p>
+          </div>
+          <div class="card">
+            <h4>Six verbs</h4>
+            <p><code>project</code> · <code>account</code> · <code>user</code>, each activate and inactivate. A charge group is the unit of authorization. No second grant path.</p>
+          </div>
+          <div class="card">
+            <h4>Two things it cannot do</h4>
+            <p>Refunds cannot execute in Slurm, so a human adds SUs back. Partial deactivation has no interface: a stored procedure by hand, per tuple.</p>
+          </div>
+        </div>
+
+        <h2 class="sec">The charging model, live</h2>
+        <div class="grid g2">
+          <div class="calc">
+            <h4>SU award to GrpTRESMins</h4>
+            <div class="calcrow">
+              <label for="su">SU awarded</label>
+              <input type="number" id="su" value="150000" min="1" step="1000">
+              <span style="font-family:var(--f-mono);font-size:11px;color:var(--ink-3)">hours</span>
+            </div>
+            <div class="chain">
+              <span class="k" id="c0">150,000</span><span class="op">×60</span>
+              <span class="k" id="c1">9,000,000</span><span class="op">×1000</span>
+              <span class="k end" id="c2">9,000,000,000</span>
+            </div>
+            <p class="calcnote">Hours to minutes, then scaled by 1000 so Slurm's integer flooring cannot round a fractional minute to zero. The result is set as <code>GrpTRESMins</code> on the account. That scaling has to be undone in three places: usage display, job cost display, and the figures returned to IDDS.</p>
+          </div>
+
+          <div class="calc">
+            <h4>MAX_TRES billing, per job</h4>
+            <div class="tres">
+              <span class="tl">CPU</span><input type="range" id="t-cpu" min="0" max="100" value="24"><span class="tv" id="v-cpu">24</span>
+              <span class="tl">Memory</span><input type="range" id="t-mem" min="0" max="100" value="16"><span class="tv" id="v-mem">16</span>
+              <span class="tl">GPU</span><input type="range" id="t-gpu" min="0" max="100" value="72"><span class="tv" id="v-gpu">72</span>
+            </div>
+            <div class="tres" style="margin-top:9px">
+              <span class="tl"></span><div class="tbar" id="b-cpu"><i></i></div><span></span>
+              <span class="tl"></span><div class="tbar" id="b-mem"><i></i></div><span></span>
+              <span class="tl"></span><div class="tbar" id="b-gpu"><i></i></div><span></span>
+            </div>
+            <div class="tout">
+              <div><span class="v" id="o-sum">112</span><span class="l">sum of components</span></div>
+              <div><span class="v win" id="o-max">72</span><span class="l">actually charged</span></div>
+              <div><span class="v" id="o-free" style="color:var(--ink-3)">40</span><span class="l">billed at zero</span></div>
+            </div>
+            <p class="calcnote">Per-partition <code>TRESBillingWeights</code> with <code>PriorityFlags=MAX_TRES</code>. The largest single component sets the charge. Everything under it is free, which is why a job's cost is not the sum of what it asked for.</p>
+          </div>
+        </div>
+
+        <h2 class="sec">Latency is not one number</h2>
+        <div class="grid g4">
+          <div class="card"><span class="stat">15 min</span><span class="statlbl">charge-group cron</span></div>
+          <div class="card"><span class="stat">10 min</span><span class="statlbl">OU sync</span></div>
+          <div class="card hi"><span class="stat orange">2 hours</span><span class="statlbl">observed, June 2026</span></div>
+          <div class="card hi"><span class="stat orange">by hand</span><span class="statlbl">Radiant</span></div>
+        </div>
+
+        <h2 class="sec">Not written down anywhere</h2>
+        <div class="chips">
+          <span class="chip bad">plugin inventory</span>
+          <span class="chip bad">cadence per resource</span>
+          <span class="chip bad">sql/acct schema</span>
+          <span class="chip bad">main.v2 scope</span>
+          <span class="chip">direct LDAP writes: "temporary" since Mar 2022</span>
+        </div>
+
+        <div class="kicker"><p>The verb contract is right. The batch trigger and the missing documentation are not.</p></div>
+      </section>
+
+      <!-- ============ 4 ============ -->
+      <section class="slide" data-t="One person, five credentials">
+        <p class="eyebrow">04 · Identity</p>
+        <h1 class="claim">One researcher, five credentials, no join.</h1>
+
+        <div class="ctrls" style="border-bottom:0;padding-bottom:2px">
+          <div class="cgroup"><b>Directory</b>
+            <button class="pill" id="corrbtn" aria-pressed="false">Populate voPersonExternalID</button>
+          </div>
+          <div class="cgroup"><b>Query</b>
+            <button class="pill insp q" data-q="0">count all</button>
+            <button class="pill insp q" data-q="1">voPersonExternalID</button>
+            <button class="pill insp q" data-q="2">voPersonID</button>
+            <button class="pill insp q" data-q="3">eduPerson</button>
+          </div>
+        </div>
+
+        <div class="grid g2" style="margin-top:12px;align-items:start">
+          <div class="figwrap">
+          <svg id="corr" viewBox="0 0 600 300" role="img" aria-label="One person holds five credentials. Today no record joins them. Populating voPersonExternalID creates the correlation record the credentials attach to.">
+            <defs><marker id="are" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="var(--identity)"/></marker></defs>
+
+            <rect class="sv-box" x="12" y="122" width="132" height="52" rx="3"/>
+            <text class="sv-name" x="78" y="146" text-anchor="middle" font-size="14">One person</text>
+            <text class="sv-sub" x="78" y="163" text-anchor="middle">one human being</text>
+
+            <rect class="corr-hub" x="216" y="116" width="176" height="64" rx="4"/>
+            <text class="corr-hubtx" x="304" y="142" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11">voPersonExternalID</text>
+            <text class="corr-hubtx" x="304" y="162" text-anchor="middle" font-size="10.5" id="hubsub">no correlation record</text>
+
+            <path class="corr-edge" d="M 146 148 H 210" marker-end="url(#are)"/>
+
+            <rect class="sv-box" x="452" y="18" width="136" height="30" rx="3"/><text x="464" y="38" font-size="12" fill="var(--ink)">NCSA identity</text>
+            <rect class="sv-box" x="452" y="76" width="136" height="30" rx="3"/><text x="464" y="96" font-size="12" fill="var(--ink)">UIUC NetID</text>
+            <rect class="sv-box" x="452" y="134" width="136" height="30" rx="3"/><text x="464" y="154" font-size="12" fill="var(--ink)">ACCESS ID</text>
+            <rect class="sv-box" x="452" y="192" width="136" height="30" rx="3"/><text x="464" y="212" font-size="12" fill="var(--ink)">campus AD</text>
+            <rect class="sv-box" x="452" y="250" width="136" height="30" rx="3"/><text x="464" y="270" font-size="12" fill="var(--ink)">Globus</text>
+
+            <path class="corr-edge" d="M 392 142 C 420 142, 424 33, 446 33" marker-end="url(#are)"/>
+            <path class="corr-edge" d="M 392 146 C 420 146, 424 91, 446 91" marker-end="url(#are)"/>
+            <path class="corr-edge" d="M 392 149 H 446" marker-end="url(#are)"/>
+            <path class="corr-edge" d="M 392 152 C 420 152, 424 207, 446 207" marker-end="url(#are)"/>
+            <path class="corr-edge" d="M 392 156 C 420 156, 424 265, 446 265" marker-end="url(#are)"/>
+
+            <text class="sv-lab" x="196" y="246" text-anchor="middle" id="corrnote" fill="var(--break)" font-size="10">matched by hand, on names and email</text>
+          </svg>
+          </div>
+          <div class="term" id="lterm"></div>
+        </div>
+
+        <p style="margin-top:16px;font-size:15.5px">The 158 duplicate-email clusters and 40 duplicate-UID cases are string matches on <code>mail</code> and <code>uidNumber</code>. There is no identifier to match on.</p>
+
+        <div class="kicker"><p>CILogon, COmanage and identity correlation are one decision, not three.</p></div>
+      </section>
+
+      <!-- ============ 5 ============ -->
+      <section class="slide" data-t="What's next">
+        <p class="eyebrow">05 · <b>Next</b></p>
+        <h1 class="claim">Six commitments. One ask.</h1>
+
+        <h2 class="sec">Freeze now. These hold whichever way the architecture goes.</h2>
+        <div class="grid g3">
+          <div class="card"><h4><code>voPersonExternalID</code> for external identities</h4><p>The attribute is the interface contract.</p></div>
+          <div class="card"><h4>Keep the six-verb plugin contract</h4><p>Events replace the batch trigger.</p></div>
+          <div class="card"><h4>Entitlements carry provenance</h4><p>Which award, which policy, expiring when.</p></div>
+          <div class="card"><h4>Revoke matches grant latency</h4><p>A service level, not an architecture.</p></div>
+          <div class="card"><h4>AMIE terminates in an edge mediator</h4><p>The XRAS award ends 30 Apr 2027.</p></div>
+          <div class="card"><h4>Organization is validated, not free text</h4><p>36 strings for one institution.</p></div>
+        </div>
+
+        <h2 class="sec">The ask</h2>
+        <div class="card ask">
+          <p style="font-size:16.5px;color:var(--ink);font-family:var(--f-display);max-width:none">Fund dedicated developer time to learn acctd and take it over, from NCSA core infrastructure.</p>
+          <div class="grid g4" style="margin-top:13px">
+            <div class="card"><h4>The write path, written down</h4><p>Validated against the code.</p></div>
+            <div class="card"><h4>Cadence, measured</h4><p>One instrumented request per lane.</p></div>
+            <div class="card"><h4>Plugins and <code>sql/acct</code></h4><p>Inventory and divergence.</p></div>
+            <div class="card"><h4>A second operator</h4><p>The actual deliverable.</p></div>
+          </div>
+        </div>
+
+        <h2 class="sec">Where the cost belongs. Hover a program.</h2>
+        <figure style="margin-top:2px">
+          <div class="figwrap">
+          <svg id="fan" viewBox="0 0 1160 250" role="img" aria-label="Six separately funded programs, ACCESS, NAIRR, Illinois Computes, Campus Cluster and ICCP, Nightingale and ACHE, and Mayo and mForge era work, all depend on one shared write path, acctd plus NCSA LDAP, which provisions every allocated NCSA resource.">
+            <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="currentColor"/></marker></defs>
+            <text class="sv-hdr" x="20" y="16">Separately funded</text>
+            <text class="sv-hdr" x="470" y="16" text-anchor="middle">One write path</text>
+            <text class="sv-hdr" x="1140" y="16" text-anchor="end">Every allocated resource</text>
+
+            <g class="fanrow" data-i="0"><rect class="sv-box" x="20" y="30" width="230" height="30" rx="3"/><text x="34" y="50" font-size="13" fill="var(--ink)">ACCESS</text></g>
+            <g class="fanrow" data-i="1"><rect class="sv-box" x="20" y="66" width="230" height="30" rx="3"/><text x="34" y="86" font-size="13" fill="var(--ink)">NAIRR Pilot</text></g>
+            <g class="fanrow" data-i="2"><rect class="sv-box" x="20" y="102" width="230" height="30" rx="3"/><text x="34" y="122" font-size="13" fill="var(--ink)">Illinois Computes</text></g>
+            <g class="fanrow" data-i="3"><rect class="sv-box" x="20" y="138" width="230" height="30" rx="3"/><text x="34" y="158" font-size="13" fill="var(--ink)">Campus Cluster / ICCP</text></g>
+            <g class="fanrow" data-i="4"><rect class="sv-box" x="20" y="174" width="230" height="30" rx="3"/><text x="34" y="194" font-size="13" fill="var(--ink)">Nightingale / ACHE</text></g>
+            <g class="fanrow" data-i="5"><rect class="sv-box" x="20" y="210" width="230" height="30" rx="3"/><text x="34" y="230" font-size="13" fill="var(--ink)">Mayo, mForge era</text></g>
+
+            <path class="sv-line fanpath" data-i="0" d="M 250 45 C 320 45, 330 118, 380 127" marker-end="url(#ar2)"/>
+            <path class="sv-line fanpath" data-i="1" d="M 250 81 C 320 81, 330 120, 380 127" marker-end="url(#ar2)"/>
+            <path class="sv-line fanpath" data-i="2" d="M 250 117 C 330 117, 340 126, 380 127" marker-end="url(#ar2)"/>
+            <path class="sv-line fanpath" data-i="3" d="M 250 153 C 330 153, 340 134, 380 128" marker-end="url(#ar2)"/>
+            <path class="sv-line fanpath" data-i="4" d="M 250 189 C 320 189, 330 136, 380 128" marker-end="url(#ar2)"/>
+            <path class="sv-line fanpath" data-i="5" d="M 250 225 C 320 225, 330 138, 380 129" marker-end="url(#ar2)"/>
+
+            <rect x="380" y="80" width="185" height="96" rx="4" fill="var(--surface)" stroke="currentColor" stroke-width="2.5"/>
+            <text x="472" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="17" font-weight="500" fill="var(--ink)">acctd</text>
+            <text x="472" y="142" text-anchor="middle" font-size="14" fill="var(--ink)">+ NCSA LDAP</text>
+
+            <path class="sv-line" d="M 565 106 C 620 106, 640 58, 700 53" marker-end="url(#ar2)"/>
+            <path class="sv-line" d="M 565 120 C 620 120, 640 94, 700 89" marker-end="url(#ar2)"/>
+            <path class="sv-line" d="M 565 128 C 620 128, 640 128, 700 125" marker-end="url(#ar2)"/>
+            <path class="sv-line" d="M 565 136 C 620 136, 640 162, 700 161" marker-end="url(#ar2)"/>
+            <path class="sv-line" d="M 565 150 C 620 150, 640 198, 700 197" marker-end="url(#ar2)"/>
+
+            <rect class="sv-box" x="700" y="38" width="440" height="30" rx="3"/><text x="714" y="58" font-size="13" fill="var(--ink)">Delta · DeltaAI · Hydro: Slurm accounts, QoS, budgets</text>
+            <rect class="sv-box" x="700" y="74" width="440" height="30" rx="3"/><text x="714" y="94" font-size="13" fill="var(--ink)">Radiant · Nightingale · Campus Cluster queues</text>
+            <rect class="sv-box" x="700" y="110" width="440" height="30" rx="3"/><text x="714" y="130" font-size="13" fill="var(--ink)">Taiga · Granite · Jade · Harbor: storage entitlements</text>
+            <rect class="sv-box" x="700" y="146" width="440" height="30" rx="3"/><text x="714" y="166" font-size="13" fill="var(--ink)">Illinois HTC · HAL · ISL · TGI RAILS</text>
+            <rect class="sv-box" x="700" y="182" width="440" height="30" rx="3"/><text x="714" y="202" font-size="13" fill="var(--ink)">Every login: LDAP holds the account data all services read</text>
+
+            <text x="700" y="236" font-size="13.5" font-weight="600" fill="var(--open)">One dependency. Six funding programs.</text>
+          </svg>
+          </div>
+        </figure>
+
+        <div class="kicker"><p>The acctd ask is small, separable, and does not wait on anything else.</p></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<aside class="notes" aria-label="Speaker notes">
+  <header><b>Speaker notes</b><div class="spacer"></div><button class="tbtn" id="ncls">Close</button></header>
+  <div class="body" id="nbody"></div>
+</aside>
+
+<div class="ov" id="jump" role="dialog" aria-modal="true" aria-label="Jump to chapter">
+  <div class="panel">
+    <h4>Jump to (J or Esc to close)</h4>
+    <div class="jgrid" id="jgrid"></div>
+  </div>
+</div>
+
+<div class="ov" id="nums" role="dialog" aria-modal="true" aria-label="Numbers and methods">
+  <div class="panel">
+    <h4>Numbers and methods (0 or Esc to close)</h4>
+    <table class="num">
+      <thead><tr><th style="width:110px">Figure</th><th style="width:26%">What it is</th><th>Method</th></tr></thead>
+      <tbody>
+        <tr><td class="f">~38,650</td><td>Accounts in NCSA LDAP</td><td class="c">Read-only directory discovery, 2 Aug 2026.</td></tr>
+        <tr><td class="f">158 / 40</td><td>Duplicate emails, duplicate UIDs</td><td class="c">String matches on <code>mail</code> and <code>uidNumber</code>. No correlation identifier existed to match on, so these are a floor.</td></tr>
+        <tr><td class="f">85 / 0.22%</td><td><code>voPersonExternalID</code> populated</td><td class="c">Directory query, 11 Aug 2026. <code>voPersonID</code>, <code>voPersonApplicationUID</code>, <code>voPersonSoRID</code> and all eduPerson attributes returned zero.</td></tr>
+        <tr><td class="f">12,219</td><td>Support tickets per year</td><td class="c">Total SUP volume. 1,591 (13%) machine-filed by reporter field. Separately, about 10% mention access, login or password by keyword. Overlapping populations, not a split.</td></tr>
+        <tr><td class="f">~443×</td><td>Time to access: visible against silently blocked</td><td class="c">20.8-hour median (n=50, created to last-updated as a resolution proxy) against a 384-day median age of AMIE-blocked projects.</td></tr>
+        <tr><td class="f">179 / 183</td><td>Blocked ACCESS projects</td><td class="c">179 by packet grouping. 183 distinct codes including secondary fields. About 60 plausibly live, about 123 probably dead letters.</td></tr>
+        <tr><td class="f">1,298</td><td>Illinois Computes requests since Mar 2023</td><td class="c">964 approved, 314 declined, 74.3%, 861 distinct PIs. Intake 184, then 407, then 437. 270 through 11 Jul 2026.</td></tr>
+        <tr><td class="f">36 / 96</td><td>Organization strings, blanks</td><td class="c">36 distinct strings for one institution, 96 blank, four spellings of UIUC, one mojibake entry.</td></tr>
+        <tr><td class="f">30 Apr 2027</td><td>End of the XRAS award</td><td class="c">NSF 2138259. No successor announced, no published continuity terms for the seven hosted tenants.</td></tr>
+        <tr><td class="f">$16,547<br>$38,610</td><td>CILogon annual tiers</td><td class="c">Essential (multi-tenant COmanage, 5 COs) and Full (dedicated registry, JWT issuance). Internal rates for U of I subscribers.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer class="foot">
+  <span class="pos" id="pos">01</span>
+  <div class="dots" id="dots"></div>
+  <span class="hint"><kbd>←</kbd><kbd>→</kbd> move · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> run · <kbd>0</kbd> numbers · <kbd>N</kbd> notes</span>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var RM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* ===================== slide 1 ===================== */
+var svg=document.getElementById("model");
+var tok=document.getElementById("tok"), tok2=document.getElementById("tok2");
+var ro=document.getElementById("ro"), roStep=document.getElementById("ro-step"), roTxt=document.getElementById("ro-txt");
+var recwrap=document.getElementById("recwrap"), rec=document.getElementById("rec");
+var lane="access", gen=0, running=false;
+
+var D_RAIL=1500, D_ARC=1900, W_STEP=1400, W_MANUAL=2100, W_PULSE=2000, W_BLOCK=1800;
+
+var LAYERS={
+  approval:["Approval","What was granted, by whom, until when.","Owner: IDDS."],
+  identity:["Identity","Who this human is, across every credential.","Owner: nobody. Five domains, no correlation service."],
+  entitlement:["Entitlement","What this person may do on this resource, right now.","Owner: nobody. Four systems write it, no precedence."],
+  provisioning:["Provisioning","Making the entitlement true on the machine.","Owner: acctd. Batch triggered, and it reaches the resource directly."],
+  enforcement:["Enforcement","The runtime check.","Owner: the resource. Kerberos and Duo, LDAP group, Slurm budget."]
+};
+
+/* one project, three representations */
+var RECS={
+  idds:{t:"IDDS: the award",
+    b:'<span class="p">acct=&gt;</span> <span class="c">SELECT charge_code, resource, su_awarded, start_date, end_date</span>\n'+
+      '<span class="p">acct-&gt;</span> <span class="c">FROM projects WHERE charge_code = \'bbka\';</span>\n\n'+
+      '<span class="o"> charge_code |  resource   | su_awarded |   start    |    end\n'+
+      '-------------+-------------+------------+------------+------------\n'+
+      ' bbka        | delta-cpu   |     150000 | 2026-04-01 | 2027-03-31\n'+
+      '(1 row)</span>\n\n'+
+      '<span class="cm"># the award. it grants nothing on its own.</span>'},
+  ldap:{t:"LDAP: the entitlement",
+    b:'<span class="p">$</span> <span class="c">ldapsearch -x -LLL -b ou=Groups,dc=ncsa,dc=illinois,dc=edu "(cn=bbka)"</span>\n\n'+
+      '<span class="o">dn: cn=bbka,ou=Groups,dc=ncsa,dc=illinois,dc=edu\n'+
+      'objectClass: posixGroup\n'+
+      '<span class="hl">businessCategory: Charge Group</span>\n'+
+      'gidNumber: 60431\n'+
+      'memberUid: jsmith\n'+
+      'memberUid: alee</span>\n\n'+
+      '<span class="cm"># membership here is the entitlement.\n'+
+      '# nothing else in the model grants access.</span>'},
+  slurm:{t:"Slurm: the enforcement",
+    b:'<span class="p">$</span> <span class="c">sacctmgr show assoc where account=bbka format=account,user,grptresmins</span>\n\n'+
+      '<span class="o">   Account       User            GrpTRESMins\n'+
+      '---------- ---------- ----------------------\n'+
+      '      bbka                 <span class="hl">cpu=9000000000</span>\n'+
+      '      bbka     jsmith\n'+
+      '      bbka       alee</span>\n\n'+
+      '<span class="cm"># 150,000 SU x 60 x 1000 = 9,000,000,000\n'+
+      '# same project. third representation. nothing reconciles them.</span>'}
+};
+function showRec(k){
+  var r=RECS[k]; if(!r) return;
+  recwrap.style.display="block";
+  rec.innerHTML=r.b;
+  setRO("Inspect", r.t, "Charge code bbka, one project, at three stages of the model.");
+  Array.prototype.forEach.call(document.querySelectorAll(".pill.insp[data-rec]"),function(x){
+    x.setAttribute("aria-pressed", String(x.dataset.rec===k));
+  });
+}
+
+var TAIL=[
+  {cap:"acctd polls. The change waits for the next cycle.", pulse:"r-poll", wait:W_PULSE},
+  {cap:"acctd picks it up.", rail:"r-poll", node:"n-acctd"},
+  {cap:"Charge group written to LDAP. In parallel, the Slurm account is built on the machine.", rails:["r-write","r-arc"], nodes:["n-ldap","n-chip","n-delta"]},
+  {cap:"Login: Kerberos and Duo, LDAP group, Slurm budget.", rail:"r-check", node:"n-delta"},
+  {done:"Access granted.", state:"ok"}
+];
+var RUNS={
+  grant:{
+    access:[{cap:"Approved in ACCESS XRAS.", node:"b-access"},
+            {cap:"Recorded in IDDS. A record, not access.", rail:"r-access", node:"n-idds"}].concat(TAIL),
+    nairr:[{cap:"Approved in NAIRR XRAS.", node:"b-nairr"},
+           {cap:"Project to username mapping transcribed by hand.", manual:"b-nairr", wait:W_MANUAL},
+           {cap:"Recorded in IDDS.", rail:"r-nairr", node:"n-idds"}].concat(TAIL),
+    local:[{cap:"IC form into Jira. Manual triage.", manual:"b-local", wait:W_MANUAL},
+           {cap:"Submitted to NCSA XRAS, recorded in IDDS.", rail:"r-local", node:"n-idds"}].concat(TAIL)
+  },
+  revoke:{
+    access:[{cap:"Project inactivated in IDDS.", node:"n-idds", rv:true},
+            {cap:"Semi-manual step in acctd.", rail:"r-poll", node:"n-acctd", manual:"n-acctd", wait:W_MANUAL, rv:true},
+            {cap:"Charge group removed. 30 day grace period.", rail:"r-write", nodes:["n-ldap","n-chip"], rv:true},
+            {done:"Removed on this lane.", sub:"The only lane with a designed end. The identity and Duo enrollment persist.", state:"warn", flash:["n-ident"]}],
+    nairr:[{cap:"Nothing fires.", blocked:true, stale:["n-delta","n-chip"], wait:W_BLOCK},
+           {done:"No inactivation event exists on this lane.", sub:"Access persists.", state:"bad"}],
+    local:[{cap:"Nothing fires.", blocked:true, stale:["n-delta","n-chip"], wait:W_BLOCK},
+           {done:"No inactivation event exists on this lane.", sub:"Radiant bills until asked to stop. XRAS end dates drive nothing.", state:"bad"}]
+  }
+};
+var EXIT=[
+  {cap:"Exit event. Offboarding automation runs.", node:"s-surf", rv:true},
+  {cap:"Campus AD and org groups removed.", node:"n-ldap", rv:true, wait:W_MANUAL},
+  {cap:"Charge groups are not touched.", blocked:true, stale:["n-chip","n-delta"], wait:W_BLOCK},
+  {cap:"Duo is never deprovisioned.", flash:["n-ident"], wait:W_BLOCK},
+  {done:"Still provisioned.", sub:"Charge group membership is the only grant path, and offboarding skips it.", state:"bad"}
+];
+
+function clearRun(){
+  Array.prototype.forEach.call(svg.querySelectorAll(".sv-box,.sv-chip,.sv-identbox,.sv-openbox"),function(e){ e.classList.remove("lit","man","stale","flash"); });
+  Array.prototype.forEach.call(svg.querySelectorAll(".rail-p"),function(e){ e.classList.remove("act","pulse"); });
+  tok.style.opacity=0; tok2.style.opacity=0;
+  ro.className="readout";
+}
+function shape(id){
+  var g=document.getElementById(id); if(!g) return null;
+  return g.querySelector(".sv-box,.sv-chip,.sv-identbox,.sv-openbox") || g;
+}
+function mark(id,cls){ var s=shape(id); if(s) s.classList.add(cls); }
+function sleep(ms,g){ return new Promise(function(r){ setTimeout(function(){ if(g===gen) r(); },ms); }); }
+function glide(railId,token,dur){
+  var p=document.getElementById(railId);
+  if(!p) return Promise.resolve();
+  p.classList.add("act");
+  if(RM) return Promise.resolve();
+  var len=p.getTotalLength(), t0=null, g=gen;
+  return new Promise(function(res){
+    function frame(ts){
+      if(g!==gen){ res(); return; }
+      if(t0===null) t0=ts;
+      var k=Math.min(1,(ts-t0)/dur);
+      var e=k<0.5 ? 2*k*k : 1-Math.pow(-2*k+2,2)/2;
+      var pt=p.getPointAtLength(len*e);
+      token.setAttribute("cx",pt.x); token.setAttribute("cy",pt.y);
+      token.style.opacity=1;
+      if(k<1) requestAnimationFrame(frame);
+      else { token.style.opacity=0; res(); }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+function setRO(step,txt,sub,state){
+  roStep.textContent=step;
+  roTxt.innerHTML=txt+(sub?'<span class="sub">'+sub+'</span>':'');
+  ro.className="readout"+(state?" "+state:"");
+}
+function setRunEnabled(on){
+  ["run-grant","run-revoke","run-exit"].forEach(function(id){
+    var b=document.getElementById(id); if(!b) return;
+    if(on) b.removeAttribute("disabled"); else b.setAttribute("disabled","");
+  });
+}
+function clearModes(){
+  svg.classList.remove("iso");
+  Array.prototype.forEach.call(document.querySelectorAll(".pill.lyr"),function(x){x.setAttribute("aria-pressed","false")});
+  Array.prototype.forEach.call(svg.querySelectorAll(".lay"),function(x){x.classList.remove("sel")});
+  Array.prototype.forEach.call(document.querySelectorAll(".pill.insp[data-rec]"),function(x){x.setAttribute("aria-pressed","false")});
+  recwrap.style.display="none";
+}
+function play(steps){
+  gen++; var g=gen; running=true; clearRun(); clearModes();
+  tok.classList.remove("rv"); tok2.classList.remove("rv");
+  var i=0;
+  function next(){
+    if(g!==gen){ running=false; return; }
+    if(i>=steps.length){ running=false; setRunEnabled(true); return; }
+    var s=steps[i], n=i+1;
+    if(s.done){
+      setRO("Result", s.done, s.sub, s.state);
+      (s.flash||[]).forEach(function(id){ var e=shape(id); if(e) e.classList.add("flash"); });
+      i++; sleep(10,g).then(next); return;
+    }
+    setRO(n+" / "+(steps.length-1), s.cap, null, s.blocked?"bad":null);
+    if(s.rv){ tok.classList.add("rv"); tok2.classList.add("rv"); }
+    if(s.pulse){ var pe=document.getElementById(s.pulse); if(pe) pe.classList.add("pulse"); }
+    var jobs=[];
+    if(s.rail) jobs.push(glide(s.rail,tok,D_RAIL));
+    if(s.rails){ jobs.push(glide(s.rails[0],tok,D_RAIL)); jobs.push(glide(s.rails[1],tok2,D_ARC)); }
+    Promise.all(jobs).then(function(){
+      if(g!==gen) return;
+      if(s.pulse){ var pe2=document.getElementById(s.pulse); if(pe2) pe2.classList.remove("pulse"); }
+      if(s.node) mark(s.node, s.rv?"man":"lit");
+      (s.nodes||[]).forEach(function(id){ mark(id, s.rv?"man":"lit"); });
+      if(s.manual) mark(s.manual,"man");
+      (s.stale||[]).forEach(function(id){ mark(id,"stale"); });
+      (s.flash||[]).forEach(function(id){ var e=shape(id); if(e) e.classList.add("flash"); });
+      i++;
+      sleep(s.wait || (RM?60:W_STEP), g).then(next);
+    });
+  }
+  setRunEnabled(false);
+  next();
+}
+
+Array.prototype.forEach.call(document.querySelectorAll(".pill.lane"),function(b){
+  b.addEventListener("click",function(){
+    Array.prototype.forEach.call(document.querySelectorAll(".pill.lane"),function(x){x.setAttribute("aria-pressed","false")});
+    b.setAttribute("aria-pressed","true");
+    lane=b.dataset.lane; gen++; running=false; clearRun(); setRunEnabled(true);
+    setRO("Ready","Grant, then revoke the same lane.");
+  });
+});
+document.getElementById("run-grant").addEventListener("click",function(){ play(RUNS.grant[lane]); });
+document.getElementById("run-revoke").addEventListener("click",function(){ play(RUNS.revoke[lane]); });
+document.getElementById("run-exit").addEventListener("click",function(){ play(EXIT); });
+document.getElementById("run-reset").addEventListener("click",function(){
+  gen++; running=false; clearRun(); clearModes(); setRunEnabled(true);
+  setRO("Ready","Run a lane, isolate a layer, or inspect one project at each stage.");
+});
+
+Array.prototype.forEach.call(document.querySelectorAll(".pill.lyr"),function(b){
+  b.addEventListener("click",function(){
+    var was=b.getAttribute("aria-pressed")==="true";
+    gen++; running=false; clearRun(); clearModes(); setRunEnabled(true);
+    if(was){ setRO("Ready","Isolation off."); return; }
+    b.setAttribute("aria-pressed","true");
+    svg.classList.add("iso");
+    var key=b.dataset.layer;
+    Array.prototype.forEach.call(svg.querySelectorAll('.lay[data-layer="'+key+'"]'),function(g){g.classList.add("sel")});
+    var L=LAYERS[key];
+    setRO(L[0],L[1],L[2]);
+  });
+});
+Array.prototype.forEach.call(document.querySelectorAll(".pill.insp[data-rec]"),function(b){
+  b.addEventListener("click",function(){
+    gen++; running=false; clearRun(); clearModes(); setRunEnabled(true);
+    showRec(b.dataset.rec);
+  });
+});
+Array.prototype.forEach.call(svg.querySelectorAll(".node.probe"),function(g){
+  function fire(){ if(running) return; gen++; clearRun(); clearModes(); showRec(g.dataset.rec); }
+  g.addEventListener("click",fire);
+  g.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); fire(); } });
+});
+
+/* ===================== slide 2 ===================== */
+var S={a:["auto","automated"], m:["manual","manual"], b:["gone","absent"], n:["nd","no data"]};
+var COLS=["Request","Award to IDDS","Provisioned","Entitlement","Usage returns","Lifecycle end"];
+var LANES=[
+  {n:"Delta, ACCESS", s:"XRAS → CDB → AMIE", c:["a","a","a","a","a","m"],
+   d:"The only lane drawn to completion: inactivated in IDDS, acctd, a semi-manual step, 30 day grace."},
+  {n:"Delta, NAIRR", s:"NAIRR XRAS → CDB", c:["m","a","a","a","a","b"],
+   d:"Provisioning automated. Intake partly manual, with mappings recorded by hand. AMIE stalled at NCSA in July 2026 on illegal characters. No lifecycle end."},
+  {n:"Delta, Illinois Computes", s:"IC Form → Jira → XRAS", c:["m","a","a","a","a","b"],
+   d:"A form into Jira. A second intake path creates a guest XRAS user when the requester has no known NCSA identity. No lifecycle end."},
+  {n:"DeltaAI", s:"multiple front doors", c:["m","a","a","a","a","b"],
+   d:"704,210 approved GPU hours, 37 allocations. Allocation authority switches between Illinois Computes and ACCESS at 11,250 GPU hours, with no recorded policy basis."},
+  {n:"Hydro", s:"NCSA XRAS", c:["m","a","a","a","a","n"],
+   d:"With Delta, one of two systems where an approval becomes a project with no human step. 442,310 approved SU, 57 allocations."},
+  {n:"Radiant", s:"NCSA XRAS → IDDS", c:["m","a","b","m","n","b"],
+   d:"acctd run by hand. A hand-issued four letter project code. Inactivation through NAPS with no automated path. Adjustments entered as deltas from an ldapsearch, because XRAS cannot show current values. Bills until asked to stop."},
+  {n:"Campus Cluster IC Queue", s:"NetID / campus AD", c:["m","a","m","m","n","b"],
+   d:"Largest by volume: 681 allocations, 64.3M approved CPU hours. Runs on NetID and Illinois Duo, so crossing from Delta changes identity domain."},
+  {n:"Taiga + Granite", s:"NCSA XRAS", c:["m","a","n","m","a","b"],
+   d:"477 allocations and 3,097 TB on Taiga. 62 and 1,307 TB on Granite. Storage usage does reach IDDS. Resource groups mirrored by a separate script, not acctd."},
+  {n:"Nightingale", s:"NCSA XRAS + ACHE vetting", c:["m","a","m","a","a","a"],
+   d:"The only lane that revokes: dual approval, daily out of band change detection with alerting, cascading deauthorization, six year retention. Scoped to one enclave. 18 allocations, 307,080 SU."},
+  {n:"Illinois HTC", s:"Google Form + XRAS", c:["m","a","m","m","b","b"],
+   d:"15 allocations, 300,012 units, awarded through XRAS while running HTCondor outside the Slurm-only metering chain. No usage returns to IDDS."},
+  {n:"ICCP", s:"campus investor portal", c:["m","b","b","m","n","b"],
+   d:"Not on acctd. Its XRAS configuration captures requests and triggers nothing downstream."}
+];
+var mat=document.getElementById("mat"), tb=mat.querySelector("tbody"), ro2=document.getElementById("ro2");
+function setRO2(step,txt,state){
+  ro2.querySelector(".step").textContent=step;
+  ro2.querySelector(".txt").innerHTML=txt;
+  ro2.className="readout"+(state?" "+state:"");
+}
+LANES.forEach(function(L){
+  var tr=document.createElement("tr"); tr.className="lrow";
+  var html='<td class="lname">'+L.n+'<small>'+L.s+'</small></td>';
+  L.c.forEach(function(k,ci){ html+='<td class="cell" data-c="'+ci+'"><span class="pip '+S[k][0]+'">'+S[k][1]+'</span></td>'; });
+  tr.innerHTML=html;
+  tr.addEventListener("click",function(){
+    Array.prototype.forEach.call(tb.children,function(r){r.classList.remove("act")});
+    tr.classList.add("act");
+    setRO2(L.n,L.d);
+  });
+  tb.appendChild(tr);
+});
+Array.prototype.forEach.call(mat.querySelectorAll("th.col"),function(th){
+  th.addEventListener("click",function(){
+    var ci=+th.dataset.c, was=th.classList.contains("act");
+    Array.prototype.forEach.call(mat.querySelectorAll("th.col"),function(x){x.classList.remove("act")});
+    Array.prototype.forEach.call(mat.querySelectorAll("td.cell"),function(x){x.classList.remove("csel")});
+    if(was){ mat.classList.remove("colsel"); setRO2("Detail","Two systems provision with no human step: Delta and Hydro."); return; }
+    th.classList.add("act"); mat.classList.add("colsel");
+    Array.prototype.forEach.call(mat.querySelectorAll('td.cell[data-c="'+ci+'"]'),function(x){x.classList.add("csel")});
+    var t={a:0,m:0,b:0,n:0};
+    LANES.forEach(function(L){ t[L.c[ci]]++; });
+    var parts=[];
+    if(t.a) parts.push(t.a+" automated");
+    if(t.m) parts.push(t.m+" manual");
+    if(t.b) parts.push(t.b+" absent");
+    if(t.n) parts.push(t.n+" no data");
+    setRO2(COLS[ci], parts.join(" · "), t.b>=6?"bad":(t.a>=8?"ok":"warn"));
+  });
+});
+
+/* ===================== slide 3 calculators ===================== */
+var fmt=function(n){ return n.toLocaleString("en-US"); };
+var suIn=document.getElementById("su");
+function calcSU(){
+  var v=Math.max(0,Math.floor(+suIn.value||0));
+  document.getElementById("c0").textContent=fmt(v);
+  document.getElementById("c1").textContent=fmt(v*60);
+  document.getElementById("c2").textContent=fmt(v*60*1000);
+}
+suIn.addEventListener("input",calcSU); calcSU();
+
+var tIds=["cpu","mem","gpu"];
+function calcTRES(){
+  var vals=tIds.map(function(k){ return +document.getElementById("t-"+k).value; });
+  var max=Math.max.apply(null,vals), sum=vals.reduce(function(a,b){return a+b;},0);
+  tIds.forEach(function(k,i){
+    document.getElementById("v-"+k).textContent=vals[i];
+    var bar=document.getElementById("b-"+k);
+    bar.querySelector("i").style.width=(max?(vals[i]/max*100):0)+"%";
+    bar.classList.toggle("win", vals[i]===max && max>0);
+  });
+  document.getElementById("o-sum").textContent=sum;
+  document.getElementById("o-max").textContent=max;
+  document.getElementById("o-free").textContent=sum-max;
+}
+tIds.forEach(function(k){ document.getElementById("t-"+k).addEventListener("input",calcTRES); });
+calcTRES();
+
+/* ===================== slide 4 ===================== */
+var corr=document.getElementById("corr"), corrbtn=document.getElementById("corrbtn");
+var edges=Array.prototype.slice.call(corr.querySelectorAll(".corr-edge"));
+function edgeLen(p){ return Math.ceil(p.getTotalLength())+4; }
+edges.forEach(function(p){
+  var L=edgeLen(p);
+  p.style.strokeDasharray=L+"px";
+  p.style.strokeDashoffset=L+"px";
+});
+corrbtn.addEventListener("click",function(){
+  var on=corr.classList.toggle("corron");
+  corrbtn.setAttribute("aria-pressed",String(on));
+  corrbtn.textContent = on ? "Remove voPersonExternalID" : "Populate voPersonExternalID";
+  edges.forEach(function(p,i){
+    if(on){ p.style.transitionDelay=(i*0.12)+"s"; p.style.strokeDashoffset="0px"; }
+    else { p.style.transitionDelay="0s"; p.style.strokeDashoffset=edgeLen(p)+"px"; }
+  });
+  document.getElementById("hubsub").textContent = on ? "one record, five identities" : "no correlation record";
+  var note=document.getElementById("corrnote");
+  note.textContent = on ? "one query answers: which systems can this person access?" : "matched by hand, on names and email";
+  note.setAttribute("fill", on ? "var(--identity)" : "var(--break)");
+});
+
+/* ldapsearch console */
+var lterm=document.getElementById("lterm");
+var QUERIES=[
+  {c:'ldapsearch -x -LLL -b dc=ncsa,dc=illinois,dc=edu "(uid=*)" dn | grep -c "^dn:"',
+   o:'38650', note:'accounts in the directory'},
+  {c:'ldapsearch -x -LLL "(voPersonExternalID=*)" dn | grep -c "^dn:"',
+   o:'85', note:'0.22% of the directory. the attribute exists, the data does not.'},
+  {c:'ldapsearch -x -LLL "(voPersonID=*)" dn | grep -c "^dn:"',
+   o:'0', note:'no internal voPerson identifier anywhere'},
+  {c:'ldapsearch -x -LLL "(eduPersonPrincipalName=*)" dn | grep -c "^dn:"',
+   o:'0', note:'no eduPerson attributes populated at all'}
+];
+var lgen=0;
+function termIdle(){
+  lterm.innerHTML='<span class="p">$</span> <span class="cur"></span>\n\n'+
+    '<span class="cm"># pick a query above. results are from the\n'+
+    '# read-only directory pass on 11 Aug 2026.</span>';
+}
+function runQuery(i){
+  var q=QUERIES[i]; if(!q) return;
+  lgen++; var g=lgen, j=0;
+  var speed = RM ? 0 : 13;
+  function tick(){
+    if(g!==lgen) return;
+    j++;
+    var typed=q.c.slice(0,j);
+    lterm.innerHTML='<span class="p">$</span> <span class="c">'+esc(typed)+'</span><span class="cur"></span>';
+    if(j<q.c.length) setTimeout(tick,speed);
+    else setTimeout(function(){
+      if(g!==lgen) return;
+      lterm.innerHTML='<span class="p">$</span> <span class="c">'+esc(q.c)+'</span>\n'+
+        '<span class="hl">'+esc(q.o)+'</span>\n\n'+
+        '<span class="cm"># '+esc(q.note)+'</span>\n'+
+        '<span class="p">$</span> <span class="cur"></span>';
+    }, RM?0:420);
+  }
+  if(speed===0){
+    lterm.innerHTML='<span class="p">$</span> <span class="c">'+esc(q.c)+'</span>\n<span class="hl">'+esc(q.o)+'</span>\n\n<span class="cm"># '+esc(q.note)+'</span>';
+    return;
+  }
+  tick();
+}
+Array.prototype.forEach.call(document.querySelectorAll(".pill.q"),function(b){
+  b.addEventListener("click",function(){
+    Array.prototype.forEach.call(document.querySelectorAll(".pill.q"),function(x){x.setAttribute("aria-pressed","false")});
+    b.setAttribute("aria-pressed","true");
+    runQuery(+b.dataset.q);
+  });
+});
+termIdle();
+
+/* ===================== slide 5 ===================== */
+var fan=document.getElementById("fan");
+Array.prototype.forEach.call(fan.querySelectorAll(".fanrow"),function(g){
+  function on(){
+    fan.classList.add("fanhover"); g.classList.add("hot");
+    var p=fan.querySelector('.fanpath[data-i="'+g.dataset.i+'"]');
+    if(p) p.classList.add("hot");
+  }
+  function off(){
+    fan.classList.remove("fanhover");
+    Array.prototype.forEach.call(fan.querySelectorAll(".hot"),function(x){x.classList.remove("hot")});
+  }
+  g.addEventListener("mouseenter",on); g.addEventListener("mouseleave",off);
+  g.addEventListener("focus",on); g.addEventListener("blur",off);
+  g.setAttribute("tabindex","0");
+});
+
+/* ===================== deck ===================== */
+var NOTES=[
+ {h:"Run it, don't describe it",
+  p:["Say the ask out loud before slide one: dedicated developer time on acctd, funded from NCSA core. Thirty seconds.",
+     "ACCESS lane, Grant. It runs about fifteen seconds, so talk over it. Point at the arc: provisioning reaches the machine, not only the directory.",
+     "Then Illinois Computes, Revoke. Nothing fires. That contrast is the talk.",
+     "Then Staff exit. Offboarding removes AD groups and skips charge groups.",
+     "Inspect is the one to use if the room is technical: same project bbka, shown as an IDDS row, an LDAP entry, and a Slurm association. Three representations, nothing reconciling them.",
+     "Isolate answers anyone who asks what entitlement means."],
+  o:["Greg may correct a box. Take it out loud."]},
+ {h:"Two clicks, then stop talking",
+  p:["Click Lifecycle end: 1 automated, 1 manual, 8 absent, 1 no data.",
+     "Then Nightingale: dual approval, cascading deauthorization, scoped to one enclave. A capability to generalize, not invent."],
+  o:["“Row X is wrong.” Ask which cell and what the right value is."]},
+ {h:"The calculators do the arguing",
+  p:["Type a real SU number into the first box. The chain shows the x60 x1000 scaling and the GrpTRESMins value. Say that the scaling is undone in three places with no detector.",
+     "Then drag the GPU slider on the second panel. Sum against charged: the largest component sets the price and everything under it is free. That is the part people get wrong when they model cost.",
+     "Latency: four numbers, one observed.",
+     "The red chips are the ask in one row."],
+  o:["“Aren't you criticizing acctd?” The verb contract is right and I want to keep it."]},
+ {h:"Run the queries",
+  p:["Start with count all: 38,650.",
+     "Then voPersonExternalID: 85. Let the number sit.",
+     "Then voPersonID and eduPerson: zero and zero.",
+     "Now toggle Populate on the diagram. The edges draw. That is the target state in one click."],
+  o:["“So we have it already?” The attribute. 0.22% populated.",
+     "“Cost?” $16,547 Essential, $38,610 Full, internal rates for U of I."]},
+ {h:"Commitments, then the ask",
+  p:["Read the six titles. Do not elaborate unless asked.",
+     "Then the ask in one sentence, and the four deliverables.",
+     "Hover the programs on the cost diagram, then say the line under it once. Do not say Illinois Computes should not pay. The diagram says it.",
+     "Press 0 if anyone challenges a number."],
+  o:["“How much time, and whose?” Have the percentage and the window ready.",
+     "“Isn't LDAP already ISF funded?” ISF funds running it. Its roadmap is servers, OS and configuration management. Nothing in it covers acctd."]}
+];
+
+var slides=Array.prototype.slice.call(document.querySelectorAll(".slide"));
+var railEl=document.getElementById("rail"), dots=document.getElementById("dots"),
+    jgrid=document.getElementById("jgrid"), pos=document.getElementById("pos"),
+    nbody=document.getElementById("nbody"), progi=document.getElementById("progi");
+var cur=0;
+function label(i){ return ("0"+(i+1)).slice(-2); }
+railEl.insertAdjacentHTML("beforeend",'<h3>Chapters</h3>');
+slides.forEach(function(sl,i){
+  var b=document.createElement("button");
+  b.className="railitem"; b.type="button";
+  b.innerHTML='<span class="n">'+label(i)+'</span><span>'+sl.dataset.t+'</span>';
+  b.addEventListener("click",function(){go(i)});
+  railEl.appendChild(b);
+  var d=document.createElement("button");
+  d.type="button"; d.title=sl.dataset.t;
+  d.setAttribute("aria-label","Go to "+sl.dataset.t);
+  d.addEventListener("click",function(){go(i)});
+  dots.appendChild(d);
+  var j=document.createElement("button");
+  j.type="button";
+  j.innerHTML='<span class="n">'+label(i)+'</span><span class="t">'+sl.dataset.t+'</span>';
+  j.addEventListener("click",function(){go(i);closeOv()});
+  jgrid.appendChild(j);
+});
+var railBtns=Array.prototype.slice.call(railEl.querySelectorAll(".railitem"));
+var dotBtns=Array.prototype.slice.call(dots.children);
+
+function renderNotes(i){
+  var n=NOTES[i]; if(!n){nbody.innerHTML="";return;}
+  var h='<h5>'+n.h+'</h5>';
+  n.p.forEach(function(t){h+='<p>'+t+'</p>'});
+  if(n.o&&n.o.length){
+    h+='<div class="obj"><em>Likely pushback</em>';
+    n.o.forEach(function(t){h+='<p>'+t+'</p>'});
+    h+='</div>';
+  }
+  nbody.innerHTML=h; nbody.scrollTop=0;
+}
+function go(i){
+  if(i<0||i>=slides.length) return;
+  slides[cur].classList.remove("on");
+  railBtns[cur].removeAttribute("aria-current");
+  dotBtns[cur].classList.remove("on");
+  cur=i;
+  slides[cur].classList.add("on");
+  railBtns[cur].setAttribute("aria-current","true");
+  dotBtns[cur].classList.add("on");
+  pos.textContent=label(cur);
+  progi.style.width=((cur+1)/slides.length*100)+"%";
+  renderNotes(cur);
+  document.getElementById("stage").scrollTop=0;
+  railBtns[cur].scrollIntoView({block:"nearest"});
+  if(cur!==0){ gen++; running=false; }
+}
+function closeOv(){ document.body.classList.remove("jump-on","nums-on"); }
+var nbtn=document.getElementById("nbtn");
+function toggleNotes(){ nbtn.setAttribute("aria-pressed",String(document.body.classList.toggle("notes-on"))); }
+nbtn.addEventListener("click",toggleNotes);
+document.getElementById("ncls").addEventListener("click",toggleNotes);
+document.getElementById("jbtn").addEventListener("click",function(){ document.body.classList.remove("nums-on"); document.body.classList.toggle("jump-on"); });
+document.getElementById("numbtn").addEventListener("click",function(){ document.body.classList.remove("jump-on"); document.body.classList.toggle("nums-on"); });
+document.getElementById("jump").addEventListener("click",function(e){ if(e.target===this) closeOv(); });
+document.getElementById("nums").addEventListener("click",function(e){ if(e.target===this) closeOv(); });
+
+document.addEventListener("keydown",function(e){
+  var t=e.target.tagName;
+  if(t==="INPUT"||t==="TEXTAREA") return;
+  var k=e.key;
+  if(k==="Escape"){ closeOv(); return; }
+  if(k==="ArrowRight"||k==="PageDown"){ e.preventDefault(); go(cur+1); }
+  else if(k==="ArrowLeft"||k==="PageUp"){ e.preventDefault(); go(cur-1); }
+  else if(k==="Home"){ e.preventDefault(); go(0); }
+  else if(k==="End"){ e.preventDefault(); go(slides.length-1); }
+  else if(k==="j"||k==="J"){ document.body.classList.remove("nums-on"); document.body.classList.toggle("jump-on"); }
+  else if(k==="0"){ document.body.classList.remove("jump-on"); document.body.classList.toggle("nums-on"); }
+  else if(k==="n"||k==="N"){ toggleNotes(); }
+  else if(cur===0 && !running && (k==="1"||k==="2"||k==="3")){
+    e.preventDefault();
+    if(k==="1") play(RUNS.grant[lane]);
+    if(k==="2") play(RUNS.revoke[lane]);
+    if(k==="3") play(EXIT);
+  }
+});
+
+go(0);
+})();
+</script>
+
+<script>
+/* Presenter notes are private. They load only when the URL ends in #present */
+(function(){
+  var on = /present/i.test(location.hash) || /present/i.test(location.search);
+  if(on) return;
+  var b=document.getElementById("nbtn"); if(b&&b.parentNode) b.parentNode.removeChild(b);
+  var a=document.querySelector("aside.notes"); if(a&&a.parentNode) a.parentNode.removeChild(a);
+  var h=document.querySelector(".foot .hint");
+  if(h) h.innerHTML='<kbd>\u2190</kbd><kbd>\u2192</kbd> move \u00b7 <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> run \u00b7 <kbd>0</kbd> numbers \u00b7 <kbd>J</kbd> jump';
+  document.addEventListener("keydown",function(e){
+    if(e.key==="n"||e.key==="N"){ e.stopImmediatePropagation(); }
+  }, true);
+})();
+</script>
+
+</body>
+</html>
