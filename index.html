@@ -240,7 +240,7 @@ input[type=range]{accent-color:var(--identity);width:100%;height:20px}
 .wrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:12px;padding-top:11px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3)}
 .wrow input[type=number]{width:64px;font-size:12px;padding:3px 6px}
 .tres2{display:grid;grid-template-columns:34px 112px 1fr;gap:7px 10px;align-items:center;margin-top:12px}
-.te{font-family:var(--f-mono);font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.te{font-family:var(--f-mono);font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--ink-2);text-align:right;white-space:nowrap}
 .tres{display:grid;grid-template-columns:64px 1fr 74px;gap:9px 12px;align-items:center;margin-top:4px}
 .tres .tl,.tres2 .tl{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-2)}
 .tres .tv{font-family:var(--f-mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
@@ -573,7 +573,7 @@ body.notes-on .notes{transform:none}
             <h4>What a job actually costs <span class="hint2">illustrative weights, drag anything</span></h4>
             <div class="jr">
               <span class="jl">cores</span><input type="range" id="q-cpu" min="1" max="128" value="8"><span class="jv" id="n-cpu">8</span>
-              <span class="jl">GB RAM</span><input type="range" id="q-mem" min="2" max="512" step="2" value="32"><span class="jv" id="n-mem">32</span>
+              <span class="jl">GB RAM</span><input type="range" id="q-mem" min="4" max="512" step="4" value="32"><span class="jv" id="n-mem">32</span>
               <span class="jl">GPUs</span><input type="range" id="q-gpu" min="0" max="8" value="1"><span class="jv" id="n-gpu">1</span>
             </div>
             <div class="wrow">
