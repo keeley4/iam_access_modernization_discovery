@@ -89,14 +89,27 @@ body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.slide.on{animation:none}}
 
+/* Short viewports: tighten the frame before any figure has to shrink. */
+@media (max-height:945px){
+  .stage{padding:16px 44px 74px}
+  h1.claim{font-size:clamp(28px,2.9vw,38px);margin-bottom:8px}
+  .dek{font-size:15.5px;margin-bottom:12px}
+  h2.sec{margin:13px 0 8px}
+  .kicker{margin-top:13px;padding-top:10px}
+  .kicker p{font-size:18px}
+  .readout{min-height:50px;padding:9px 14px}
+  .readout .txt{font-size:16.5px}
+  figure{margin-top:8px}
+}
+
 .eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 10px}
 .eyebrow b{color:var(--open);font-weight:500}
 h1.claim{font-family:var(--f-display);font-weight:700;font-size:clamp(32px,3.5vw,46px);line-height:1.06;letter-spacing:-.02em;margin:0 0 10px;text-wrap:balance;max-width:28ch}
 .dek{font-size:16.5px;line-height:1.45;color:var(--ink-2);max-width:56ch;margin:0 0 16px}
-h2.sec{font-family:var(--f-mono);font-size:10.5px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 10px}
+h2.sec{font-family:var(--f-mono);font-size:10.5px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin:18px 0 9px}
 p{max-width:68ch}
 
-.kicker{margin-top:24px;border-top:2px solid var(--ink);padding-top:13px}
+.kicker{margin-top:20px;border-top:2px solid var(--ink);padding-top:12px}
 .kicker p{margin:0;font-family:var(--f-display);font-size:20px;line-height:1.38;max-width:62ch;font-weight:600}
 
 .grid{display:grid;gap:12px}
@@ -148,7 +161,7 @@ code,.mono{font-family:var(--f-mono);font-size:.885em;background:var(--surface-2
 .readout .sub{display:block;font-family:var(--f-body);font-size:13px;line-height:1.4;color:var(--ink-2);margin-top:5px;font-weight:400}
 
 /* terminal */
-.term{background:#0D1117;border:1px solid rgba(255,255,255,.09);border-radius:5px;padding:13px 16px;font-family:var(--f-mono);font-size:12.5px;line-height:1.62;color:#C2CCD8;overflow-x:auto;white-space:pre;tab-size:4}
+.term{background:#0D1117;border:1px solid rgba(255,255,255,.09);border-radius:5px;padding:13px 16px;font-family:var(--f-mono);font-size:12px;line-height:1.62;color:#C2CCD8;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4}
 .term .p{color:#6EBC94}
 .term .c{color:#EEF2F7}
 .term .o{color:#98A5B4}
@@ -161,6 +174,8 @@ code,.mono{font-family:var(--f-mono);font-size:.885em;background:var(--surface-2
 /* svg */
 figure{margin:12px 0 0}
 figure svg{width:100%;height:auto;display:block;color:var(--path)}
+#model{max-height:max(300px, calc(100vh - 505px))}
+#fan{max-height:max(150px, calc(100vh - 704px))}
 .figwrap{overflow-x:auto}
 svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 .sv-box{fill:var(--surface);stroke:currentColor;stroke-width:1.5;transition:stroke .25s,stroke-width .25s,fill .25s}
@@ -172,8 +187,9 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 .sv-arc{stroke:currentColor;stroke-width:2;fill:none;transition:stroke .25s,stroke-width .25s}
 .sv-ident{stroke:var(--identity);stroke-width:1.5;fill:none}
 .sv-identbox{fill:var(--identity-bg);stroke:var(--identity);stroke-width:1.5}
-.sv-ou{fill:var(--surface-2);stroke:var(--rule-2);stroke-width:1}
-.sv-outx{font-family:"IBM Plex Mono",monospace;font-size:9.5px;fill:var(--ink-2);letter-spacing:.01em}
+.sv-hair{stroke:var(--rule);stroke-width:1}
+.sv-outx{font-family:"IBM Plex Mono",monospace;font-size:10px;fill:var(--ink);letter-spacing:.01em}
+.sv-outtag{font-family:"IBM Plex Mono",monospace;font-size:9.5px;fill:var(--ink-3);letter-spacing:.02em}
 .sv-open{stroke:var(--open);stroke-width:1.5;fill:none;stroke-dasharray:5 4}
 .sv-openbox{fill:var(--open-bg);stroke:var(--open);stroke-width:1.5;stroke-dasharray:5 4}
 .sv-chip{fill:var(--surface-2);stroke:var(--rule-2);stroke-width:1;transition:fill .25s,stroke .25s}
@@ -213,9 +229,9 @@ table.mat td{padding:0;border-top:1px solid var(--rule)}
 table.mat tr.lrow{cursor:pointer}
 table.mat tr.lrow:hover td,table.mat tr.lrow.act td{background:var(--surface-2)}
 table.mat tr.lrow.act td.lname{box-shadow:inset 3px 0 0 var(--ink)}
-td.lname{padding:9px 10px 9px 8px;font-weight:500;line-height:1.25}
-td.lname small{display:block;font-family:var(--f-mono);font-size:10px;color:var(--ink-3);font-weight:400;margin-top:2px}
-td.cell{text-align:center;padding:9px 4px;transition:opacity .2s}
+td.lname{padding:12px 10px 12px 8px;font-weight:500;line-height:1.3}
+td.lname small{display:block;font-family:var(--f-mono);font-size:10px;color:var(--ink-3);font-weight:400;margin-top:3px}
+td.cell{text-align:center;padding:12px 4px;transition:opacity .2s}
 table.mat.colsel td.cell:not(.csel){opacity:.26}
 .pip{display:inline-block;min-width:70px;padding:3px 7px;border-radius:3px;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:500}
 .pip.auto{background:var(--auto-bg);color:var(--auto)}
@@ -346,7 +362,7 @@ body.notes-on .notes{transform:none}
       <section class="slide" data-t="An award is not access">
         <p class="eyebrow">01 · The model</p>
         <h1 class="claim">An award is not access.</h1>
-        <p class="dek">Different systems own each step. Run a request through and watch where it stops.</p>
+        <p class="dek">Run a request through and watch where it stops.</p>
 
         <div class="ctrls">
           <div class="cgroup"><b>Path</b>
@@ -385,132 +401,134 @@ body.notes-on .notes{transform:none}
 
         <figure>
           <div class="figwrap">
-          <svg id="model" viewBox="0 0 1200 520" role="img" aria-label="Five stage model. Three request lanes converge on the IDDS allocations database, which mints UIDs and GIDs. Two independent writers then reach NCSA LDAP: acctd polls IDDS in batch and writes allocation state into resource-specific OUs, while a sync script on Savannah writes identity attributes into the main OU. In parallel acct.pl builds the Slurm account on the resource, which checks LDAP group membership at login. Identity is a separate track: LDAP holds the attributes, Kerberos holds the password, and there is no correlation service.">
+          <svg id="model" viewBox="0 0 1200 470" role="img" aria-label="Five stage model. Three request lanes converge on the IDDS allocations database, which mints UIDs and GIDs. Two independent writers then reach NCSA LDAP: acctd polls IDDS in batch and writes allocation state into resource-specific OUs, while a sync script on Savannah writes identity attributes into the main OU. In parallel acct.pl builds the Slurm account on the resource, which checks LDAP group membership at login. Identity is a separate track: LDAP holds the attributes, Kerberos holds the password, and there is no correlation service.">
             <defs>
               <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="currentColor"/></marker>
               <marker id="arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="var(--identity)"/></marker>
               <marker id="aro" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="var(--open)"/></marker>
             </defs>
 
-            <text class="sv-hdr" x="145" y="22" text-anchor="middle">1 · Approval</text>
-            <text class="sv-hdr" x="400" y="22" text-anchor="middle">2 · Allocation of record</text>
-            <text class="sv-hdr" x="635" y="22" text-anchor="middle">3 · Provisioning</text>
-            <text class="sv-hdr" x="872" y="22" text-anchor="middle">4 · Entitlement</text>
-            <text class="sv-hdr" x="1096" y="22" text-anchor="middle">5 · Enforcement</text>
-            <line class="sv-line" x1="20" y1="36" x2="1180" y2="36" stroke-width="1" opacity=".3"/>
+            <text class="sv-hdr" x="145" y="20" text-anchor="middle">1 · Approval</text>
+            <text class="sv-hdr" x="400" y="20" text-anchor="middle">2 · Allocation of record</text>
+            <text class="sv-hdr" x="635" y="20" text-anchor="middle">3 · Provisioning</text>
+            <text class="sv-hdr" x="875" y="20" text-anchor="middle">4 · Entitlement</text>
+            <text class="sv-hdr" x="1096" y="20" text-anchor="middle">5 · Enforcement</text>
+            <line class="sv-line" x1="20" y1="32" x2="1180" y2="32" stroke-width="1" opacity=".3"/>
 
             <g class="lay" data-layer="provisioning">
-              <path id="r-arc" class="sv-arc rail-p" d="M 635 217 C 700 118, 950 86, 1093 212" marker-end="url(#ar)"/>
-              <text class="sv-lab" x="836" y="70" text-anchor="middle">acct.pl + plugins run ON the machine:</text>
-              <text class="sv-lab" x="836" y="86" text-anchor="middle">Slurm account · QoS · SU budget</text>
+              <path id="r-arc" class="sv-arc rail-p" d="M 635 190 C 700 96, 950 66, 1093 185" marker-end="url(#ar)"/>
+              <text class="sv-lab" x="864" y="58" text-anchor="middle">acct.pl and plugins execute on the resource</text>
+              <text class="sv-lab" x="864" y="72" text-anchor="middle">Slurm account · QoS · SU budget</text>
             </g>
 
             <g class="lay" data-layer="approval">
               <g class="node" id="b-local">
-                <rect class="sv-box" x="30" y="150" width="230" height="58" rx="3"/>
-                <text class="sv-name" x="44" y="174" font-size="15">Illinois Computes</text>
-                <text class="sv-sub" x="44" y="193">IC Form → Jira → NCSA XRAS</text>
+                <rect class="sv-box" x="30" y="127" width="214" height="56" rx="3"/>
+                <text class="sv-name" x="44" y="150" font-size="15">Illinois Computes</text>
+                <text class="sv-sub" x="44" y="169">IC Form → Jira → NCSA XRAS</text>
               </g>
               <g class="node" id="b-access">
-                <rect class="sv-box" x="30" y="222" width="230" height="58" rx="3"/>
-                <text class="sv-name" x="44" y="246" font-size="15">ACCESS</text>
-                <text class="sv-sub" x="44" y="265">ACCESS XRAS → CDB</text>
+                <rect class="sv-box" x="30" y="196" width="214" height="56" rx="3"/>
+                <text class="sv-name" x="44" y="219" font-size="15">ACCESS</text>
+                <text class="sv-sub" x="44" y="238">ACCESS XRAS → CDB</text>
               </g>
               <g class="node" id="b-nairr">
-                <rect class="sv-box" x="30" y="294" width="230" height="58" rx="3"/>
-                <text class="sv-name" x="44" y="318" font-size="15">NAIRR</text>
-                <text class="sv-sub" x="44" y="337">NAIRR XRAS → CDB</text>
+                <rect class="sv-box" x="30" y="265" width="214" height="56" rx="3"/>
+                <text class="sv-name" x="44" y="288" font-size="15">NAIRR</text>
+                <text class="sv-sub" x="44" y="307">NAIRR XRAS → CDB</text>
               </g>
-              <path id="r-local" class="sv-line rail-p" d="M 260 179 H 297 V 235 H 330" marker-end="url(#ar)"/>
-              <path id="r-access" class="sv-line rail-p" d="M 260 251 H 330" marker-end="url(#ar)"/>
-              <path id="r-nairr" class="sv-line rail-p" d="M 260 323 H 297 V 267 H 330" marker-end="url(#ar)"/>
-              <text class="sv-lab" x="303" y="172">XRAS</text>
-              <text class="sv-lab" x="295" y="244" text-anchor="middle">AMIE</text>
-              <text class="sv-lab" x="303" y="334">AMIE ?</text>
-              <text class="sv-lab" x="400" y="182" text-anchor="middle">mints UIDs and GIDs</text>
-              <text class="sv-lab" x="400" y="196" text-anchor="middle" font-size="9">resources can set their own</text>
+              <path id="r-local" class="sv-line rail-p" d="M 244 155 H 300 V 204 H 330" marker-end="url(#ar)"/>
+              <path id="r-access" class="sv-line rail-p" d="M 244 224 H 330" marker-end="url(#ar)"/>
+              <path id="r-nairr" class="sv-line rail-p" d="M 244 293 H 300 V 244 H 330" marker-end="url(#ar)"/>
+              <text class="sv-lab" x="272" y="147" text-anchor="middle">XRAS</text>
+              <text class="sv-lab" x="272" y="216" text-anchor="middle">AMIE</text>
+              <text class="sv-lab" x="272" y="310" text-anchor="middle">AMIE ?</text>
+              <text class="sv-lab" x="400" y="164" text-anchor="middle">mints UIDs and GIDs</text>
+              <text class="sv-lab" x="400" y="178" text-anchor="middle" font-size="9">resources can set their own</text>
               <g class="node probe" id="n-idds" data-rec="idds" tabindex="0" role="button" aria-label="Inspect the IDDS row">
-                <rect class="sv-box" x="330" y="217" width="140" height="68" rx="3"/>
-                <text class="sv-name" x="400" y="248" text-anchor="middle">IDDS</text>
-                <text class="sv-sub" x="400" y="267" text-anchor="middle">what was awarded</text>
+                <rect class="sv-box" x="330" y="190" width="140" height="68" rx="3"/>
+                <text class="sv-name" x="400" y="221" text-anchor="middle">IDDS</text>
+                <text class="sv-sub" x="400" y="240" text-anchor="middle">what was awarded</text>
               </g>
             </g>
 
             <g class="lay" data-layer="provisioning">
-              <path id="r-poll" class="sv-line rail-p" d="M 470 251 H 570" marker-end="url(#ar)"/>
-              <text class="sv-lab" x="520" y="204" text-anchor="middle">batch poll</text>
+              <path id="r-poll" class="sv-line rail-p" d="M 470 224 H 570" marker-end="url(#ar)"/>
+              <text class="sv-lab" x="520" y="216" text-anchor="middle">batch poll</text>
               <g class="node" id="n-acctd">
-                <rect class="sv-box" x="570" y="217" width="130" height="68" rx="3"/>
-                <text class="sv-name" x="635" y="248" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16">acctd</text>
-                <text class="sv-sub" x="635" y="267" text-anchor="middle">batch, poll-driven</text>
+                <rect class="sv-box" x="570" y="190" width="130" height="68" rx="3"/>
+                <text class="sv-name" x="635" y="221" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16">acctd</text>
+                <text class="sv-sub" x="635" y="240" text-anchor="middle">batch, poll-driven</text>
               </g>
             </g>
 
             <g class="lay" data-layer="entitlement">
-              <path id="r-write" class="sv-line rail-p" d="M 700 245 C 740 245, 762 240, 800 240" marker-end="url(#ar)"/>
-              <text class="sv-lab" x="750" y="188" text-anchor="middle">writes allocation state</text>
-              <text class="sv-lab" x="750" y="202" text-anchor="middle" font-size="9" fill="var(--open)">resource OUs · no owner</text>
+              <path id="r-write" class="sv-line rail-p" d="M 700 218 C 740 218, 766 214, 795 214" marker-end="url(#ar)"/>
+              <text class="sv-lab" x="790" y="148" text-anchor="middle">writes allocation state</text>
+              <text class="sv-lab" x="790" y="162" text-anchor="middle" font-size="9" fill="var(--open)">resource OUs · no owner</text>
               <g class="node probe" id="n-ldap" data-rec="ldap" tabindex="0" role="button" aria-label="Inspect the LDAP entry">
-                <rect class="sv-box" x="800" y="208" width="150" height="104" rx="3"/>
-                <text class="sv-name" x="875" y="228" text-anchor="middle" font-size="15">NCSA LDAP</text>
-                <rect class="sv-ou" x="808" y="236" width="134" height="28" rx="2"/>
-                <text class="sv-outx" x="875" y="254" text-anchor="middle">resource OUs</text>
-                <rect class="sv-ou" x="808" y="268" width="134" height="28" rx="2"/>
-                <text class="sv-outx" x="875" y="286" text-anchor="middle">main OU</text>
-                <text class="sv-sub" x="875" y="306" text-anchor="middle" font-size="9" font-style="italic">entitlement, de facto</text>
+                <rect class="sv-box" x="795" y="172" width="160" height="108" rx="3"/>
+                <text class="sv-name" x="875" y="192" text-anchor="middle" font-size="15">NCSA LDAP</text>
+                <line class="sv-hair" x1="803" y1="201" x2="947" y2="201"/>
+                <text class="sv-outx" x="807" y="217">resource OUs</text>
+                <text class="sv-outtag" x="943" y="217" text-anchor="end">acctd</text>
+                <line class="sv-hair" x1="803" y1="229" x2="947" y2="229"/>
+                <text class="sv-outx" x="807" y="245">main OU</text>
+                <text class="sv-outtag" x="943" y="245" text-anchor="end">sync</text>
+                <line class="sv-hair" x1="803" y1="257" x2="947" y2="257"/>
+                <text class="sv-sub" x="875" y="271" text-anchor="middle" font-size="9" font-style="italic">entitlement, de facto</text>
               </g>
               <g class="node" id="n-chip">
-                <rect class="sv-chip" x="800" y="320" width="92" height="22" rx="3"/>
-                <text class="sv-chiptx" x="846" y="335" text-anchor="middle" font-size="9">charge groups</text>
+                <rect class="sv-chip" x="795" y="288" width="96" height="22" rx="3"/>
+                <text class="sv-chiptx" x="843" y="303" text-anchor="middle" font-size="9">charge groups</text>
               </g>
             </g>
 
             <g class="lay" data-layer="identity">
-              <path id="r-sync" class="sv-ident" d="M 455 285 C 492 330, 492 349, 520 349" marker-end="url(#arb)"/>
+              <path id="r-sync" class="sv-ident" d="M 455 258 C 492 296, 492 312, 520 312" marker-end="url(#arb)"/>
               <g class="node" id="n-sync">
-                <rect class="sv-box" x="520" y="326" width="220" height="46" rx="3"/>
-                <text class="sv-name" x="630" y="345" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12.5">sync script</text>
-                <text class="sv-sub" x="630" y="363" text-anchor="middle">on Savannah · writes identity</text>
+                <rect class="sv-box" x="520" y="290" width="220" height="44" rx="3"/>
+                <text class="sv-name" x="630" y="309" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12.5">sync script</text>
+                <text class="sv-sub" x="630" y="326" text-anchor="middle">on Savannah · writes identity</text>
               </g>
-              <path id="r-sync2" class="sv-ident" d="M 740 349 C 772 349, 780 282, 800 274" marker-end="url(#arb)"/>
+              <path id="r-sync2" class="sv-ident" d="M 740 312 C 772 312, 780 256, 795 248" marker-end="url(#arb)"/>
             </g>
 
             <g class="lay" data-layer="enforcement">
-              <path id="r-check" class="sv-line rail-p" d="M 950 251 H 1015" marker-end="url(#ar)"/>
-              <text class="sv-lab" x="980" y="204" text-anchor="middle" font-size="9.5">group check</text>
+              <path id="r-check" class="sv-line rail-p" d="M 955 224 H 1015" marker-end="url(#ar)"/>
+              <text class="sv-lab" x="985" y="166" text-anchor="middle" font-size="9">group check</text>
               <g class="node probe" id="n-delta" data-rec="slurm" tabindex="0" role="button" aria-label="Inspect the Slurm association">
-                <rect class="sv-box" x="1015" y="217" width="163" height="68" rx="3"/>
-                <text class="sv-name" x="1096" y="245" text-anchor="middle">Delta</text>
-                <text class="sv-sub" x="1096" y="264" text-anchor="middle" font-size="9.5">Kerberos + Duo · LDAP group</text>
-                <text class="sv-sub" x="1096" y="277" text-anchor="middle" font-size="9.5">· Slurm refuses over budget</text>
+                <rect class="sv-box" x="1015" y="190" width="163" height="68" rx="3"/>
+                <text class="sv-name" x="1096" y="218" text-anchor="middle">Delta</text>
+                <text class="sv-sub" x="1096" y="237" text-anchor="middle" font-size="9.5">Kerberos + Duo · LDAP group</text>
+                <text class="sv-sub" x="1096" y="250" text-anchor="middle" font-size="9.5">· Slurm refuses over budget</text>
               </g>
             </g>
 
             <g class="lay" data-layer="identity">
               <g class="node" id="n-ident">
-                <rect class="sv-identbox" x="700" y="392" width="478" height="112" rx="3"/>
-                <text x="716" y="414" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="0.09em" fill="var(--identity)">IDENTITY: A SEPARATE TRACK</text>
-                <text x="716" y="439" font-size="13.5" fill="var(--ink)">NCSA identity · NetID · ACCESS ID · campus AD · Globus</text>
-                <text x="716" y="463" font-size="13" fill="var(--ink)">LDAP holds the attributes. Kerberos holds the password.</text>
-                <text x="716" y="488" font-size="13.5" font-weight="600" fill="var(--identity)">No correlation service.</text>
+                <rect class="sv-identbox" x="700" y="352" width="478" height="104" rx="3"/>
+                <text x="716" y="374" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="0.09em" fill="var(--identity)">IDENTITY: A SEPARATE TRACK</text>
+                <text x="716" y="398" font-size="13.5" fill="var(--ink)">NCSA identity · NetID · ACCESS ID · campus AD · Globus</text>
+                <text x="716" y="420" font-size="13" fill="var(--ink)">LDAP holds the attributes. Kerberos holds the password.</text>
+                <text x="716" y="443" font-size="13.5" font-weight="600" fill="var(--identity)">No correlation service.</text>
               </g>
-              <line class="sv-ident" x1="915" y1="392" x2="915" y2="318" marker-end="url(#arb)"/>
-              <line class="sv-ident" x1="1096" y1="392" x2="1096" y2="291" marker-end="url(#arb)"/>
-              <text class="sv-lab" x="915" y="380" text-anchor="middle" fill="var(--identity)">an account must exist first</text>
-              <text class="sv-lab" x="1096" y="380" text-anchor="middle" fill="var(--identity)">authN at login</text>
+              <line class="sv-ident" x1="915" y1="352" x2="915" y2="284" marker-end="url(#arb)"/>
+              <line class="sv-ident" x1="1096" y1="352" x2="1096" y2="262" marker-end="url(#arb)"/>
+              <text class="sv-lab" x="925" y="330" fill="var(--identity)">account must exist first</text>
+              <text class="sv-lab" x="1106" y="330" fill="var(--identity)">authN at login</text>
             </g>
 
             <g class="lay" data-layer="surfaces">
               <g class="node" id="s-surf">
-                <rect class="sv-openbox" x="30" y="392" width="430" height="112" rx="3"/>
-                <text x="46" y="416" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="0.09em" fill="var(--open)">INTERACTION SURFACES</text>
-                <text x="46" y="448" font-size="13" fill="var(--ink)">identity.ncsa · Group Management · IC Form</text>
-                <text x="46" y="480" font-size="13" fill="var(--open)">They write. They decide nothing.</text>
+                <rect class="sv-openbox" x="30" y="352" width="430" height="104" rx="3"/>
+                <text x="46" y="374" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="0.09em" fill="var(--open)">INTERACTION SURFACES</text>
+                <text x="46" y="406" font-size="13" fill="var(--ink)">identity.ncsa · Group Management · IC Form</text>
+                <text x="46" y="438" font-size="13" fill="var(--open)">They write. They decide nothing.</text>
               </g>
-              <path id="r-pi" class="sv-open rail-p" d="M 400 392 V 291" marker-end="url(#aro)"/>
-              <text class="sv-lab" x="408" y="330" fill="var(--open)">PI adds member</text>
+              <path id="r-pi" class="sv-open rail-p" d="M 400 352 V 262" marker-end="url(#aro)"/>
+              <text class="sv-lab" x="408" y="344" fill="var(--open)">PI adds member</text>
             </g>
-
             <circle id="tok" class="token" r="7.5" cx="0" cy="0"/>
             <circle id="tok2" class="token" r="7.5" cx="0" cy="0"/>
           </svg>
@@ -563,7 +581,7 @@ body.notes-on .notes{transform:none}
           </div>
           <div class="card">
             <h4>What it does</h4>
-            <p>Six functions: activate and inactivate, at <code>project</code>, <code>account</code> and <code>user</code> level. A charge group is the unit of authorization, and there is no second grant path. It decides nothing of its own: IDDS mints every identifier it carries.</p>
+            <p>Six functions: activate and inactivate, at <code>project</code>, <code>account</code> and <code>user</code> level. A charge group is the only grant path. It decides nothing itself: IDDS mints every identifier.</p>
           </div>
           <div class="card">
             <h4>What it cannot do</h4>
@@ -572,7 +590,8 @@ body.notes-on .notes{transform:none}
         </div>
 
         <h2 class="sec">The charging model, live</h2>
-        <div class="grid g2">
+        <div class="grid g2" style="align-items:start">
+          <div>
           <div class="calc">
             <h4>SU award to GrpTRESMins <span style="text-transform:none;letter-spacing:0;color:var(--identity)">type a number</span></h4>
             <div class="calcrow">
@@ -587,6 +606,11 @@ body.notes-on .notes{transform:none}
             </div>
             <p class="calcnote">Hours to minutes, then scaled by 1000 so Slurm's integer flooring cannot round a fractional minute to zero. The result is set as <code>GrpTRESMins</code> on the account. That scaling has to be undone in three places: usage display, job cost display, and the figures returned to IDDS.</p>
           </div>
+          <div class="card bad" style="margin-top:12px">
+            <h4>Slurm is the source of authority on usage</h4>
+            <p>If the charge is the largest component and never the sum, reported usage is rounded down by design.</p>
+          </div>
+          </div>
 
           <div class="calc">
             <h4>What a job actually costs <span class="hint2">illustrative weights, drag anything</span></h4>
@@ -596,7 +620,7 @@ body.notes-on .notes{transform:none}
               <span class="jl">GPUs</span><input type="range" id="q-gpu" min="0" max="8" value="1"><span class="jv" id="n-gpu">1</span>
             </div>
             <div class="wrow">
-              <span><code style="background:none;padding:0">TRESBillingWeights</code>, site config, per partition:</span>
+              <span><code style="background:none;padding:0">TRESBillingWeights</code>, per partition:</span>
               <span>cpu <input type="number" id="w-cpu" value="1" step="0.25" min="0"></span>
               <span>mem <input type="number" id="w-mem" value="0.25" step="0.25" min="0"></span>
               <span>gpu <input type="number" id="w-gpu" value="12" step="1" min="0"></span>
@@ -613,11 +637,6 @@ body.notes-on .notes{transform:none}
             </div>
             <p class="calcnote" id="tresnote"></p>
           </div>
-        </div>
-
-        <div class="card bad" style="margin-top:16px">
-          <h4>Slurm is the source of authority on usage</h4>
-          <p>If the charge is the largest component and never the sum, reported usage is rounded down by design.</p>
         </div>
 
         <h2 class="sec">Latency is not one number</h2>
@@ -1370,4 +1389,3 @@ go(0);
 
 </body>
 </html>
-
