@@ -1,0 +1,1111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ideal State — IAM and Portal</title>
+<meta name="description" content="Target architecture for NCSA identity, allocations and portal: two authorities, one portal, LDAP demoted to a mirror. Derived from Nathan Tolbert’s perfect-world frame.">
+<meta name="author" content="NCSA">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F5F6F9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F131A" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181F'/%3E%3Cpath d='M8 16h16' stroke='%23E8EBF1' stroke-width='1.8'/%3E%3Ccircle cx='8' cy='16' r='3.2' fill='%23E8EBF1'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='%23E8EBF1'/%3E%3Ccircle cx='24' cy='16' r='3.2' fill='%236EBC94'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+html{color-scheme:light dark;-webkit-text-size-adjust:100%}
+img,svg{max-width:100%}
+[hidden]{display:none!important}
+button,input{font:inherit}
+
+/* Whiteboard convention: black for the approval path, blue for identity,
+   orange for what is not authoritative. Miro stickies: green auto, yellow manual, red absent. */
+:root{
+  --ground:#F5F6F9; --surface:#FFFFFF; --surface-2:#E9ECF1;
+  --ink:#14181F; --ink-2:#4B5462; --ink-3:#7C8695;
+  --rule:rgba(20,24,31,.13); --rule-2:rgba(20,24,31,.30);
+  --path:#14181F; --identity:#2B5EA8; --open:#AE561A;
+  --auto:#2C6A4E; --manual:#8C6A12; --break:#9F2A2A;
+  --identity-bg:rgba(43,94,168,.09); --open-bg:rgba(174,86,26,.10);
+  --auto-bg:rgba(44,106,78,.11); --manual-bg:rgba(140,106,18,.12); --break-bg:rgba(159,42,42,.10);
+  --shadow:0 1px 2px rgba(20,24,31,.05), 0 8px 28px -18px rgba(20,24,31,.28);
+  --f-display:"Spectral",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F131A; --surface:#171C25; --surface-2:#212833;
+    --ink:#E8EBF1; --ink-2:#A9B2C0; --ink-3:#79838F;
+    --rule:rgba(232,235,241,.15); --rule-2:rgba(232,235,241,.32);
+    --path:#E8EBF1; --identity:#83ACE9; --open:#E59559;
+    --auto:#6EBC94; --manual:#D9B75F; --break:#E6837B;
+    --identity-bg:rgba(131,172,233,.14); --open-bg:rgba(229,149,89,.14);
+    --auto-bg:rgba(110,188,148,.15); --manual-bg:rgba(217,183,95,.15); --break-bg:rgba(230,131,123,.15);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F131A; --surface:#171C25; --surface-2:#212833;
+  --ink:#E8EBF1; --ink-2:#A9B2C0; --ink-3:#79838F;
+  --rule:rgba(232,235,241,.15); --rule-2:rgba(232,235,241,.32);
+  --path:#E8EBF1; --identity:#83ACE9; --open:#E59559;
+  --auto:#6EBC94; --manual:#D9B75F; --break:#E6837B;
+  --identity-bg:rgba(131,172,233,.14); --open-bg:rgba(229,149,89,.14);
+  --auto-bg:rgba(110,188,148,.15); --manual-bg:rgba(217,183,95,.15); --break-bg:rgba(230,131,123,.15);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--identity);outline-offset:2px;border-radius:2px}
+
+.app{display:grid;grid-template-rows:auto auto 1fr;height:100vh}
+.topbar{display:flex;align-items:center;gap:16px;padding:0 20px;height:52px;border-bottom:1px solid var(--rule);background:var(--surface)}
+.brand{font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:-.01em;white-space:nowrap}
+.topbar .meta{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.spacer{flex:1}
+.prog{height:2px;background:var(--surface-2)}
+.prog i{display:block;height:2px;background:var(--ink);width:0;transition:width .3s ease}
+.tbtn{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:1px solid var(--rule-2);color:var(--ink-2);padding:5px 10px;border-radius:3px;cursor:pointer;white-space:nowrap}
+.tbtn:hover{background:var(--surface-2);color:var(--ink)}
+.tbtn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.tbtn kbd{font-family:var(--f-mono);opacity:.55;margin-left:5px;font-size:10px}
+
+.main{display:grid;grid-template-columns:206px 1fr;min-height:0}
+.rail{border-right:1px solid var(--rule);background:var(--surface);overflow-y:auto;padding:16px 0 24px}
+.rail h3{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0 0 8px;padding:0 16px;font-weight:500}
+.railitem{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:baseline;width:100%;text-align:left;background:none;border:0;cursor:pointer;padding:8px 16px;color:var(--ink-2);font-family:var(--f-body);font-size:13.5px;line-height:1.3;border-left:2px solid transparent}
+.railitem .n{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.railitem:hover{background:var(--surface-2);color:var(--ink)}
+.railitem[aria-current="true"]{color:var(--ink);font-weight:600;border-left-color:var(--ink);background:var(--surface-2)}
+.railitem[aria-current="true"] .n{color:var(--ink)}
+
+.stage{position:relative;overflow-y:auto;overflow-x:hidden;padding:26px 44px 86px}
+.slide{display:none;max-width:1180px;margin:0 auto}
+.slide.on{display:block;animation:rise .3s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.on{animation:none}}
+
+/* Short viewports: tighten the frame before any figure has to shrink. */
+@media (max-height:945px){
+  .stage{padding:16px 44px 74px}
+  h1.claim{font-size:clamp(28px,2.9vw,38px);margin-bottom:8px}
+  .dek{font-size:15.5px;margin-bottom:12px}
+  h2.sec{margin:13px 0 8px}
+  .kicker{margin-top:13px;padding-top:10px}
+  .kicker p{font-size:18px}
+  .readout{min-height:50px;padding:9px 14px}
+  .readout .txt{font-size:16.5px}
+  figure{margin-top:8px}
+}
+
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 10px}
+.eyebrow b{color:var(--open);font-weight:500}
+h1.claim{font-family:var(--f-display);font-weight:700;font-size:clamp(32px,3.5vw,46px);line-height:1.06;letter-spacing:-.02em;margin:0 0 10px;text-wrap:balance;max-width:28ch}
+.dek{font-size:16.5px;line-height:1.45;color:var(--ink-2);max-width:56ch;margin:0 0 16px}
+h2.sec{font-family:var(--f-mono);font-size:10.5px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin:18px 0 9px}
+p{max-width:68ch}
+
+.kicker{margin-top:20px;border-top:2px solid var(--ink);padding-top:12px}
+.kicker p{margin:0;font-family:var(--f-display);font-size:20px;line-height:1.38;max-width:62ch;font-weight:600}
+
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+@media (max-width:1080px){.g3,.g4{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:14px 15px;box-shadow:var(--shadow)}
+.card h4{margin:0 0 5px;font-size:13.5px;font-weight:600;line-height:1.3}
+.card p{margin:0;font-size:13px;line-height:1.45;color:var(--ink-2);max-width:none}
+.card.hi{border-left:3px solid var(--open)}
+.card.ask{border-top:3px solid var(--ink)}
+
+.stat{font-family:var(--f-display);font-weight:700;font-size:30px;line-height:1;letter-spacing:-.02em;display:block;margin-bottom:5px;font-variant-numeric:tabular-nums}
+.stat.orange{color:var(--open)}
+.statlbl{font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);display:block;line-height:1.4}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.chip{font-family:var(--f-mono);font-size:11.5px;background:var(--surface);border:1px solid var(--rule-2);border-radius:3px;padding:6px 11px;color:var(--ink-2)}
+.chip.bad{border-color:var(--break);color:var(--break);background:var(--break-bg)}
+
+code,.mono{font-family:var(--f-mono);font-size:.885em;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+
+/* controls */
+.ctrls{display:flex;flex-wrap:wrap;gap:9px 20px;align-items:center;padding:10px 0 11px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.cgroup{display:flex;align-items:center;gap:7px}
+.cgroup > b{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin-right:2px}
+.pill{font-family:var(--f-body);font-size:12.5px;font-weight:500;background:var(--surface);border:1px solid var(--rule-2);color:var(--ink-2);padding:5px 11px;border-radius:14px;cursor:pointer;white-space:nowrap;transition:background .14s,color .14s,border-color .14s}
+.pill:hover{border-color:var(--ink);color:var(--ink)}
+.pill[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.pill.run{border-radius:4px;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px}
+.pill.run.go{background:var(--auto);border-color:var(--auto);color:#fff}
+.pill.run.rv{background:var(--open);border-color:var(--open);color:#fff}
+.pill.run.ex{background:var(--break);border-color:var(--break);color:#fff}
+.pill.run:hover{filter:brightness(1.08)}
+.pill[disabled]{opacity:.42;cursor:default;filter:none}
+.pill.stop,.pill.insp{border-radius:4px;font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:6px 10px}
+
+/* readout */
+.readout{margin-top:11px;display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:start;background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--ink-3);border-radius:4px;padding:11px 16px;min-height:56px}
+.readout.ok{border-left-color:var(--auto)}
+.readout.warn{border-left-color:var(--open)}
+.readout.bad{border-left-color:var(--break)}
+.readout .step{font-family:var(--f-mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);padding-top:4px;line-height:1.35}
+.readout .txt{font-family:var(--f-display);font-size:18px;line-height:1.35;margin:0;max-width:80ch}
+.readout.bad .txt,.readout.warn .txt{font-weight:600}
+.readout.bad .txt{color:var(--break)}
+.readout.warn .txt{color:var(--open)}
+.readout .sub{display:block;font-family:var(--f-body);font-size:13px;line-height:1.4;color:var(--ink-2);margin-top:5px;font-weight:400}
+
+/* terminal */
+.term{background:#0D1117;border:1px solid rgba(255,255,255,.09);border-radius:5px;padding:13px 16px;font-family:var(--f-mono);font-size:12px;line-height:1.62;color:#C2CCD8;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4}
+.term .p{color:#6EBC94}
+.term .c{color:#EEF2F7}
+.term .o{color:#98A5B4}
+.term .hl{color:#E9975C;font-weight:500}
+.term .cm{color:#5C6B7C}
+.cur{display:inline-block;width:7px;height:13px;background:#6EBC94;vertical-align:-2px;animation:blink 1.05s steps(2,start) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.cur{animation:none}}
+
+/* svg */
+figure{margin:12px 0 0}
+figure svg{width:100%;height:auto;display:block;color:var(--path)}
+#model{max-height:max(300px, calc(100vh - 505px))}
+#fan{max-height:max(150px, calc(100vh - 704px))}
+.figwrap{overflow-x:auto}
+svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.sv-box{fill:var(--surface);stroke:currentColor;stroke-width:1.5;transition:stroke .25s,stroke-width .25s,fill .25s}
+.sv-name{font-family:"Spectral",Georgia,serif;font-weight:600;font-size:17px;fill:var(--ink)}
+.sv-sub{font-size:10.5px;fill:var(--ink-3)}
+.sv-hdr{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.09em;fill:var(--ink-3);text-transform:uppercase}
+.sv-lab{font-family:"IBM Plex Mono",monospace;font-size:10.5px;fill:var(--ink-2)}
+.sv-line{stroke:currentColor;stroke-width:1.5;fill:none;transition:stroke .25s,stroke-width .25s}
+.sv-arc{stroke:currentColor;stroke-width:2;fill:none;transition:stroke .25s,stroke-width .25s}
+.sv-ident{stroke:var(--identity);stroke-width:1.5;fill:none}
+.sv-identbox{fill:var(--identity-bg);stroke:var(--identity);stroke-width:1.5}
+.sv-hair{stroke:var(--rule);stroke-width:1}
+.sv-outx{font-family:"IBM Plex Mono",monospace;font-size:10px;fill:var(--ink);letter-spacing:.01em}
+.sv-outtag{font-family:"IBM Plex Mono",monospace;font-size:9.5px;fill:var(--ink-3);letter-spacing:.02em}
+.sv-open{stroke:var(--open);stroke-width:1.5;fill:none;stroke-dasharray:5 4}
+.sv-openbox{fill:var(--open-bg);stroke:var(--open);stroke-width:1.5;stroke-dasharray:5 4}
+.sv-chip{fill:var(--surface-2);stroke:var(--rule-2);stroke-width:1;transition:fill .25s,stroke .25s}
+.sv-chiptx{font-family:"IBM Plex Mono",monospace;font-size:10px;fill:var(--ink-2);letter-spacing:.03em}
+.node.probe{cursor:pointer}
+.node.probe:hover .sv-box{stroke:var(--identity)}
+
+.node .sv-box.lit,.node .sv-chip.lit{stroke:var(--auto);stroke-width:2.5;fill:var(--auto-bg)}
+.node .sv-box.man,.node .sv-chip.man{stroke:var(--manual);stroke-width:2.5;fill:var(--manual-bg)}
+.node .sv-box.stale,.node .sv-chip.stale{stroke:var(--break);stroke-width:2.5;stroke-dasharray:6 4;fill:var(--break-bg)}
+.rail-p.act{stroke:var(--auto);stroke-width:2.5}
+.rail-p.pulse{stroke:var(--manual);stroke-width:2.5;stroke-dasharray:6 5;animation:march 1.4s linear infinite}
+@keyframes march{to{stroke-dashoffset:-22}}
+.token{fill:var(--auto);stroke:var(--surface);stroke-width:2;opacity:0}
+.token.rv{fill:var(--open)}
+.flash{animation:flash .9s ease 3}
+@keyframes flash{50%{opacity:.2}}
+@media (prefers-reduced-motion:reduce){.rail-p.pulse,.flash{animation:none}}
+
+.lay{transition:opacity .28s ease}
+svg.iso .lay{opacity:.1}
+svg.iso .lay.sel{opacity:1}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:11px;align-items:center}
+.legend span{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-2);display:flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:2px;display:inline-block}
+
+/* matrix */
+.matwrap{overflow-x:auto;margin-top:2px}
+table.mat{border-collapse:collapse;width:100%;min-width:840px;font-size:13px}
+table.mat th{font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:500;text-align:center;padding:0 4px 9px;vertical-align:bottom}
+table.mat th.col{cursor:pointer}
+table.mat th.col:hover{color:var(--ink)}
+table.mat th.col.act{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+table.mat th.lane{text-align:left;padding-left:0;width:200px}
+table.mat td{padding:0;border-top:1px solid var(--rule)}
+table.mat tr.lrow{cursor:pointer}
+table.mat tr.lrow:hover td,table.mat tr.lrow.act td{background:var(--surface-2)}
+table.mat tr.lrow.act td.lname{box-shadow:inset 3px 0 0 var(--ink)}
+td.lname{padding:12px 10px 12px 8px;font-weight:500;line-height:1.3}
+td.lname small{display:block;font-family:var(--f-mono);font-size:10px;color:var(--ink-3);font-weight:400;margin-top:3px}
+td.cell{text-align:center;padding:12px 4px;transition:opacity .2s}
+table.mat.colsel td.cell:not(.csel){opacity:.26}
+.pip{display:inline-block;min-width:70px;padding:3px 7px;border-radius:3px;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:500}
+.pip.auto{background:var(--auto-bg);color:var(--auto)}
+.pip.manual{background:var(--manual-bg);color:var(--manual)}
+.pip.gone{background:var(--break-bg);color:var(--break)}
+.pip.nd{background:var(--surface-2);color:var(--ink-3)}
+
+/* calculators */
+.calc{background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:15px 16px;box-shadow:var(--shadow)}
+.calc h4{margin:0 0 11px;font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.calcrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.calcrow label{font-family:var(--f-mono);font-size:11px;color:var(--ink-2);letter-spacing:.03em}
+input[type=number]{font-family:var(--f-mono);font-size:14px;width:118px;padding:5px 8px;border:1px solid var(--rule-2);border-radius:3px;background:var(--ground);color:var(--ink)}
+input[type=range]{accent-color:var(--identity);width:100%;height:20px}
+.chain{display:flex;align-items:center;gap:0;margin-top:12px;flex-wrap:wrap}
+.chain .k{font-family:var(--f-mono);font-size:15px;padding:8px 12px;border:1px solid var(--rule-2);border-radius:3px;background:var(--ground);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chain .k.end{border-color:var(--auto);background:var(--auto-bg);color:var(--auto);font-weight:500}
+.chain .op{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);padding:0 9px;white-space:nowrap}
+.calcnote{margin-top:10px;font-size:12.5px;color:var(--ink-3);line-height:1.45}
+.hint2{text-transform:none;letter-spacing:0;color:var(--identity);font-weight:400}
+.jr{display:grid;grid-template-columns:60px 1fr 46px;gap:8px 10px;align-items:center}
+.jl{font-family:var(--f-mono);font-size:11px;color:var(--ink-2)}
+.jv{font-family:var(--f-mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.wrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:12px;padding-top:11px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3)}
+.wrow input[type=number]{width:64px;font-size:12px;padding:3px 6px}
+.tres2{display:grid;grid-template-columns:34px 112px 1fr;gap:7px 10px;align-items:center;margin-top:12px}
+.te{font-family:var(--f-mono);font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--ink-2);text-align:right;white-space:nowrap}
+.tres{display:grid;grid-template-columns:64px 1fr 74px;gap:9px 12px;align-items:center;margin-top:4px}
+.tres .tl,.tres2 .tl{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-2)}
+.tres .tv{font-family:var(--f-mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.tbar{height:9px;background:var(--surface-2);border-radius:2px;overflow:hidden;position:relative}
+.tbar i{display:block;height:9px;background:var(--ink-3);border-radius:2px;transition:width .2s ease}
+.tbar.win i{background:var(--open)}
+.tout{display:flex;gap:26px;margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);flex-wrap:wrap}
+.tout div span{display:block}
+.tout .v{font-family:var(--f-display);font-size:26px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.tout .v.win{color:var(--open)}
+.tout .l{font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-top:5px}
+
+/* correlation */
+.corr-edge{stroke:var(--identity);stroke-width:1.75;fill:none;transition:stroke-dashoffset .9s ease}
+.corr-hub{fill:var(--surface);stroke:var(--rule-2);stroke-width:1.5;stroke-dasharray:5 4;transition:stroke .35s,fill .35s}
+svg.corron .corr-hub{stroke:var(--identity);stroke-dasharray:none;fill:var(--identity-bg)}
+.corr-hubtx{fill:var(--ink-3);transition:fill .35s}
+svg.corron .corr-hubtx{fill:var(--identity)}
+@media (prefers-reduced-motion:reduce){.corr-edge{transition:none}}
+
+/* cost fan */
+.fanrow,.fanpath{transition:opacity .18s}
+
+/* overlays */
+.ov{position:fixed;inset:0;background:rgba(10,13,18,.58);backdrop-filter:blur(3px);z-index:60;display:none;padding:6vh 5vw}
+body.jump-on #jump{display:block}
+body.nums-on #nums{display:block}
+.ov .panel{max-width:1000px;margin:0 auto;background:var(--surface);border-radius:6px;padding:24px 30px 30px;box-shadow:0 30px 80px -30px rgba(0,0,0,.6);max-height:88vh;overflow-y:auto}
+.ov h4{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0 0 14px;font-weight:500}
+.jgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+@media (max-width:820px){.jgrid{grid-template-columns:repeat(2,1fr)}}
+.jgrid button{text-align:left;background:var(--ground);border:1px solid var(--rule);border-radius:4px;padding:12px 13px;cursor:pointer;color:var(--ink);font-family:var(--f-body)}
+.jgrid button:hover{border-color:var(--ink);background:var(--surface-2)}
+.jgrid .n{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3);display:block;margin-bottom:3px}
+.jgrid .t{font-size:14px;font-weight:600;line-height:1.25;display:block}
+
+table.num{border-collapse:collapse;width:100%;font-size:13px}
+table.num th{text-align:left;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500;padding:0 12px 8px 0;border-bottom:1px solid var(--rule-2)}
+table.num td{padding:9px 12px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.42}
+table.num td.f{font-family:var(--f-mono);font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
+table.num td.c{color:var(--ink-2);font-size:12.5px}
+
+.notes{position:fixed;right:0;top:54px;bottom:0;width:372px;max-width:88vw;background:var(--surface);border-left:1px solid var(--rule-2);box-shadow:-14px 0 40px -26px rgba(0,0,0,.5);transform:translateX(100%);transition:transform .22s ease;z-index:40;display:flex;flex-direction:column}
+body.notes-on .notes{transform:none}
+@media (prefers-reduced-motion:reduce){.notes{transition:none}}
+.notes header{padding:13px 18px;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:10px}
+.notes header b{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.notes .body{padding:18px;overflow-y:auto}
+.notes h5{font-family:var(--f-display);font-size:16px;margin:0 0 10px;font-weight:600}
+.notes p{font-size:14px;line-height:1.55;margin:0 0 11px;max-width:none}
+.notes .obj{border-top:1px solid var(--rule);padding-top:11px;margin-top:13px}
+.notes .obj em{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--break);font-style:normal;display:block;margin-bottom:5px}
+
+.foot{position:fixed;left:206px;right:0;bottom:0;height:40px;background:var(--surface);border-top:1px solid var(--rule);display:flex;align-items:center;gap:14px;padding:0 20px;z-index:20}
+@media (max-width:900px){.foot{left:0}}
+.dots{display:flex;gap:6px;align-items:center}
+.dots button{width:9px;height:9px;padding:0;border-radius:50%;border:1px solid var(--rule-2);background:transparent;cursor:pointer}
+.dots button.on{background:var(--ink);border-color:var(--ink)}
+.foot .pos{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.foot .hint{font-family:var(--f-mono);font-size:10px;letter-spacing:.05em;color:var(--ink-3);margin-left:auto}
+.foot .hint kbd{border:1px solid var(--rule-2);border-radius:2px;padding:1px 4px;margin:0 1px}
+
+@media (max-width:900px){
+  .main{grid-template-columns:1fr}
+  .rail{display:none}
+  .stage{padding:20px 18px 86px}
+}
+
+@media print{
+  .topbar,.prog,.rail,.foot,.notes,.ov,.ctrls,.readout{display:none!important}
+  .app{display:block;height:auto}.main{display:block}
+  .stage{overflow:visible;padding:0;height:auto}
+  .slide{display:block!important;max-width:none;margin:0 0 30px;page-break-after:always}
+  .slide:last-child{page-break-after:auto}
+  body{background:#fff;color:#000}
+  .card,.calc{box-shadow:none;break-inside:avoid}
+  .term{background:#fff;color:#1a1a1a;border:1px solid #bbb}
+  .term .p,.term .c,.term .o,.term .cm{color:#1a1a1a}
+  .term .hl{color:#8a3b00;font-weight:600}.cur{display:none}
+}
+
+/* ---- v3 additions ---- */
+.sv-auth{fill:var(--surface);stroke:currentColor;stroke-width:1.5}
+.sv-der{fill:var(--surface);stroke:var(--open);stroke-width:1.5;stroke-dasharray:5 4}
+.node .sv-box.lit,.node .sv-auth.lit,.node .sv-der.lit{stroke:var(--auto);stroke-width:3;fill:var(--auto-bg);stroke-dasharray:none}
+.edge{stroke:currentColor;stroke-width:1.6;fill:none;transition:stroke .2s,stroke-width .2s}
+.edge.lit{stroke:var(--auto);stroke-width:3}
+.edge.ret{stroke:var(--identity)}
+.bnd{stroke:var(--identity);stroke-width:1.4;stroke-dasharray:6 5;fill:none;opacity:.8}
+.bndtx{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;fill:var(--identity)}
+.zone{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.11em;text-transform:uppercase;fill:var(--ink-3)}
+#ideal{max-height:max(320px, calc(100vh - 470px))}
+.epwrap{margin-top:10px;max-height:min(46vh,420px);overflow-y:auto;border:1px solid var(--rule);border-radius:5px;background:var(--surface)}
+table.ep{border-collapse:collapse;width:100%;font-size:13px}
+table.ep th{position:sticky;top:0;background:var(--surface);text-align:left;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500;padding:9px 12px;border-bottom:1px solid var(--rule-2)}
+table.ep td{padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.45;color:var(--ink-2)}
+table.ep td.m{font-family:var(--f-mono);font-size:11.5px;color:var(--ink);white-space:nowrap}
+table.ep td.m b{color:var(--identity);font-weight:500}
+.tiergrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+@media (max-width:1080px){.tiergrid{grid-template-columns:repeat(2,1fr)}}
+.tier{background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:13px 14px;box-shadow:var(--shadow);cursor:pointer;text-align:left;font-family:var(--f-body);color:var(--ink)}
+.tier:hover{border-color:var(--ink)}
+.tier[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink),var(--shadow)}
+.tier .tn{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:5px}
+.tier h4{margin:0 0 4px;font-size:14px;font-weight:600}
+.tier p{margin:0;font-size:12.5px;line-height:1.4;color:var(--ink-2);max-width:none}
+.phaserow{display:grid;grid-template-columns:150px 1fr;gap:10px 14px;align-items:center;margin-top:9px}
+.phlbl{font-family:var(--f-mono);font-size:11px;color:var(--ink-2)}
+.phval{font-family:var(--f-mono);font-size:11.5px;padding:5px 10px;border-radius:3px;display:inline-block;transition:background .2s,color .2s}
+.phval.old{background:var(--manual-bg);color:var(--manual)}
+.phval.new{background:var(--auto-bg);color:var(--auto)}
+.phval.mid{background:var(--surface-2);color:var(--ink-3)}
+.qlist{counter-reset:q;margin-top:4px}
+.qrow{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--rule);align-items:start}
+.qrow .qn{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);padding-top:2px}
+.qrow .qt{font-size:14px;line-height:1.45;font-weight:600}
+.qrow .qs{font-size:12.5px;line-height:1.45;color:var(--ink-2);margin-top:3px}
+.owner{font-family:var(--f-mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--open);margin-top:4px;display:block}
+.srcline{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3);margin-top:14px;line-height:1.6}
+.srcline a{color:var(--identity)}
+
+</style>
+</head>
+<body>
+<noscript><p style="max-width:60ch;margin:48px auto;font:16px/1.6 system-ui,sans-serif">This page is an interactive walkthrough and needs JavaScript enabled.</p></noscript>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">Ideal State</div>
+    <div class="meta">Target architecture · strawman for technical review · 16 Nov 2026</div>
+    <div class="spacer"></div>
+    <button class="tbtn" id="numbtn">Contracts<kbd>0</kbd></button>
+    <button class="tbtn" id="nbtn" aria-pressed="false">Notes<kbd>N</kbd></button>
+    <button class="tbtn" id="jbtn">Jump<kbd>J</kbd></button>
+  </header>
+  <div class="prog"><i id="progi"></i></div>
+
+  <div class="main">
+    <nav class="rail" id="rail" aria-label="Chapters"></nav>
+    <main class="stage" id="stage">
+
+      <!-- ============ 1 ============ -->
+      <section class="slide" data-t="Two authorities, one portal">
+        <p class="eyebrow">01 · The model</p>
+        <h1 class="claim">Two authorities, one portal.</h1>
+        <p class="dek">Everything left of the dashed line is the truth. Everything right of it is a copy that can be rebuilt. Trace a flow and watch where authority stops.</p>
+
+        <div class="ctrls">
+          <div class="cgroup"><b>Trace</b>
+            <button class="pill run go" id="f-identity">▶ New identity</button>
+            <button class="pill run go" id="f-xras">▶ XRAS award</button>
+            <button class="pill run rv" id="f-amie">▶ AMIE, no identity</button>
+            <button class="pill run ex" id="f-usage">↩ Usage return</button>
+            <button class="pill stop" id="f-reset">Reset</button>
+          </div>
+          <div class="cgroup"><b>Isolate</b>
+            <button class="pill lyr" data-layer="intake">Front door</button>
+            <button class="pill lyr" data-layer="authority">Authorities</button>
+            <button class="pill lyr" data-layer="derived">Projections</button>
+            <button class="pill lyr" data-layer="resources">Resources</button>
+          </div>
+        </div>
+
+        <div class="readout" id="ro">
+          <span class="step" id="ro-step">Ready</span>
+          <p class="txt" id="ro-txt">Four flows carry almost all the traffic. Run one, or isolate a layer.<span class="sub">Derived from Nathan Tolbert's "perfect world" frame on the program Miro board.</span></p>
+        </div>
+
+        <figure>
+          <div class="figwrap">
+          <svg id="ideal" viewBox="0 0 1200 490" role="img" aria-label="Target architecture. Researchers reach a portal; external systems reach integration adapters. Both call two authorities: an identity registry that owns people, groups and POSIX identifiers, and CiLedger that owns projects, allocations, quotas and usage. Credential services hold Kerberos and OIDC. Right of a dashed authority boundary sit derived projections: an LDAP mirror with a single writer, and per-resource provisioning agents. Resources consume both, and report usage back to CiLedger.">
+            <defs>
+              <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="currentColor"/></marker>
+              <marker id="arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="var(--identity)"/></marker>
+            </defs>
+
+            <text class="sv-hdr" x="275" y="18" text-anchor="middle">1 &#183; Front door</text>
+            <text class="sv-hdr" x="700" y="18" text-anchor="middle">2 &#183; Authorities (systems of record)</text>
+            <text class="sv-hdr" x="1040" y="18" text-anchor="middle">3 &#183; Derived</text>
+            <line class="sv-line" x1="20" y1="30" x2="1180" y2="30" stroke-width="1" opacity=".3"/>
+
+            <g data-layer="derived" class="lay">
+              <path class="bnd" d="M 905 44 V 388"/>
+              <text class="bndtx" x="905" y="404" text-anchor="middle">authority boundary</text>
+            </g>
+
+            <g id="edges" fill="none">
+              <path id="e-people" class="edge" d="M 250 110 H 296" marker-end="url(#ar)"/>
+              <path id="e-ext"    class="edge" d="M 250 322 H 296" marker-end="url(#ar)"/>
+              <path id="e-p-reg"  class="edge" d="M 510 100 H 566" marker-end="url(#ar)"/>
+              <path id="e-p-led"  class="edge" d="M 510 126 C 536 180, 540 230, 566 282" marker-end="url(#ar)"/>
+              <path id="e-a-led"  class="edge" d="M 510 322 H 566" marker-end="url(#ar)"/>
+              <path id="e-a-reg"  class="edge" d="M 510 296 C 536 230, 540 170, 566 116" marker-end="url(#ar)"/>
+              <path id="e-reg-cr" class="edge" d="M 700 140 V 166" marker-end="url(#ar)"/>
+              <path id="e-reg-ld" class="edge" d="M 830 100 H 936" marker-end="url(#ar)"/>
+              <path id="e-led-ag" class="edge" d="M 830 300 H 936" marker-end="url(#ar)"/>
+              <path id="e-ag-res" class="edge" d="M 1040 354 V 406" marker-end="url(#ar)"/>
+              <path id="e-ld-res" class="edge" d="M 1140 110 H 1166 V 440 H 1144" marker-end="url(#ar)"/>
+              <path id="e-usage"  class="edge ret" d="M 620 410 V 344" marker-end="url(#arb)" stroke="var(--identity)"/>
+              <path id="e-invite" class="edge ret" d="M 600 340 V 380 H 270 V 110 H 296" marker-end="url(#arb)" stroke="var(--identity)" stroke-dasharray="5 4"/>
+            </g>
+
+            <text class="sv-lab" x="866" y="90" text-anchor="middle">mirror</text>
+            <text class="sv-lab" x="866" y="290" text-anchor="middle">entitlements</text>
+            <text class="sv-lab" x="1158" y="250" text-anchor="end">Tier 0 reads</text>
+            <text class="sv-lab" x="630" y="392">usage and provisioning state</text>
+            <text class="sv-lab" x="282" y="404">invitation when no local identity exists</text>
+
+            <g class="node lay" data-layer="intake" id="n-people">
+              <rect class="sv-box" x="40" y="78" width="210" height="64" rx="5"/>
+              <text class="sv-name" x="145" y="105" text-anchor="middle">Researchers, PIs</text>
+              <text class="sv-sub"  x="145" y="124" text-anchor="middle">one front door, not thirteen</text>
+            </g>
+            <g class="node lay" data-layer="intake" id="n-ext">
+              <rect class="sv-box" x="40" y="290" width="210" height="64" rx="5"/>
+              <text class="sv-name" x="145" y="317" text-anchor="middle">External systems</text>
+              <text class="sv-sub"  x="145" y="336" text-anchor="middle">XRAS &#183; AMIE &#183; AD &#183; screening</text>
+            </g>
+            <g class="node lay" data-layer="intake" id="n-portal">
+              <rect class="sv-box" x="300" y="78" width="210" height="64" rx="5"/>
+              <text class="sv-name" x="405" y="105" text-anchor="middle">Portal</text>
+              <text class="sv-sub"  x="405" y="124" text-anchor="middle">all UI &#183; no durable state</text>
+            </g>
+            <g class="node lay" data-layer="intake" id="n-adapt">
+              <rect class="sv-box" x="300" y="290" width="210" height="64" rx="5"/>
+              <text class="sv-name" x="405" y="317" text-anchor="middle">Adapters</text>
+              <text class="sv-sub"  x="405" y="336" text-anchor="middle">translate only &#183; never decide</text>
+            </g>
+
+            <g class="node lay" data-layer="authority" id="n-reg">
+              <rect class="sv-auth" x="570" y="58" width="260" height="82" rx="5"/>
+              <text class="sv-name" x="700" y="86" text-anchor="middle">Identity Registry</text>
+              <text class="sv-sub"  x="700" y="106" text-anchor="middle">people &#183; groups &#183; POSIX IDs</text>
+              <text class="sv-sub"  x="700" y="124" text-anchor="middle">COmanage Registry</text>
+            </g>
+            <g class="node lay" data-layer="authority" id="n-cred">
+              <rect class="sv-auth" x="570" y="170" width="260" height="56" rx="5"/>
+              <text class="sv-name" x="700" y="196" text-anchor="middle">Credential Services</text>
+              <text class="sv-sub"  x="700" y="214" text-anchor="middle">Kerberos KDC &#183; OIDC &#183; SSH CA</text>
+            </g>
+            <g class="node lay" data-layer="authority" id="n-led">
+              <rect class="sv-auth" x="570" y="258" width="260" height="82" rx="5"/>
+              <text class="sv-name" x="700" y="286" text-anchor="middle">CiLedger</text>
+              <text class="sv-sub"  x="700" y="306" text-anchor="middle">projects &#183; allocations &#183; quotas &#183; usage</text>
+              <text class="sv-sub"  x="700" y="324" text-anchor="middle">replaces IDDS and acctd</text>
+            </g>
+
+            <g class="node lay" data-layer="derived" id="n-ldap">
+              <rect class="sv-der" x="940" y="78" width="200" height="64" rx="5"/>
+              <text class="sv-name" x="1040" y="105" text-anchor="middle">LDAP mirror</text>
+              <text class="sv-sub"  x="1040" y="124" text-anchor="middle">one writer &#183; no resource OUs</text>
+            </g>
+            <g class="node lay" data-layer="derived" id="n-agents">
+              <rect class="sv-der" x="940" y="290" width="200" height="64" rx="5"/>
+              <text class="sv-name" x="1040" y="317" text-anchor="middle">Provisioning agents</text>
+              <text class="sv-sub"  x="1040" y="336" text-anchor="middle">converge, then report back</text>
+            </g>
+            <g class="node lay" data-layer="resources" id="n-res">
+              <rect class="sv-box" x="300" y="410" width="840" height="60" rx="5"/>
+              <text class="sv-name" x="720" y="437" text-anchor="middle">Resources &#8212; Delta &#183; DeltaAI &#183; Radiant &#183; Taiga &#183; Granite &#183; Nightingale &#183; ICCP</text>
+              <text class="sv-sub"  x="720" y="456" text-anchor="middle">17 allocatable resources &#183; Tier 0 reads LDAP &#183; Tiers 1 to 3 call the entitlement API and report usage</text>
+            </g>
+          </svg>
+          </div>
+          <div class="legend">
+            <span><i style="background:var(--ink)"></i>authoritative</span>
+            <span><i style="background:var(--open)"></i>derived projection</span>
+            <span><i style="background:var(--identity)"></i>return path, absent from the original frame</span>
+            <span><i style="background:var(--auto)"></i>active in the traced flow</span>
+          </div>
+        </figure>
+      </section>
+
+      <!-- ============ 2 ============ -->
+      <section class="slide" data-t="Five principles, and their price">
+        <p class="eyebrow">02 · The commitments</p>
+        <h1 class="claim">Five principles. Each one costs something.</h1>
+        <p class="dek">Nathan's words on the left. What they oblige us to do on the right — that is the part a review has to agree to.</p>
+
+        <div class="grid g2" style="margin-top:14px">
+          <div class="card ask"><h4>1 · LDAP is not an authority. Few things write to it.</h4>
+            <p><b>Price:</b> nine per-resource OUs collapse into one tree, and every tool that writes to LDAP loses its credential. Unknown consumers read it anonymously from any NCSA IP and nobody has an inventory.</p></div>
+          <div class="card ask"><h4>2 · CoManage is the single authority for identity and groups.</h4>
+            <p><b>Price:</b> 158 duplicate-email clusters and 40 duplicate uidNumber sets have to be reconciled <i>before</i> migration, not during. Two entries sharing a POSIX UID are one identity to the filesystem.</p></div>
+          <div class="card ask"><h4>3 · CiLedger is the single authority for allocations.</h4>
+            <p><b>Price:</b> a real data remodel. IDDS has no projects table — a project <i>is</i> a charge number, with metadata in a versioned XSEDE-era requests table. Nothing ports cleanly.</p></div>
+          <div class="card ask"><h4>4 · All UI interaction is handled in the portal.</h4>
+            <p><b>Price:</b> six documented intake paths, a Google Form and one person's inbox have to close, or the portal is a seventh front door. The portal must also never be a required step in a machine flow.</p></div>
+          <div class="card ask"><h4>5 · Identity creation should be easy, starting from federated identities.</h4>
+            <p><b>Price:</b> depends entirely on the Kerberos question. If every identity needs a Kerberos password to exist, federated-first enrollment is constrained hard.</p></div>
+          <div class="card hi"><h4>The principle the frame does not state</h4>
+            <p>Membership straddles 2 and 3. <b>Proposal:</b> CiLedger owns allocation membership; the registry owns every group not backed by an allocation; allocation-backed groups are derived and read-only. This is the most contestable call in the design.</p></div>
+        </div>
+
+        <div class="kicker"><p>Four of the five are data-governance commitments, not engineering ones. The build is not the hard part.</p></div>
+      </section>
+
+      <!-- ============ 3 ============ -->
+      <section class="slide" data-t="One writer per data class">
+        <p class="eyebrow">03 · Authority</p>
+        <h1 class="claim">One writer per data class. Everyone else reads.</h1>
+        <p class="dek">Pick a row to see who writes it today. If a team disagrees with a row here, the contracts behind it are moot.</p>
+
+        <div class="readout" id="ro3">
+          <span class="step" id="ro3-step">Today</span>
+          <p class="txt" id="ro3-txt">Select a data class.<span class="sub">The gap between the two columns is the migration.</span></p>
+        </div>
+
+        <div class="matwrap">
+          <table class="mat" id="authtbl">
+            <thead><tr><th class="lane">Data class</th><th class="col">Authority in the target state</th><th class="col">Status</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 4 ============ -->
+      <section class="slide" data-t="The contracts">
+        <p class="eyebrow">04 · Interfaces</p>
+        <h1 class="claim">Five contracts. Versioned, idempotent, auditable.</h1>
+        <p class="dek">Enough surface for a team to say "that will not work for us." Pick a component.</p>
+
+        <div class="ctrls">
+          <div class="cgroup"><b>Component</b>
+            <button class="pill api" data-api="identity" aria-pressed="true">Identity Registry</button>
+            <button class="pill api" data-api="ledger">CiLedger</button>
+            <button class="pill api" data-api="portal">Portal</button>
+            <button class="pill api" data-api="resource">Resource-facing</button>
+            <button class="pill api" data-api="external">External adapters</button>
+          </div>
+        </div>
+
+        <div class="readout" id="ro4">
+          <span class="step" id="ro4-step">Base</span>
+          <p class="txt" id="ro4-txt">—<span class="sub" id="ro4-sub"></span></p>
+        </div>
+
+        <div class="epwrap">
+          <table class="ep">
+            <thead><tr><th style="width:38%">Call</th><th>Purpose and the thing it fixes</th></tr></thead>
+            <tbody id="epbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 5 ============ -->
+      <section class="slide" data-t="Resource conformance tiers">
+        <p class="eyebrow">05 · Adoption</p>
+        <h1 class="claim">Seventeen resources will not move at once. So they don't have to.</h1>
+        <p class="dek">A resource picks a tier. The tier decides what it builds and what it gets. No phase waits for the slowest resource.</p>
+
+        <div class="tiergrid" id="tiers"></div>
+
+        <div class="readout" id="ro5" style="margin-top:14px">
+          <span class="step" id="ro5-step">Tier 0</span>
+          <p class="txt" id="ro5-txt">—<span class="sub" id="ro5-sub"></span></p>
+        </div>
+
+        <div class="kicker"><p>The design risk is the mirror image of the usual one: nothing is blocked, and nothing is forced to move either.</p></div>
+      </section>
+
+      <!-- ============ 6 ============ -->
+      <section class="slide" data-t="Migration, phase by phase">
+        <p class="eyebrow">06 · Sequencing</p>
+        <h1 class="claim">Strangler, not cutover. Each phase stands alone.</h1>
+        <p class="dek">Drag through the phases. One writer per data class at every moment, including mid-phase — dual-write is where this kind of migration dies.</p>
+
+        <div class="calc" style="margin-top:12px">
+          <h4>Phase <span id="phnum">0</span> · <span id="phname">Reconcile</span></h4>
+          <input type="range" id="phase" min="0" max="4" value="0" step="1" aria-label="Migration phase">
+          <p class="calcnote" id="phdesc" style="margin-top:9px"></p>
+          <div id="phrows" style="margin-top:12px"></div>
+          <p class="calcnote" id="phvalue" style="border-top:1px solid var(--rule);padding-top:10px;margin-top:13px"></p>
+        </div>
+      </section>
+
+      <!-- ============ 7 ============ -->
+      <section class="slide" data-t="Attack this">
+        <p class="eyebrow">07 · What we need from you</p>
+        <h1 class="claim">Ten questions, ranked by how much damage a good answer does.</h1>
+        <p class="dek">Agreement is not useful here. Corrections and refusals are.</p>
+
+        <div class="qlist" id="qlist"></div>
+
+        <div class="kicker"><p>A working group reached substantially these conclusions in December 2020 and did not ship. Nobody should approve this without an answer to question 2.</p></div>
+
+        <p class="srcline">Full architecture and API contracts: the companion document. Source frame: Nathan Tolbert, "perfect world" plan, program Miro board. Current-state figures: NCSA IAM discovery rounds 1–4, Jul–Oct 2026.</p>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<aside class="notes" aria-label="Presenter notes">
+  <header><b>Presenter notes</b><div class="spacer"></div><button class="tbtn" id="ncls">Close</button></header>
+  <div class="body" id="nbody"></div>
+</aside>
+
+<div class="ov" id="jump" role="dialog" aria-modal="true" aria-label="Jump to chapter">
+  <div class="panel">
+    <h4>Jump to (J or Esc to close)</h4>
+    <div class="jgrid" id="jgrid"></div>
+  </div>
+</div>
+
+<div class="ov" id="nums" role="dialog" aria-modal="true" aria-label="Cross-cutting contract rules">
+  <div class="panel">
+    <h4>Cross-cutting rules (0 or Esc to close)</h4>
+    <table class="num">
+      <thead><tr><th style="width:150px">Rule</th><th style="width:28%">Statement</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td class="f">Service auth</td><td>OAuth2 client credentials, one client per adapter or agent</td><td class="c">A resource agent gets <code>ledger.entitlements.read</code> and <code>ledger.usage.write</code> and nothing else.</td></tr>
+        <tr><td class="f">Human auth</td><td>OIDC, with token exchange from the portal</td><td class="c">Downstream calls carry the end user's identity, not a service account. That is what makes the audit trail usable.</td></tr>
+        <tr><td class="f">Authorization</td><td>Computed in the owning service, never the caller</td><td class="c">The portal hiding a button is UX. The API still enforces, because machine paths bypass the portal.</td></tr>
+        <tr><td class="f">Idempotency</td><td><code>Idempotency-Key</code> on every mutating endpoint</td><td class="c">Non-negotiable for AMIE and XRAS adapters, which will retry.</td></tr>
+        <tr><td class="f">Versioning</td><td><code>/v1</code> in path, additive within a version</td><td class="c">Assume two versions run concurrently for long periods — resource teams adopt at very different rates.</td></tr>
+        <tr><td class="f">Errors</td><td>RFC 9457 problem details, typed domain errors</td><td class="c"><code>derived_group</code>, <code>uid_collision</code>, <code>screening_hold</code>, <code>allocation_expired</code>, <code>dead_account</code>.</td></tr>
+        <tr><td class="f">Events</td><td>At-least-once, ordered per aggregate, revision-stamped</td><td class="c">Events are notifications, not data transfer. A consumer holding a higher revision discards the event.</td></tr>
+        <tr><td class="f">Reconcile</td><td>Mandatory scheduled full reconcile for every consumer</td><td class="c">Events reduce latency; the reconcile guarantees correctness. Roughly doubles consumer work — the most arguable rule here.</td></tr>
+        <tr><td class="f">Audit</td><td>Actor, cause chain, before and after, on every write</td><td class="c">"Why did this user lose access at 2am" becomes a query, not a day of someone's time.</td></tr>
+        <tr><td class="f">Governance</td><td>IIB approval for new interfaces to NCSA IdM services</td><td class="c">Per IAM Policy v1.3. Every contract here is such an interface. A gate on the program, not a footnote.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer class="foot">
+  <span class="pos" id="pos">01</span>
+  <div class="dots" id="dots"></div>
+  <span class="hint"><kbd>←</kbd><kbd>→</kbd> move · <kbd>1</kbd>–<kbd>4</kbd> trace · <kbd>0</kbd> rules · <kbd>N</kbd> notes</span>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var RM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ===================== slide 1 : the ideal-state trace ===================== */
+var svg=document.getElementById("ideal");
+var roS=document.getElementById("ro-step"), roT=document.getElementById("ro-txt"), roEl=document.getElementById("ro");
+var gen=0, running=false;
+
+var FLOWS={
+  identity:{name:"New identity",cls:"ok",steps:[
+    ["n-people,e-people","Arrive","A researcher arrives from an invitation link, an AMIE prompt, or an XRAS request."],
+    ["n-portal,e-p-reg","Portal","The portal is an OIDC relying party. It never sees a Kerberos password and holds no durable record."],
+    ["n-reg","Match","The registry matches on released claims and returns a ranked candidate list. Today COmanage Match throws an error on two candidates; this contract requires a list and a review queue instead."],
+    ["n-reg","Mint","One identity, one minter: the registry assigns the NCSA username and the POSIX UID. Forty duplicate uidNumber sets exist today because two systems can both mint."],
+    ["n-cred,e-reg-cr","Credential","A Kerberos principal is created. Whether a password must exist for a federated user is Nathan's open question, and it is load-bearing."],
+    ["n-ldap,e-reg-ld","Mirror","The mirror agent writes LDAP. LDAP learns nothing it was not told."],
+    ["n-res,e-ld-res","Done","A Tier 0 resource sees the new identity on its next LDAP read, with no code change of its own."]
+  ]},
+  xras:{name:"XRAS award",cls:"ok",steps:[
+    ["n-ext,e-ext","Approved","Reviewers act in XRAS. The portal was the submit UI; the decision comes back to the adapter."],
+    ["n-adapt,e-a-led","Translate","The adapter calls CiLedger with a typed external reference. LDAP's projectReqID today holds both ACCESS codes and XRAS IDs with no discriminator."],
+    ["n-led","Screen","Export-control screening runs before activation and returns clear, hold or deny. The hook has to exist even while the API automation is unfunded."],
+    ["n-led","Activate","CiLedger activates the allocation and stamps a new entitlement revision."],
+    ["n-agents,e-led-ag","Converge","The resource agent pulls the entitlement snapshot and makes local state match. It converges on a snapshot; it does not replay a change log."],
+    ["n-res,e-ag-res","Provisioned","The agent reports what it actually did. acctd has no feedback path today, which is why partial deactivation needs hand-run SQL."]
+  ]},
+  amie:{name:"AMIE packet, no local identity",cls:"warn",steps:[
+    ["n-ext,e-ext","Packet","An AMIE packet arrives for an ACCESS project."],
+    ["n-adapt,e-a-reg","Resolve","The adapter asks the registry to match the ACCESS identity. No local person exists."],
+    ["n-led","Park","CiLedger creates the project in awaiting_identity rather than silently queueing the packet."],
+    ["n-portal,e-invite","Invite","A tracked invitation is issued, with an expiry and a reminder schedule — not a help-desk chase."],
+    ["n-reg","Resolve or prune","Accepted, the identity is created and the allocation activates. Expired, the project is marked abandoned and the queue is pruned. 757 packets across 179 projects are outstanding today; the oldest is 1,017 days old and nothing prunes."]
+  ]},
+  usage:{name:"Usage return",cls:"bad",steps:[
+    ["n-res","Jobs run","Slurm records accumulate on the resource."],
+    ["n-led,e-usage","Report","Usage posts to CiLedger, idempotent per job key, and the agent reports provisioning state alongside it."],
+    ["n-led","Balance","CiLedger debits, emits balance warnings, and a refund is a first-class transaction. Refunds are impossible inside Slurm today and are done by hand-adding SUs."],
+    ["n-ext","Forward","The ACCESS usage adapter forwards what belongs to ACCESS. This whole return path is an addition — the original frame's arrows to systems are one-way."]
+  ]}
+};
+
+function clearLit(){
+  Array.prototype.forEach.call(svg.querySelectorAll(".lit"),function(e){e.classList.remove("lit")});
+}
+function lightIds(ids){
+  ids.split(",").forEach(function(id){
+    var el=document.getElementById(id); if(!el) return;
+    if(el.classList.contains("edge")) el.classList.add("lit");
+    else { var b=el.querySelector("rect"); if(b) b.classList.add("lit"); }
+  });
+}
+function setRead(cls,step,txt){
+  roEl.className="readout"+(cls?" "+cls:"");
+  roS.textContent=step;
+  roT.innerHTML=txt;
+}
+function play(key){
+  var f=FLOWS[key]; if(!f) return;
+  gen++; var my=gen; running=true; clearLit();
+  var i=0;
+  (function next(){
+    if(my!==gen) return;
+    if(i>=f.steps.length){ running=false; setRead(f.cls,"Complete",f.name+" traced.<span class='sub'>Run another, or isolate a layer to see which components carry it.</span>"); return; }
+    var s=f.steps[i++];
+    lightIds(s[0]);
+    setRead(f.cls,s[1],s[2]);
+    setTimeout(next, RM?700:1600);
+  })();
+}
+["identity","xras","amie","usage"].forEach(function(k){
+  var b=document.getElementById("f-"+k); if(b) b.addEventListener("click",function(){play(k)});
+});
+document.getElementById("f-reset").addEventListener("click",function(){
+  gen++; running=false; clearLit(); svg.classList.remove("iso");
+  Array.prototype.forEach.call(document.querySelectorAll(".pill.lyr"),function(p){p.setAttribute("aria-pressed","false")});
+  setRead("","Ready","Four flows carry almost all the traffic. Run one, or isolate a layer.<span class='sub'>Derived from Nathan Tolbert's “perfect world” frame on the program Miro board.</span>");
+});
+Array.prototype.forEach.call(document.querySelectorAll(".pill.lyr"),function(p){
+  p.addEventListener("click",function(){
+    var on=p.getAttribute("aria-pressed")==="true";
+    Array.prototype.forEach.call(document.querySelectorAll(".pill.lyr"),function(q){q.setAttribute("aria-pressed","false")});
+    Array.prototype.forEach.call(svg.querySelectorAll(".lay"),function(g){g.classList.remove("sel")});
+    if(on){ svg.classList.remove("iso"); return; }
+    p.setAttribute("aria-pressed","true");
+    svg.classList.add("iso");
+    Array.prototype.forEach.call(svg.querySelectorAll('.lay[data-layer="'+p.dataset.layer+'"]'),function(g){g.classList.add("sel")});
+    var L={intake:["Front door","One portal for humans, one adapter layer for machines. The portal holds no durable state and is never a required step in a machine flow — otherwise its availability becomes every resource's availability."],
+           authority:["Authorities","Two systems of record, plus credentials. Everything else in the picture can be deleted and rebuilt from these."],
+           derived:["Projections","LDAP and the per-resource agents hold no truth of their own. Only the mirror agent binds to LDAP with write access; every other write credential is revoked."],
+           resources:["Resources","Seventeen allocatable resources. Only Delta and Hydro are fully auto-provisioned today."]}[p.dataset.layer];
+    setRead("",L[0],L[1]);
+  });
+});
+
+/* ===================== slide 3 : authority table ===================== */
+var AUTH=[
+ ["Person record, names, email","Identity Registry","new","identity.ncsa.illinois.edu, IDDS people and LDAP each write it independently."],
+ ["Organization and affiliation","Identity Registry, controlled vocabulary","new","Free text, user-editable. 36 distinct strings for one institution, 96 blank, four spellings of UIUC."],
+ ["Federated identity links","Identity Registry","gone","Nowhere coherent. Globus and CILogon each do their own linking. voPersonExternalID is populated on 0.22% of entries."],
+ ["NCSA username, POSIX UID/GID","Identity Registry","manual","LDAP and IDDS both. 40 duplicate uidNumber sets — two entries sharing a POSIX UID are one identity to the filesystem."],
+ ["Kerberos principal and password","Credential Services","manual","A Redis queue dispatched from a screen session, with a one-minute cron as the acknowledged safety net."],
+ ["Non-allocation groups","Identity Registry","manual","Savannah group tool, org-chart sync, campus AD sync. 7,477 groups carry an owner."],
+ ["Projects and allocations","CiLedger","new","IDDS. There is no projects table — a project is a charge number."],
+ ["Allocation membership","CiLedger","new","IDDS allocation_breakdown plus ACCTD writing LDAP charge groups. 3,865 charge groups exist."],
+ ["Quotas","CiLedger","auto","IDDS models these well — 8 tables, and a quota_pending flag that pushes to acctd. This part ports."],
+ ["Usage and job records","Resource, appended to CiLedger","auto","Slurm sacct to parselogs to send-jobs to jobd to IDDS. Works, except HTCondor falls outside it entirely."],
+ ["Per-resource allocation state","CiLedger","auto","IDDS accounts_history. The tuple model is right and survives; the project alone carries no state."],
+ ["Covered-entity membership (ACHE)","Identity Registry","manual","Savannah's Covered Entity Manager, one of three unrelated IAM jobs Savannah does."]
+];
+var PIP={"new":["gone","must be built"],"manual":["manual","manual today"],"auto":["auto","already automated"],"gone":["gone","no owner today"]};
+(function(){
+  var tb=document.querySelector("#authtbl tbody"); if(!tb) return;
+  AUTH.forEach(function(r,i){
+    var tr=document.createElement("tr"); tr.className="lrow";
+    tr.innerHTML='<td class="lname">'+r[0]+'</td><td class="cell" style="text-align:left;padding-left:10px">'+r[1]+'</td>'+
+                 '<td class="cell"><span class="pip '+PIP[r[2]][0]+'">'+PIP[r[2]][1]+'</span></td>';
+    tr.addEventListener("click",function(){
+      Array.prototype.forEach.call(tb.querySelectorAll("tr"),function(x){x.classList.remove("act")});
+      tr.classList.add("act");
+      var el=document.getElementById("ro3");
+      el.className="readout "+(r[2]==="auto"?"ok":(r[2]==="new"?"warn":"bad"));
+      document.getElementById("ro3-step").textContent="Today";
+      document.getElementById("ro3-txt").innerHTML=r[3]+"<span class='sub'>Target authority: "+r[1]+"</span>";
+    });
+    tb.appendChild(tr);
+  });
+})();
+
+/* ===================== slide 4 : contracts ===================== */
+var API={
+ identity:{base:"/identity/v1",sub:"COmanage Registry behind our own interface, so the implementation can be swapped for Keycloak plus Grouper without breaking callers. That indirection is a real cost — argue about it.",rows:[
+  ["POST /match","Returns a <b>ranked candidate list</b>, never an error on multiple. The single most important deviation from COmanage's native behaviour."],
+  ["POST /people","Create a person. Idempotent on request_id. Returns an opaque immutable person_id that is not the username."],
+  ["GET /people?identifier=&amp;type=","Lookup by ncsa_username, access_id, eppn, uin, email, orcid or x509_dn."],
+  ["POST /people/{id}/org-identities","Link a federated identity. Policy check: IAM Policy v1.3 allows one account per external IdP."],
+  ["POST /people/{id}/identifiers","Conflict returns 409 with the owning person_id. This is the duplicate-detection hook."],
+  ["GET /people/{id}/posix","uid_number, login, shell, home, subUID and subGID ranges — already an open Identity Coordination item."],
+  ["POST /people/{id}/posix","Assign POSIX identity. The registry is the <b>only</b> minter, and fails closed on collision."],
+  ["PATCH /people/{id}/status","active, suspended, grace, closed. LDAP has five values today (A/I/G/P/C); the mapping needs sign-off."],
+  ["PUT /groups/{gid}/members/{pid}","409 derived_group if the group is allocation-backed."],
+  ["POST /invitations","Tracked invitation with expiry and reminders. Replaces PI invitation URLs and the AMIE email chase."]
+ ]},
+ ledger:{base:"/ledger/v1",sub:"The hardest new build, and the place where IDDS's accumulated model has to be deliberately broken rather than ported.",rows:[
+  ["POST /projects","Projects are first-class. In IDDS a project <i>is</i> a charge number, with metadata in a versioned XSEDE-era requests table."],
+  ["GET /projects?external_ref=xras_request:…","Typed external references. LDAP's projectReqID holds ACCESS codes and XRAS IDs with no discriminator."],
+  ["POST /projects/{id}/allocations","New award, renewal or supplement: resource, amount, unit, start, end, award_source."],
+  ["POST /allocations/{id}/transactions","award, supplement, transfer, <b>refund</b>, debit, adjustment. Append-only. Refunds are impossible inside Slurm today."],
+  ["PUT /allocations/{id}/members/{pid}","pi, co_pi, manager, member. Emits an entitlement change."],
+  ["GET /people/{pid}/allocations","Everything one person can reach. <b>Directly answers the account-correlation gap</b> LDAP cannot answer today."],
+  ["GET/PUT /allocations/{id}/quotas/{res}","Block and inode quotas, soft and hard. Mirrors what IDDS already models well."],
+  ["POST /usage","Batch job records, idempotent per job_key. Must accept non-Slurm shapes — HTCondor has to fit."],
+  ["GET /resources/{res}/entitlements?since=","<b>The systems-facing read.</b> Cursor-paged, revision-stamped, full snapshot available for cold starts."],
+  ["POST /resources/{res}/provisioning-state","The agent reports what it actually did. Closes a loop acctd has never had."],
+  ["POST /allocations/{id}/lifecycle","activate, grace, expire, inactivate, reactivate. A dead account blocks reactivation, as IDDS does today."]
+ ]},
+ portal:{base:"backend-for-frontend",sub:"Holds sessions, drafts and UI preferences. Nothing another system would ever query.",rows:[
+  ["Forbidden — LDAP writes","No direct LDAP write, ever. Not even “just for groups.”"],
+  ["Forbidden — shadow user table","No local user table shadowing the registry."],
+  ["Forbidden — portal-only rules","If the portal enforces a rule, an API must enforce it too. Machine paths bypass the portal entirely."],
+  ["Forbidden — required in machine flows","If AMIE provisioning can only complete through a portal screen, portal availability becomes every resource's availability."],
+  ["Profile and identity","GET/PATCH /identity/v1/people/{id}. Replaces identity.ncsa.illinois.edu/manage, where the free-text organization problem originates."],
+  ["Collaborator add/remove","PUT /ledger/v1/allocations/{id}/members/{pid}. Replaces four lane-dependent tools."],
+  ["Balance and usage","GET /ledger/v1/allocations/{id}. Replaces computing deltas from ldapsearch; XRAS cannot display current values."],
+  ["Allocation request","XRAS submit embed or API. <b>Unresolved:</b> embedding XRAS and reimplementing submission are very different projects with different owners."],
+  ["Match review queue","Admin surface for several-candidate matches. Replaces manual duplicate repair by BUSIT."]
+ ]},
+ resource:{base:"tiers 0 to 3",sub:"The pull is the contract; events are an optimization that may be lost. An agent that has not reconciled by pull within its interval is non-compliant even if it is handling events correctly.",rows:[
+  ["Tier 0 — mirror only","Reads LDAP exactly as today. Gets correct identity and charge-group data, no balance, no quota push, no feedback."],
+  ["Tier 1 — reconciling","Polls the entitlement snapshot and diffs. Gets authoritative entitlements, quotas, expiry and grace."],
+  ["Tier 2 — event-driven","Adds an event subscription for latency. Still must reconcile on a schedule."],
+  ["Tier 3 — full participant","Adds usage and provisioning-state reporting. Live balances and real enforcement."],
+  ["Agent rule — converge","Given a snapshot, produce the state it implies. An agent that replays a change log drifts and cannot self-heal."],
+  ["Agent rule — fail closed","An unresolvable UID conflict is a deferral and an alert, never a guess."],
+  ["Agent rule — re-runnable","Radiant's acctd is run by hand today. The replacement must be safe on a schedule."],
+  ["LDAP — single writer","Only the mirror agent binds with write access. Every other write credential is revoked."],
+  ["LDAP — declared mapping","A published, versioned attribute map. No undeclared attributes."],
+  ["LDAP — validated enums","accountStatus becomes a validated set. One malformed value with a trailing space exists in production."],
+  ["LDAP — no resource OUs","Nine per-resource OU pairs collapse into one tree. ou=vforge survives decommission; ou=bailey appears in no documentation."],
+  ["LDAP — published lag","Each mirror emits a freshness timestamp. There are at least four undocumented cadences today."]
+ ]},
+ external:{base:"adapters",sub:"Adapters translate; they never decide. Each is a separate deployable with its own replay state, so a failure degrades one lane rather than the program.",rows:[
+  ["XRAS → CiLedger","On approval, create the project or allocation with a typed external ref. Back out: current balance, so reviewers stop computing deltas from ldapsearch."],
+  ["AMIE → CiLedger","Packet to match to project, or awaiting_identity plus a tracked invitation. Packets are acknowledged, never silently queued."],
+  ["CiLedger → ACCESS usage","Separate ACCESS integration from AMIE, with its own key and test-then-production gate."],
+  ["Screening","clear, hold or deny plus a decision id. Must work with a manual fallback that writes the same record, since the API automation is unfunded."],
+  ["Campus AD → Registry","Inbound org-identity source. Writes into the registry, never into LDAP. Currently a PHP daily script on Savannah."],
+  ["CiLedger → Billing","Reads usage and customer assignments. Today the quantity cell is hand-edited per assignment each month — the clearest automation win in the program."],
+  ["Jira SUP","Ticket on a deferral, a screening hold or a match review. 955 tickets a year are already auto-filed by AMIE."],
+  ["Unowned policy question","NSF Important Notice 149 is enforced. When ACCESS terminates an identity and the person still holds a live NCSA award, nothing defines what happens locally."]
+ ]}
+};
+(function(){
+  var body=document.getElementById("epbody");
+  function show(k){
+    var a=API[k];
+    document.getElementById("ro4-step").textContent="Base";
+    document.getElementById("ro4-txt").childNodes[0].nodeValue=a.base;
+    document.getElementById("ro4-sub").textContent=a.sub;
+    body.innerHTML=a.rows.map(function(r){return '<tr><td class="m">'+r[0]+'</td><td>'+r[1]+'</td></tr>'}).join("");
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".pill.api"),function(p){
+    p.addEventListener("click",function(){
+      Array.prototype.forEach.call(document.querySelectorAll(".pill.api"),function(q){q.setAttribute("aria-pressed","false")});
+      p.setAttribute("aria-pressed","true"); show(p.dataset.api);
+    });
+  });
+  show("identity");
+})();
+
+/* ===================== slide 5 : tiers ===================== */
+var TIERS=[
+ ["Tier 0","Mirror only","Reads LDAP, exactly as today.","Builds nothing. Gets correct identity and charge-group data — and no balance, no quota push, no state feedback. A resource may sit here indefinitely; no phase is gated on the slowest one.","ICCP · Nightingale · anything without engineering capacity"],
+ ["Tier 1","Reconciling","Runs an agent that polls the entitlement snapshot and diffs against local state.","Gets authoritative entitlements, quotas, expiry and grace. This is where the manual-step inventory starts to shrink — Radiant's hand-run acctd, partial deactivation by stored procedure.","Most resources, eventually"],
+ ["Tier 2","Event-driven","Tier 1 plus an event subscription.","Near-real-time provisioning. The pull is still the contract: an agent that has not reconciled within its interval is non-compliant even if its event handling is perfect.","Delta · DeltaAI"],
+ ["Tier 3","Full participant","Tier 2 plus usage and provisioning-state reporting.","Live balances, real enforcement, and CiLedger knowing whether an entitlement is actually in effect. This is where the value is, and Delta is the only credible first adopter.","Delta first"]
+];
+(function(){
+  var wrap=document.getElementById("tiers"); if(!wrap) return;
+  TIERS.forEach(function(t,i){
+    var b=document.createElement("button");
+    b.type="button"; b.className="tier"; b.setAttribute("aria-pressed", i===0?"true":"false");
+    b.innerHTML='<span class="tn">'+t[0]+'</span><h4>'+t[1]+'</h4><p>'+t[2]+'</p>';
+    b.addEventListener("click",function(){
+      Array.prototype.forEach.call(wrap.children,function(c){c.setAttribute("aria-pressed","false")});
+      b.setAttribute("aria-pressed","true");
+      document.getElementById("ro5").className="readout "+(i===0?"bad":i===3?"ok":"warn");
+      document.getElementById("ro5-step").textContent=t[0];
+      document.getElementById("ro5-txt").childNodes[0].nodeValue=t[3];
+      document.getElementById("ro5-sub").textContent="Plausibly here: "+t[4];
+    });
+    wrap.appendChild(b);
+  });
+  wrap.children[0].click();
+})();
+
+/* ===================== slide 6 : phases ===================== */
+var CLASSES=["Identity records","POSIX UID/GID","Kerberos","Groups","Allocations","Quotas and usage","LDAP"];
+var PHASES=[
+ {n:"Reconcile",d:"No new systems. Resolve the 40 duplicate uidNumber sets and 158 duplicate-email clusters, settle the UID minter, finish organization normalization, define the accountStatus mapping against production.",
+  v:["IDDS + LDAP","contested","id-mq queue","Savannah tools","IDDS","IDDS","de facto authority"],c:["old","old","old","old","old","old","old"],
+  val:"If it stops here: the data is correct and several known defects are closed. Worth doing whether or not anything else happens."},
+ {n:"Ledger facade",d:"CiLedger stands up as a read-only facade over IDDS. No new store, no writes. Resources start reading one documented entitlement API instead of scoped ldapsearch. Delta goes to Tier 1 first.",
+  v:["IDDS + LDAP","Identity Registry","id-mq queue","Savannah tools","IDDS, read via CiLedger","IDDS","de facto authority"],c:["old","new","old","old","mid","old","old"],
+  val:"If it stops here: resources have one read interface, and XRAS can finally display current allocation values."},
+ {n:"Registry for new identities",d:"The registry is deployed and backfilled, and routes new enrollments only. Portal enrollment replaces identity.ncsa.illinois.edu. Existing identities keep working unchanged. id-mq retires once the registry owns Kerberos writes.",
+  v:["Registry for new, LDAP for old","Identity Registry","Credential Services","Identity Registry","IDDS, read via CiLedger","IDDS","de facto authority"],c:["mid","new","new","new","mid","old","old"],
+  val:"If it stops here: the worst piece of infrastructure in the estate is gone, and new identities stop adding duplicates."},
+ {n:"Flip allocation authority",d:"CiLedger becomes the writer; IDDS becomes its mirror, then retires. acctd callouts are replaced per-resource by provisioning agents, one resource at a time. Delta first, Radiant early, ICCP last or never.",
+  v:["Identity Registry","Identity Registry","Credential Services","Identity Registry","CiLedger","CiLedger","mirror in progress"],c:["new","new","new","new","new","new","mid"],
+  val:"This is where the cost is. The temptation will be to stop at phase 1 and declare progress — approximately what happened after 2020."},
+ {n:"Demote LDAP, unbundle Savannah",d:"LDAP becomes a pure projection with a single writer and resource OUs collapse. Savannah's three IAM jobs rehome: AD sync to an inbound connector, Covered Entity Manager to a registry group, Invoice Tool to a billing adapter reading CiLedger usage.",
+  v:["Identity Registry","Identity Registry","Credential Services","Identity Registry","CiLedger","CiLedger","projection only"],c:["new","new","new","new","new","new","new"],
+  val:"Target state reached. Nothing writes to LDAP but the mirror agent, and nobody has to know which of nine OUs a user lives in."}
+];
+(function(){
+  var sl=document.getElementById("phase"); if(!sl) return;
+  var rows=document.getElementById("phrows");
+  CLASSES.forEach(function(c,i){
+    var d=document.createElement("div"); d.className="phaserow";
+    d.innerHTML='<span class="phlbl">'+c+'</span><span><span class="phval" id="pv'+i+'"></span></span>';
+    rows.appendChild(d);
+  });
+  function draw(){
+    var p=PHASES[+sl.value];
+    document.getElementById("phnum").textContent=sl.value;
+    document.getElementById("phname").textContent=p.n;
+    document.getElementById("phdesc").textContent=p.d;
+    document.getElementById("phvalue").textContent=p.val;
+    CLASSES.forEach(function(c,i){
+      var e=document.getElementById("pv"+i);
+      e.textContent=p.v[i]; e.className="phval "+p.c[i];
+    });
+  }
+  sl.addEventListener("input",draw); draw();
+})();
+
+/* ===================== slide 7 : questions ===================== */
+var QS=[
+ ["Is CiLedger something we will actually build, or a box on a whiteboard?","If nobody is going to replace IDDS, phases 3 and 4 are fiction and this should be a plan for improving IDDS instead.","Program sponsor"],
+ ["Why would this succeed where the 2020 IAM Working Group did not?","It reached substantially the same conclusions — LDAP plus COmanage, an administrative API, groups tied to allocations — and did not ship.","Sponsor + IAM team"],
+ ["Is the membership boundary rule wrong?","Glasgow's 2020 objection, that separating identity from allocations creates unnecessary complexity, applies directly to it. If he is right, two contracts collapse together.","Tolbert + Glasgow"],
+ ["Does the pull-based entitlement API work at Delta's scale?","Reconcile intervals, page sizes and cold-start cost against roughly 38,000 identities are unmodelled.","Delta engineering"],
+ ["Can LDAP actually be demoted?","Unknown consumers read it anonymously from any NCSA IP and nobody has an inventory. If that inventory is unobtainable, principle 1 may be undeliverable.","IAM team"],
+ ["Is the portal scope honest?","All UI in the portal, plus six intake paths, plus ICCP's investor portal, plus the ACCESS portal, is a multi-year product, not a component.","Sponsor"],
+ ["Does the tiering let every resource stay at Tier 0 forever?","It is designed so no resource blocks the program. The risk is that nothing moves past Tier 0 and the program ships a facade.","Resource owners"],
+ ["Can systems authenticate by anything but Kerberos?","Nathan's own question. If SSH certificates and OIDC are viable, federated-first enrollment gets much simpler. If not, principle 5 is constrained hard.","IAM team + Security"],
+ ["Is mandatory reconcile-plus-events over-engineering?","It roughly doubles consumer work. The case for it: every current NCSA sync already has a reconcile bolted on after the fact.","Resource owners"],
+ ["What is factually wrong here?","Much of the current-state detail comes from discovery reading rather than from the people who run these systems. Corrections are more useful than agreement.","Everyone"]
+];
+(function(){
+  var w=document.getElementById("qlist"); if(!w) return;
+  QS.forEach(function(q,i){
+    var d=document.createElement("div"); d.className="qrow";
+    d.innerHTML='<span class="qn">'+("0"+(i+1)).slice(-2)+'</span><div><div class="qt">'+q[0]+'</div><div class="qs">'+q[1]+'</div><span class="owner">candidate owner: '+q[2]+'</span></div>';
+    w.appendChild(d);
+  });
+})();
+
+/* ===================== shell ===================== */
+var NOTES=[
+ {h:"Open on the picture, not the principles.",p:["Let the diagram sit for a beat. The dashed line is the whole idea: left of it is truth, right of it is copies. Everything NCSA argues about today is a disagreement about which side something is on.","Run “AMIE, no identity” if the room is sceptical — 757 outstanding packets is the fact that lands."],o:["“This is just a redraw of Nathan's board.” Yes, plus the boundary rule and the return path. Say so."]},
+ {h:"The price column is the actual agenda.",p:["Nobody argues with the five principles. They argue with the price, and the price is mostly data governance, not code."],o:["“We already agreed to these in 2020.” Correct, and that is question 2."]},
+ {h:"Let people click their own row.",p:["The right-hand column is what their team does today. It is more persuasive than any summary."],o:["“Quotas already work.” They do. That row is marked already automated on purpose — it shows the table is not a hit list."]},
+ {h:"Do not read the endpoints aloud.",p:["Point at three: POST /match returning a candidate list, GET /people/{pid}/allocations, and POST /provisioning-state. Those three are the real design content."],o:["“Why wrap COmanage in our own API?” Fair. It is a real cost. The answer is swap-ability, and it is arguable."]},
+ {h:"Tiering is the political design, not the technical one.",p:["It exists so no resource team can block the program and none can be blamed for it either. Say that out loud; people respect the honesty."],o:["“So nobody has to do anything?” Correct, and that is question 7."]},
+ {h:"Drag slowly. Stop at phase 1.",p:["Phase 1 is cheap and visible. Phase 3 is where the money is. Ask directly whether the program can commit to phase 3 — if not, do 0 and 1 as standalone improvements and drop the rest."],o:["“Why not dual-write during the flip?” Because that is how these migrations die. One writer per class at every moment."]},
+ {h:"End on question 10, not question 1.",p:["The ask is corrections, not approval. Name the three people whose objection would change the design most and ask them in the room."],o:[]}
+];
+
+var slides=Array.prototype.slice.call(document.querySelectorAll(".slide"));
+var railEl=document.getElementById("rail"), dots=document.getElementById("dots"),
+    jgrid=document.getElementById("jgrid"), pos=document.getElementById("pos"),
+    nbody=document.getElementById("nbody"), progi=document.getElementById("progi");
+var cur=0;
+function label(i){ return ("0"+(i+1)).slice(-2); }
+railEl.insertAdjacentHTML("beforeend",'<h3>Chapters</h3>');
+slides.forEach(function(sl,i){
+  var b=document.createElement("button");
+  b.className="railitem"; b.type="button";
+  b.innerHTML='<span class="n">'+label(i)+'</span><span>'+sl.dataset.t+'</span>';
+  b.addEventListener("click",function(){go(i)});
+  railEl.appendChild(b);
+  var d=document.createElement("button");
+  d.type="button"; d.title=sl.dataset.t;
+  d.setAttribute("aria-label","Go to "+sl.dataset.t);
+  d.addEventListener("click",function(){go(i)});
+  dots.appendChild(d);
+  var j=document.createElement("button");
+  j.type="button";
+  j.innerHTML='<span class="n">'+label(i)+'</span><span class="t">'+sl.dataset.t+'</span>';
+  j.addEventListener("click",function(){go(i);closeOv()});
+  jgrid.appendChild(j);
+});
+var railBtns=Array.prototype.slice.call(railEl.querySelectorAll(".railitem"));
+var dotBtns=Array.prototype.slice.call(dots.children);
+
+function renderNotes(i){
+  var n=NOTES[i]; if(!n){nbody.innerHTML="";return;}
+  var h='<h5>'+n.h+'</h5>';
+  n.p.forEach(function(t){h+='<p>'+t+'</p>'});
+  if(n.o&&n.o.length){
+    h+='<div class="obj"><em>Likely pushback</em>';
+    n.o.forEach(function(t){h+='<p>'+t+'</p>'});
+    h+='</div>';
+  }
+  nbody.innerHTML=h; nbody.scrollTop=0;
+}
+function go(i){
+  if(i<0||i>=slides.length) return;
+  slides[cur].classList.remove("on");
+  railBtns[cur].removeAttribute("aria-current");
+  dotBtns[cur].classList.remove("on");
+  cur=i;
+  slides[cur].classList.add("on");
+  railBtns[cur].setAttribute("aria-current","true");
+  dotBtns[cur].classList.add("on");
+  pos.textContent=label(cur);
+  progi.style.width=((cur+1)/slides.length*100)+"%";
+  renderNotes(cur);
+  document.getElementById("stage").scrollTop=0;
+  railBtns[cur].scrollIntoView({block:"nearest"});
+  if(cur!==0){ gen++; running=false; }
+}
+function closeOv(){ document.body.classList.remove("jump-on","nums-on"); }
+var nbtn=document.getElementById("nbtn");
+function toggleNotes(){ nbtn.setAttribute("aria-pressed",String(document.body.classList.toggle("notes-on"))); }
+nbtn.addEventListener("click",toggleNotes);
+document.getElementById("ncls").addEventListener("click",toggleNotes);
+document.getElementById("jbtn").addEventListener("click",function(){ document.body.classList.remove("nums-on"); document.body.classList.toggle("jump-on"); });
+document.getElementById("numbtn").addEventListener("click",function(){ document.body.classList.remove("jump-on"); document.body.classList.toggle("nums-on"); });
+document.getElementById("jump").addEventListener("click",function(e){ if(e.target===this) closeOv(); });
+document.getElementById("nums").addEventListener("click",function(e){ if(e.target===this) closeOv(); });
+
+document.addEventListener("keydown",function(e){
+  var t=e.target.tagName;
+  if(t==="INPUT"||t==="TEXTAREA") return;
+  var k=e.key;
+  if(k==="Escape"){ closeOv(); return; }
+  if(k==="ArrowRight"||k==="PageDown"){ e.preventDefault(); go(cur+1); }
+  else if(k==="ArrowLeft"||k==="PageUp"){ e.preventDefault(); go(cur-1); }
+  else if(k==="Home"){ e.preventDefault(); go(0); }
+  else if(k==="End"){ e.preventDefault(); go(slides.length-1); }
+  else if(k==="j"||k==="J"){ document.body.classList.remove("nums-on"); document.body.classList.toggle("jump-on"); }
+  else if(k==="0"){ document.body.classList.remove("jump-on"); document.body.classList.toggle("nums-on"); }
+  else if(k==="n"||k==="N"){ toggleNotes(); }
+  else if(cur===0 && !running && (k==="1"||k==="2"||k==="3"||k==="4")){
+    e.preventDefault();
+    play(["identity","xras","amie","usage"][+k-1]);
+  }
+});
+
+go(0);
+})();
+</script>
+
+<script>
+(function(){
+  var on=/present/i.test(location.hash)||/present/i.test(location.search); if(on) return;
+  var b=document.getElementById("nbtn"); if(b&&b.parentNode) b.parentNode.removeChild(b);
+  var a=document.querySelector("aside.notes"); if(a&&a.parentNode) a.parentNode.removeChild(a);
+  var h=document.querySelector(".foot .hint");
+  if(h) h.innerHTML='<kbd>←</kbd><kbd>→</kbd> move · <kbd>1</kbd>–<kbd>4</kbd> trace · <kbd>0</kbd> rules · <kbd>J</kbd> jump';
+  document.addEventListener("keydown",function(e){ if(e.key==="n"||e.key==="N"){ e.stopImmediatePropagation(); } },true);
+})();
+</script>
+<script>
+(function(){
+  try{ if(window.self===window.top) return; }catch(e){}
+  var bar=document.querySelector(".topbar"); if(!bar) return;
+  var a=document.createElement("a");
+  a.href=location.href; a.target="_blank"; a.rel="noopener";
+  a.className="tbtn"; a.textContent="Open full screen ↗"; bar.appendChild(a);
+})();
+</script>
+
+</body>
+</html>
