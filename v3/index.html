@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ideal State — IAM and Portal</title>
-<meta name="description" content="Target architecture for NCSA identity, allocations and portal: two authorities, one portal, LDAP demoted to a mirror. Derived from Nathan Tolbert’s perfect-world frame.">
+<meta name="description" content="Target architecture for NCSA identity, allocations and portal: two authorities, one portal, LDAP demoted to a mirror.">
 <meta name="author" content="NCSA">
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light dark">
@@ -387,9 +387,9 @@ table.ep td.m b{color:var(--identity);font-weight:500}
 <div class="app">
   <header class="topbar">
     <div class="brand">Ideal State</div>
-    <div class="meta">Target architecture · strawman for technical review · 16 Nov 2026</div>
+    <div class="meta">Target architecture · draft for review · 16 Nov 2026</div>
     <div class="spacer"></div>
-    <button class="tbtn" id="numbtn">Contracts<kbd>0</kbd></button>
+    <button class="tbtn" id="numbtn">Rules<kbd>0</kbd></button>
     <button class="tbtn" id="nbtn" aria-pressed="false">Notes<kbd>N</kbd></button>
     <button class="tbtn" id="jbtn">Jump<kbd>J</kbd></button>
   </header>
@@ -403,7 +403,7 @@ table.ep td.m b{color:var(--identity);font-weight:500}
       <section class="slide" data-t="Two authorities, one portal">
         <p class="eyebrow">01 · The model</p>
         <h1 class="claim">Two authorities, one portal.</h1>
-        <p class="dek">Everything left of the dashed line is the truth. Everything right of it is a copy that can be rebuilt. Trace a flow and watch where authority stops.</p>
+        <p class="dek">Left of the dashed line is the truth. Right of it is a copy that can be rebuilt.</p>
 
         <div class="ctrls">
           <div class="cgroup"><b>Trace</b>
@@ -423,12 +423,12 @@ table.ep td.m b{color:var(--identity);font-weight:500}
 
         <div class="readout" id="ro">
           <span class="step" id="ro-step">Ready</span>
-          <p class="txt" id="ro-txt">Four flows carry almost all the traffic. Run one, or isolate a layer.<span class="sub">Derived from Nathan Tolbert's "perfect world" frame on the program Miro board.</span></p>
+          <p class="txt" id="ro-txt">Run a flow, or isolate a layer.</p>
         </div>
 
         <figure>
           <div class="figwrap">
-          <svg id="ideal" viewBox="0 0 1200 490" role="img" aria-label="Target architecture. Researchers reach a portal; external systems reach integration adapters. Both call two authorities: an identity registry that owns people, groups and POSIX identifiers, and CiLedger that owns projects, allocations, quotas and usage. Credential services hold Kerberos and OIDC. Right of a dashed authority boundary sit derived projections: an LDAP mirror with a single writer, and per-resource provisioning agents. Resources consume both, and report usage back to CiLedger.">
+<svg id="ideal" viewBox="0 0 1200 490" role="img" aria-label="Target architecture. Researchers reach a portal; external systems reach integration adapters. Both call two authorities: an identity registry that owns people, groups and POSIX identifiers, and CiLedger that owns projects, allocations, quotas and usage. Credential services hold Kerberos and OIDC. Right of a dashed authority boundary sit derived projections: an LDAP mirror with a single writer, and per-resource provisioning agents. Resources consume both, and report usage back to CiLedger.">
             <defs>
               <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="currentColor"/></marker>
               <marker id="arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="var(--identity)"/></marker>
@@ -520,55 +520,54 @@ table.ep td.m b{color:var(--identity);font-weight:500}
               <text class="sv-name" x="720" y="437" text-anchor="middle">Resources &#8212; Delta &#183; DeltaAI &#183; Radiant &#183; Taiga &#183; Granite &#183; Nightingale &#183; ICCP</text>
               <text class="sv-sub"  x="720" y="456" text-anchor="middle">17 allocatable resources &#183; Tier 0 reads LDAP &#183; Tiers 1 to 3 call the entitlement API and report usage</text>
             </g>
-          </svg>
-          </div>
+          </svg>          </div>
           <div class="legend">
             <span><i style="background:var(--ink)"></i>authoritative</span>
-            <span><i style="background:var(--open)"></i>derived projection</span>
-            <span><i style="background:var(--identity)"></i>return path, absent from the original frame</span>
-            <span><i style="background:var(--auto)"></i>active in the traced flow</span>
+            <span><i style="background:var(--open)"></i>derived</span>
+            <span><i style="background:var(--identity)"></i>return path</span>
+            <span><i style="background:var(--auto)"></i>active in the trace</span>
           </div>
         </figure>
       </section>
 
       <!-- ============ 2 ============ -->
-      <section class="slide" data-t="Five principles, and their price">
+      <section class="slide" data-t="Five principles, five prices">
         <p class="eyebrow">02 · The commitments</p>
-        <h1 class="claim">Five principles. Each one costs something.</h1>
-        <p class="dek">Nathan's words on the left. What they oblige us to do on the right — that is the part a review has to agree to.</p>
+        <h1 class="claim">Five principles. Each one has a price.</h1>
+        <p class="dek">The principles are easy to agree to. The prices are the actual decision.</p>
 
         <div class="grid g2" style="margin-top:14px">
-          <div class="card ask"><h4>1 · LDAP is not an authority. Few things write to it.</h4>
-            <p><b>Price:</b> nine per-resource OUs collapse into one tree, and every tool that writes to LDAP loses its credential. Unknown consumers read it anonymously from any NCSA IP and nobody has an inventory.</p></div>
-          <div class="card ask"><h4>2 · CoManage is the single authority for identity and groups.</h4>
-            <p><b>Price:</b> 158 duplicate-email clusters and 40 duplicate uidNumber sets have to be reconciled <i>before</i> migration, not during. Two entries sharing a POSIX UID are one identity to the filesystem.</p></div>
-          <div class="card ask"><h4>3 · CiLedger is the single authority for allocations.</h4>
-            <p><b>Price:</b> a real data remodel. IDDS has no projects table — a project <i>is</i> a charge number, with metadata in a versioned XSEDE-era requests table. Nothing ports cleanly.</p></div>
-          <div class="card ask"><h4>4 · All UI interaction is handled in the portal.</h4>
-            <p><b>Price:</b> six documented intake paths, a Google Form and one person's inbox have to close, or the portal is a seventh front door. The portal must also never be a required step in a machine flow.</p></div>
-          <div class="card ask"><h4>5 · Identity creation should be easy, starting from federated identities.</h4>
-            <p><b>Price:</b> depends entirely on the Kerberos question. If every identity needs a Kerberos password to exist, federated-first enrollment is constrained hard.</p></div>
-          <div class="card hi"><h4>The principle the frame does not state</h4>
-            <p>Membership straddles 2 and 3. <b>Proposal:</b> CiLedger owns allocation membership; the registry owns every group not backed by an allocation; allocation-backed groups are derived and read-only. This is the most contestable call in the design.</p></div>
+          <div class="card ask"><h4>LDAP is not an authority</h4>
+            <p>Nine resource OUs collapse into one tree. Every other write credential is revoked. Nobody has an inventory of who reads LDAP today.</p></div>
+          <div class="card ask"><h4>One authority for identity and groups</h4>
+            <p>158 duplicate-email clusters and 40 duplicate UID sets get reconciled <i>before</i> migration. Two entries sharing a UID are one identity to the filesystem.</p></div>
+          <div class="card ask"><h4>One authority for allocations</h4>
+            <p>A real remodel, not a port. IDDS has no projects table — a project <i>is</i> a charge number.</p></div>
+          <div class="card ask"><h4>All UI in one portal</h4>
+            <p>Six intake paths, a Google Form and one person's inbox have to close. Otherwise the portal is a seventh front door.</p></div>
+          <div class="card ask"><h4>Identity creation starts federated</h4>
+            <p>Depends on the Kerberos question. If every identity needs a Kerberos password, this is constrained hard.</p></div>
+          <div class="card hi"><h4>The sixth, unstated one</h4>
+            <p>Membership is both a group and an allocation fact. Proposal: the ledger owns allocation membership; the registry owns everything else. Most contestable call here.</p></div>
         </div>
 
-        <div class="kicker"><p>Four of the five are data-governance commitments, not engineering ones. The build is not the hard part.</p></div>
+        <div class="kicker"><p>Four of the five are data-governance commitments. The build is not the hard part.</p></div>
       </section>
 
       <!-- ============ 3 ============ -->
       <section class="slide" data-t="One writer per data class">
         <p class="eyebrow">03 · Authority</p>
-        <h1 class="claim">One writer per data class. Everyone else reads.</h1>
-        <p class="dek">Pick a row to see who writes it today. If a team disagrees with a row here, the contracts behind it are moot.</p>
+        <h1 class="claim">One writer per data class.</h1>
+        <p class="dek">Pick a row to see who writes it today.</p>
 
         <div class="readout" id="ro3">
           <span class="step" id="ro3-step">Today</span>
-          <p class="txt" id="ro3-txt">Select a data class.<span class="sub">The gap between the two columns is the migration.</span></p>
+          <p class="txt" id="ro3-txt">Select a data class.</p>
         </div>
 
         <div class="matwrap">
           <table class="mat" id="authtbl">
-            <thead><tr><th class="lane">Data class</th><th class="col">Authority in the target state</th><th class="col">Status</th></tr></thead>
+            <thead><tr><th class="lane">Data class</th><th class="col">Target authority</th><th class="col">Status</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -577,16 +576,16 @@ table.ep td.m b{color:var(--identity);font-weight:500}
       <!-- ============ 4 ============ -->
       <section class="slide" data-t="The contracts">
         <p class="eyebrow">04 · Interfaces</p>
-        <h1 class="claim">Five contracts. Versioned, idempotent, auditable.</h1>
-        <p class="dek">Enough surface for a team to say "that will not work for us." Pick a component.</p>
+        <h1 class="claim">Five contracts.</h1>
+        <p class="dek">Enough surface to say "that won't work for us."</p>
 
         <div class="ctrls">
           <div class="cgroup"><b>Component</b>
-            <button class="pill api" data-api="identity" aria-pressed="true">Identity Registry</button>
-            <button class="pill api" data-api="ledger">CiLedger</button>
+            <button class="pill api" data-api="identity" aria-pressed="true">Registry</button>
+            <button class="pill api" data-api="ledger">Ledger</button>
             <button class="pill api" data-api="portal">Portal</button>
-            <button class="pill api" data-api="resource">Resource-facing</button>
-            <button class="pill api" data-api="external">External adapters</button>
+            <button class="pill api" data-api="resource">Resources</button>
+            <button class="pill api" data-api="external">Adapters</button>
           </div>
         </div>
 
@@ -597,17 +596,17 @@ table.ep td.m b{color:var(--identity);font-weight:500}
 
         <div class="epwrap">
           <table class="ep">
-            <thead><tr><th style="width:38%">Call</th><th>Purpose and the thing it fixes</th></tr></thead>
+            <thead><tr><th style="width:38%">Call</th><th>What it fixes</th></tr></thead>
             <tbody id="epbody"></tbody>
           </table>
         </div>
       </section>
 
       <!-- ============ 5 ============ -->
-      <section class="slide" data-t="Resource conformance tiers">
+      <section class="slide" data-t="Resource tiers">
         <p class="eyebrow">05 · Adoption</p>
-        <h1 class="claim">Seventeen resources will not move at once. So they don't have to.</h1>
-        <p class="dek">A resource picks a tier. The tier decides what it builds and what it gets. No phase waits for the slowest resource.</p>
+        <h1 class="claim">Seventeen resources don't move at once.</h1>
+        <p class="dek">A resource picks a tier. The tier decides what it builds.</p>
 
         <div class="tiergrid" id="tiers"></div>
 
@@ -616,14 +615,14 @@ table.ep td.m b{color:var(--identity);font-weight:500}
           <p class="txt" id="ro5-txt">—<span class="sub" id="ro5-sub"></span></p>
         </div>
 
-        <div class="kicker"><p>The design risk is the mirror image of the usual one: nothing is blocked, and nothing is forced to move either.</p></div>
+        <div class="kicker"><p>Nothing is blocked. Nothing is forced to move either.</p></div>
       </section>
 
       <!-- ============ 6 ============ -->
-      <section class="slide" data-t="Migration, phase by phase">
+      <section class="slide" data-t="Migration">
         <p class="eyebrow">06 · Sequencing</p>
-        <h1 class="claim">Strangler, not cutover. Each phase stands alone.</h1>
-        <p class="dek">Drag through the phases. One writer per data class at every moment, including mid-phase — dual-write is where this kind of migration dies.</p>
+        <h1 class="claim">Strangler, not cutover.</h1>
+        <p class="dek">One writer per data class at every moment. Dual-write is where this dies.</p>
 
         <div class="calc" style="margin-top:12px">
           <h4>Phase <span id="phnum">0</span> · <span id="phname">Reconcile</span></h4>
@@ -636,15 +635,13 @@ table.ep td.m b{color:var(--identity);font-weight:500}
 
       <!-- ============ 7 ============ -->
       <section class="slide" data-t="Attack this">
-        <p class="eyebrow">07 · What we need from you</p>
-        <h1 class="claim">Ten questions, ranked by how much damage a good answer does.</h1>
-        <p class="dek">Agreement is not useful here. Corrections and refusals are.</p>
+        <p class="eyebrow">07 · What we need</p>
+        <h1 class="claim">Ten questions.</h1>
+        <p class="dek">Ranked by how much damage a good answer does. Corrections beat agreement.</p>
 
         <div class="qlist" id="qlist"></div>
 
-        <div class="kicker"><p>A working group reached substantially these conclusions in December 2020 and did not ship. Nobody should approve this without an answer to question 2.</p></div>
-
-        <p class="srcline">Full architecture and API contracts: the companion document. Source frame: Nathan Tolbert, "perfect world" plan, program Miro board. Current-state figures: NCSA IAM discovery rounds 1–4, Jul–Oct 2026.</p>
+        <div class="kicker"><p>A working group reached these conclusions in 2020 and did not ship. Question 2 is the real gate.</p></div>
       </section>
 
     </main>
@@ -663,22 +660,22 @@ table.ep td.m b{color:var(--identity);font-weight:500}
   </div>
 </div>
 
-<div class="ov" id="nums" role="dialog" aria-modal="true" aria-label="Cross-cutting contract rules">
+<div class="ov" id="nums" role="dialog" aria-modal="true" aria-label="Cross-cutting rules">
   <div class="panel">
     <h4>Cross-cutting rules (0 or Esc to close)</h4>
     <table class="num">
-      <thead><tr><th style="width:150px">Rule</th><th style="width:28%">Statement</th><th>Why</th></tr></thead>
+      <thead><tr><th style="width:150px">Rule</th><th style="width:30%">Statement</th><th>Why</th></tr></thead>
       <tbody>
-        <tr><td class="f">Service auth</td><td>OAuth2 client credentials, one client per adapter or agent</td><td class="c">A resource agent gets <code>ledger.entitlements.read</code> and <code>ledger.usage.write</code> and nothing else.</td></tr>
-        <tr><td class="f">Human auth</td><td>OIDC, with token exchange from the portal</td><td class="c">Downstream calls carry the end user's identity, not a service account. That is what makes the audit trail usable.</td></tr>
-        <tr><td class="f">Authorization</td><td>Computed in the owning service, never the caller</td><td class="c">The portal hiding a button is UX. The API still enforces, because machine paths bypass the portal.</td></tr>
-        <tr><td class="f">Idempotency</td><td><code>Idempotency-Key</code> on every mutating endpoint</td><td class="c">Non-negotiable for AMIE and XRAS adapters, which will retry.</td></tr>
-        <tr><td class="f">Versioning</td><td><code>/v1</code> in path, additive within a version</td><td class="c">Assume two versions run concurrently for long periods — resource teams adopt at very different rates.</td></tr>
-        <tr><td class="f">Errors</td><td>RFC 9457 problem details, typed domain errors</td><td class="c"><code>derived_group</code>, <code>uid_collision</code>, <code>screening_hold</code>, <code>allocation_expired</code>, <code>dead_account</code>.</td></tr>
-        <tr><td class="f">Events</td><td>At-least-once, ordered per aggregate, revision-stamped</td><td class="c">Events are notifications, not data transfer. A consumer holding a higher revision discards the event.</td></tr>
-        <tr><td class="f">Reconcile</td><td>Mandatory scheduled full reconcile for every consumer</td><td class="c">Events reduce latency; the reconcile guarantees correctness. Roughly doubles consumer work — the most arguable rule here.</td></tr>
-        <tr><td class="f">Audit</td><td>Actor, cause chain, before and after, on every write</td><td class="c">"Why did this user lose access at 2am" becomes a query, not a day of someone's time.</td></tr>
-        <tr><td class="f">Governance</td><td>IIB approval for new interfaces to NCSA IdM services</td><td class="c">Per IAM Policy v1.3. Every contract here is such an interface. A gate on the program, not a footnote.</td></tr>
+        <tr><td class="f">Service auth</td><td>OAuth2 client credentials, one client each</td><td class="c">A resource agent gets entitlement read and usage write. Nothing else.</td></tr>
+        <tr><td class="f">Human auth</td><td>OIDC with token exchange</td><td class="c">Calls carry the end user, not a service account. That is what makes the audit trail usable.</td></tr>
+        <tr><td class="f">Authorization</td><td>In the owning service, never the caller</td><td class="c">Machine paths bypass the portal, so the API has to enforce.</td></tr>
+        <tr><td class="f">Idempotency</td><td><code>Idempotency-Key</code> on every write</td><td class="c">AMIE and XRAS adapters will retry.</td></tr>
+        <tr><td class="f">Versioning</td><td>Additive within <code>/v1</code></td><td class="c">Assume two versions run side by side for a long time.</td></tr>
+        <tr><td class="f">Errors</td><td>Typed domain errors, RFC 9457</td><td class="c"><code>derived_group</code>, <code>uid_collision</code>, <code>screening_hold</code>, <code>dead_account</code>.</td></tr>
+        <tr><td class="f">Events</td><td>At-least-once, revision-stamped</td><td class="c">An event says something changed. The consumer re-reads for state.</td></tr>
+        <tr><td class="f">Reconcile</td><td>Scheduled full reconcile, mandatory</td><td class="c">Doubles consumer work. The most arguable rule on this page.</td></tr>
+        <tr><td class="f">Audit</td><td>Actor and cause chain on every write</td><td class="c">"Why did this user lose access at 2am" becomes a query.</td></tr>
+        <tr><td class="f">Governance</td><td>IIB approval per interface</td><td class="c">IAM Policy v1.3. Every contract here is one. A gate, not a footnote.</td></tr>
       </tbody>
     </table>
   </div>
@@ -694,48 +691,43 @@ table.ep td.m b{color:var(--identity);font-weight:500}
 (function(){
 "use strict";
 var RM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var STEP = RM ? 2200 : 5200;
 
-/* ===================== slide 1 : the ideal-state trace ===================== */
+/* ===================== slide 1 ===================== */
 var svg=document.getElementById("ideal");
 var roS=document.getElementById("ro-step"), roT=document.getElementById("ro-txt"), roEl=document.getElementById("ro");
 var gen=0, running=false;
 
 var FLOWS={
   identity:{name:"New identity",cls:"ok",steps:[
-    ["n-people,e-people","Arrive","A researcher arrives from an invitation link, an AMIE prompt, or an XRAS request."],
-    ["n-portal,e-p-reg","Portal","The portal is an OIDC relying party. It never sees a Kerberos password and holds no durable record."],
-    ["n-reg","Match","The registry matches on released claims and returns a ranked candidate list. Today COmanage Match throws an error on two candidates; this contract requires a list and a review queue instead."],
-    ["n-reg","Mint","One identity, one minter: the registry assigns the NCSA username and the POSIX UID. Forty duplicate uidNumber sets exist today because two systems can both mint."],
-    ["n-cred,e-reg-cr","Credential","A Kerberos principal is created. Whether a password must exist for a federated user is Nathan's open question, and it is load-bearing."],
-    ["n-ldap,e-reg-ld","Mirror","The mirror agent writes LDAP. LDAP learns nothing it was not told."],
-    ["n-res,e-ld-res","Done","A Tier 0 resource sees the new identity on its next LDAP read, with no code change of its own."]
+    ["n-people,e-people,n-portal","Arrive","The portal is an OIDC relying party. It never sees a Kerberos password."],
+    ["n-reg,e-p-reg","Match","The registry returns a ranked candidate list, not an error, when two people match."],
+    ["n-reg","Mint","One minter for the username and POSIX UID. Forty duplicate UID sets exist because two systems can both mint today."],
+    ["n-cred,e-reg-cr","Credential","Kerberos principal created. Whether a federated user needs a password is still open."],
+    ["n-ldap,e-reg-ld,n-res,e-ld-res","Mirror","LDAP is written by one agent. A Tier 0 resource picks it up with no code change."]
   ]},
   xras:{name:"XRAS award",cls:"ok",steps:[
-    ["n-ext,e-ext","Approved","Reviewers act in XRAS. The portal was the submit UI; the decision comes back to the adapter."],
-    ["n-adapt,e-a-led","Translate","The adapter calls CiLedger with a typed external reference. LDAP's projectReqID today holds both ACCESS codes and XRAS IDs with no discriminator."],
-    ["n-led","Screen","Export-control screening runs before activation and returns clear, hold or deny. The hook has to exist even while the API automation is unfunded."],
-    ["n-led","Activate","CiLedger activates the allocation and stamps a new entitlement revision."],
-    ["n-agents,e-led-ag","Converge","The resource agent pulls the entitlement snapshot and makes local state match. It converges on a snapshot; it does not replay a change log."],
-    ["n-res,e-ag-res","Provisioned","The agent reports what it actually did. acctd has no feedback path today, which is why partial deactivation needs hand-run SQL."]
+    ["n-ext,e-ext,n-adapt","Approved","Reviewers act in XRAS. The decision comes back to an adapter."],
+    ["n-led,e-a-led","Record","Typed external reference. Today one LDAP field holds both ACCESS codes and XRAS IDs with no discriminator."],
+    ["n-led","Screen","Export-control screening runs before activation. Clear, hold or deny."],
+    ["n-agents,e-led-ag","Converge","The agent pulls the entitlement snapshot and makes local state match it."],
+    ["n-res,e-ag-res","Report","The agent says what it actually did. There is no feedback path today."]
   ]},
   amie:{name:"AMIE packet, no local identity",cls:"warn",steps:[
-    ["n-ext,e-ext","Packet","An AMIE packet arrives for an ACCESS project."],
-    ["n-adapt,e-a-reg","Resolve","The adapter asks the registry to match the ACCESS identity. No local person exists."],
-    ["n-led","Park","CiLedger creates the project in awaiting_identity rather than silently queueing the packet."],
-    ["n-portal,e-invite","Invite","A tracked invitation is issued, with an expiry and a reminder schedule — not a help-desk chase."],
-    ["n-reg","Resolve or prune","Accepted, the identity is created and the allocation activates. Expired, the project is marked abandoned and the queue is pruned. 757 packets across 179 projects are outstanding today; the oldest is 1,017 days old and nothing prunes."]
+    ["n-ext,e-ext,n-adapt","Packet","A packet arrives for an ACCESS project. No local person matches."],
+    ["n-led,e-a-led","Park","The project is created as awaiting_identity, not silently queued."],
+    ["n-portal,e-invite","Invite","A tracked invitation with an expiry, instead of a help-desk chase."],
+    ["n-reg","Resolve or prune","Accepted, it activates. Expired, it is pruned. 757 packets are outstanding today; the oldest is 1,017 days."]
   ]},
   usage:{name:"Usage return",cls:"bad",steps:[
-    ["n-res","Jobs run","Slurm records accumulate on the resource."],
-    ["n-led,e-usage","Report","Usage posts to CiLedger, idempotent per job key, and the agent reports provisioning state alongside it."],
-    ["n-led","Balance","CiLedger debits, emits balance warnings, and a refund is a first-class transaction. Refunds are impossible inside Slurm today and are done by hand-adding SUs."],
-    ["n-ext","Forward","The ACCESS usage adapter forwards what belongs to ACCESS. This whole return path is an addition — the original frame's arrows to systems are one-way."]
+    ["n-res","Jobs run","Usage accumulates on the resource."],
+    ["n-led,e-usage","Report","Posted to the ledger, idempotent per job."],
+    ["n-led","Balance","Refund is a first-class transaction. Today refunds are impossible in Slurm and done by hand."],
+    ["n-ext","Forward","What belongs to ACCESS goes back out. This whole return path is an addition."]
   ]}
 };
 
-function clearLit(){
-  Array.prototype.forEach.call(svg.querySelectorAll(".lit"),function(e){e.classList.remove("lit")});
-}
+function clearLit(){ Array.prototype.forEach.call(svg.querySelectorAll(".lit"),function(e){e.classList.remove("lit")}); }
 function lightIds(ids){
   ids.split(",").forEach(function(id){
     var el=document.getElementById(id); if(!el) return;
@@ -745,8 +737,7 @@ function lightIds(ids){
 }
 function setRead(cls,step,txt){
   roEl.className="readout"+(cls?" "+cls:"");
-  roS.textContent=step;
-  roT.innerHTML=txt;
+  roS.textContent=step; roT.innerHTML=txt;
 }
 function play(key){
   var f=FLOWS[key]; if(!f) return;
@@ -754,11 +745,10 @@ function play(key){
   var i=0;
   (function next(){
     if(my!==gen) return;
-    if(i>=f.steps.length){ running=false; setRead(f.cls,"Complete",f.name+" traced.<span class='sub'>Run another, or isolate a layer to see which components carry it.</span>"); return; }
+    if(i>=f.steps.length){ running=false; setRead(f.cls,"Done",f.name+".<span class='sub'>Run another, or isolate a layer.</span>"); return; }
     var s=f.steps[i++];
-    lightIds(s[0]);
-    setRead(f.cls,s[1],s[2]);
-    setTimeout(next, RM?700:1600);
+    lightIds(s[0]); setRead(f.cls,s[1],s[2]);
+    setTimeout(next, STEP);
   })();
 }
 ["identity","xras","amie","usage"].forEach(function(k){
@@ -767,7 +757,7 @@ function play(key){
 document.getElementById("f-reset").addEventListener("click",function(){
   gen++; running=false; clearLit(); svg.classList.remove("iso");
   Array.prototype.forEach.call(document.querySelectorAll(".pill.lyr"),function(p){p.setAttribute("aria-pressed","false")});
-  setRead("","Ready","Four flows carry almost all the traffic. Run one, or isolate a layer.<span class='sub'>Derived from Nathan Tolbert's “perfect world” frame on the program Miro board.</span>");
+  setRead("","Ready","Run a flow, or isolate a layer.");
 });
 Array.prototype.forEach.call(document.querySelectorAll(".pill.lyr"),function(p){
   p.addEventListener("click",function(){
@@ -775,36 +765,35 @@ Array.prototype.forEach.call(document.querySelectorAll(".pill.lyr"),function(p){
     Array.prototype.forEach.call(document.querySelectorAll(".pill.lyr"),function(q){q.setAttribute("aria-pressed","false")});
     Array.prototype.forEach.call(svg.querySelectorAll(".lay"),function(g){g.classList.remove("sel")});
     if(on){ svg.classList.remove("iso"); return; }
-    p.setAttribute("aria-pressed","true");
-    svg.classList.add("iso");
+    p.setAttribute("aria-pressed","true"); svg.classList.add("iso");
     Array.prototype.forEach.call(svg.querySelectorAll('.lay[data-layer="'+p.dataset.layer+'"]'),function(g){g.classList.add("sel")});
-    var L={intake:["Front door","One portal for humans, one adapter layer for machines. The portal holds no durable state and is never a required step in a machine flow — otherwise its availability becomes every resource's availability."],
-           authority:["Authorities","Two systems of record, plus credentials. Everything else in the picture can be deleted and rebuilt from these."],
-           derived:["Projections","LDAP and the per-resource agents hold no truth of their own. Only the mirror agent binds to LDAP with write access; every other write credential is revoked."],
-           resources:["Resources","Seventeen allocatable resources. Only Delta and Hydro are fully auto-provisioned today."]}[p.dataset.layer];
+    var L={intake:["Front door","One portal for people, one adapter layer for machines. Neither holds durable state."],
+           authority:["Authorities","Two systems of record. Everything else can be deleted and rebuilt from these."],
+           derived:["Projections","No truth of their own. One agent writes LDAP; every other write credential is revoked."],
+           resources:["Resources","Seventeen allocatable. Two are fully auto-provisioned today."]}[p.dataset.layer];
     setRead("",L[0],L[1]);
   });
 });
 
-/* ===================== slide 3 : authority table ===================== */
+/* ===================== slide 3 ===================== */
 var AUTH=[
- ["Person record, names, email","Identity Registry","new","identity.ncsa.illinois.edu, IDDS people and LDAP each write it independently."],
- ["Organization and affiliation","Identity Registry, controlled vocabulary","new","Free text, user-editable. 36 distinct strings for one institution, 96 blank, four spellings of UIUC."],
- ["Federated identity links","Identity Registry","gone","Nowhere coherent. Globus and CILogon each do their own linking. voPersonExternalID is populated on 0.22% of entries."],
- ["NCSA username, POSIX UID/GID","Identity Registry","manual","LDAP and IDDS both. 40 duplicate uidNumber sets — two entries sharing a POSIX UID are one identity to the filesystem."],
- ["Kerberos principal and password","Credential Services","manual","A Redis queue dispatched from a screen session, with a one-minute cron as the acknowledged safety net."],
- ["Non-allocation groups","Identity Registry","manual","Savannah group tool, org-chart sync, campus AD sync. 7,477 groups carry an owner."],
- ["Projects and allocations","CiLedger","new","IDDS. There is no projects table — a project is a charge number."],
- ["Allocation membership","CiLedger","new","IDDS allocation_breakdown plus ACCTD writing LDAP charge groups. 3,865 charge groups exist."],
- ["Quotas","CiLedger","auto","IDDS models these well — 8 tables, and a quota_pending flag that pushes to acctd. This part ports."],
- ["Usage and job records","Resource, appended to CiLedger","auto","Slurm sacct to parselogs to send-jobs to jobd to IDDS. Works, except HTCondor falls outside it entirely."],
- ["Per-resource allocation state","CiLedger","auto","IDDS accounts_history. The tuple model is right and survives; the project alone carries no state."],
- ["Covered-entity membership (ACHE)","Identity Registry","manual","Savannah's Covered Entity Manager, one of three unrelated IAM jobs Savannah does."]
+ ["Person record","Registry","new","Identity portal, IDDS and LDAP each write it independently."],
+ ["Organization","Registry, controlled list","new","Free text. 36 strings for one institution, 96 blank, four spellings of UIUC."],
+ ["Federated identity links","Registry","gone","Nowhere coherent. One external-ID field is populated on 0.22% of entries."],
+ ["Username, POSIX UID/GID","Registry","manual","Two minters. 40 duplicate UID sets."],
+ ["Kerberos credential","Credential Services","manual","A Redis queue dispatched from a screen session, with a one-minute cron as the net."],
+ ["Non-allocation groups","Registry","manual","Group tool, org-chart sync, AD sync. 7,477 groups have an owner."],
+ ["Projects and allocations","Ledger","new","IDDS. No projects table — a project is a charge number."],
+ ["Allocation membership","Ledger","new","IDDS plus ACCTD writing LDAP charge groups. 3,865 of them."],
+ ["Quotas","Ledger","auto","IDDS models these well. This part ports."],
+ ["Usage records","Resource → Ledger","auto","Slurm to jobd to IDDS. Works, except HTCondor sits outside it."],
+ ["Per-resource state","Ledger","auto","IDDS history tables. The tuple model is right and survives."],
+ ["ACHE covered entity","Registry","manual","A separate app, one of three unrelated IAM jobs it does."]
 ];
-var PIP={"new":["gone","must be built"],"manual":["manual","manual today"],"auto":["auto","already automated"],"gone":["gone","no owner today"]};
+var PIP={"new":["gone","must be built"],"manual":["manual","manual today"],"auto":["auto","already automated"],"gone":["gone","no owner"]};
 (function(){
   var tb=document.querySelector("#authtbl tbody"); if(!tb) return;
-  AUTH.forEach(function(r,i){
+  AUTH.forEach(function(r){
     var tr=document.createElement("tr"); tr.className="lrow";
     tr.innerHTML='<td class="lname">'+r[0]+'</td><td class="cell" style="text-align:left;padding-left:10px">'+r[1]+'</td>'+
                  '<td class="cell"><span class="pip '+PIP[r[2]][0]+'">'+PIP[r[2]][1]+'</span></td>';
@@ -813,81 +802,77 @@ var PIP={"new":["gone","must be built"],"manual":["manual","manual today"],"auto
       tr.classList.add("act");
       var el=document.getElementById("ro3");
       el.className="readout "+(r[2]==="auto"?"ok":(r[2]==="new"?"warn":"bad"));
-      document.getElementById("ro3-step").textContent="Today";
-      document.getElementById("ro3-txt").innerHTML=r[3]+"<span class='sub'>Target authority: "+r[1]+"</span>";
+      document.getElementById("ro3-txt").innerHTML=r[3];
     });
     tb.appendChild(tr);
   });
 })();
 
-/* ===================== slide 4 : contracts ===================== */
+/* ===================== slide 4 ===================== */
 var API={
- identity:{base:"/identity/v1",sub:"COmanage Registry behind our own interface, so the implementation can be swapped for Keycloak plus Grouper without breaking callers. That indirection is a real cost — argue about it.",rows:[
-  ["POST /match","Returns a <b>ranked candidate list</b>, never an error on multiple. The single most important deviation from COmanage's native behaviour."],
-  ["POST /people","Create a person. Idempotent on request_id. Returns an opaque immutable person_id that is not the username."],
-  ["GET /people?identifier=&amp;type=","Lookup by ncsa_username, access_id, eppn, uin, email, orcid or x509_dn."],
-  ["POST /people/{id}/org-identities","Link a federated identity. Policy check: IAM Policy v1.3 allows one account per external IdP."],
-  ["POST /people/{id}/identifiers","Conflict returns 409 with the owning person_id. This is the duplicate-detection hook."],
-  ["GET /people/{id}/posix","uid_number, login, shell, home, subUID and subGID ranges — already an open Identity Coordination item."],
-  ["POST /people/{id}/posix","Assign POSIX identity. The registry is the <b>only</b> minter, and fails closed on collision."],
-  ["PATCH /people/{id}/status","active, suspended, grace, closed. LDAP has five values today (A/I/G/P/C); the mapping needs sign-off."],
-  ["PUT /groups/{gid}/members/{pid}","409 derived_group if the group is allocation-backed."],
-  ["POST /invitations","Tracked invitation with expiry and reminders. Replaces PI invitation URLs and the AMIE email chase."]
+ identity:{base:"/identity/v1",sub:"Our interface, so the implementation can be swapped. That indirection is a real cost.",rows:[
+  ["POST /match","Ranked candidate list, never an error on two matches."],
+  ["POST /people","Create a person. Opaque immutable id, not the username."],
+  ["GET /people?identifier=","Lookup by username, ACCESS ID, eppn, UIN, email, ORCID or DN."],
+  ["POST /people/{id}/org-identities","Link a federated identity. One per external IdP, per policy."],
+  ["POST /people/{id}/identifiers","409 with the owning id. The duplicate-detection hook."],
+  ["POST /people/{id}/posix","The only UID minter. Fails closed on collision."],
+  ["PATCH /people/{id}/status","Four states. LDAP has five today; the mapping needs sign-off."],
+  ["PUT /groups/{g}/members/{p}","409 if the group is allocation-backed."],
+  ["POST /invitations","Tracked, with expiry and reminders."]
  ]},
- ledger:{base:"/ledger/v1",sub:"The hardest new build, and the place where IDDS's accumulated model has to be deliberately broken rather than ported.",rows:[
-  ["POST /projects","Projects are first-class. In IDDS a project <i>is</i> a charge number, with metadata in a versioned XSEDE-era requests table."],
-  ["GET /projects?external_ref=xras_request:…","Typed external references. LDAP's projectReqID holds ACCESS codes and XRAS IDs with no discriminator."],
-  ["POST /projects/{id}/allocations","New award, renewal or supplement: resource, amount, unit, start, end, award_source."],
-  ["POST /allocations/{id}/transactions","award, supplement, transfer, <b>refund</b>, debit, adjustment. Append-only. Refunds are impossible inside Slurm today."],
-  ["PUT /allocations/{id}/members/{pid}","pi, co_pi, manager, member. Emits an entitlement change."],
-  ["GET /people/{pid}/allocations","Everything one person can reach. <b>Directly answers the account-correlation gap</b> LDAP cannot answer today."],
-  ["GET/PUT /allocations/{id}/quotas/{res}","Block and inode quotas, soft and hard. Mirrors what IDDS already models well."],
-  ["POST /usage","Batch job records, idempotent per job_key. Must accept non-Slurm shapes — HTCondor has to fit."],
-  ["GET /resources/{res}/entitlements?since=","<b>The systems-facing read.</b> Cursor-paged, revision-stamped, full snapshot available for cold starts."],
-  ["POST /resources/{res}/provisioning-state","The agent reports what it actually did. Closes a loop acctd has never had."],
-  ["POST /allocations/{id}/lifecycle","activate, grace, expire, inactivate, reactivate. A dead account blocks reactivation, as IDDS does today."]
+ ledger:{base:"/ledger/v1",sub:"The hardest new build. Where the old model gets broken rather than ported.",rows:[
+  ["POST /projects","Projects are first-class, not charge numbers."],
+  ["GET /projects?external_ref=","Typed references. No more polymorphic join keys."],
+  ["POST /projects/{id}/allocations","Award, renewal or supplement."],
+  ["POST /allocations/{id}/transactions","Append-only. <b>Refund is first-class.</b>"],
+  ["PUT /allocations/{id}/members/{p}","PI, co-PI, manager, member."],
+  ["GET /people/{p}/allocations","<b>Answers the account-correlation gap</b> LDAP cannot."],
+  ["GET/PUT /allocations/{id}/quotas/{r}","Block and inode, soft and hard."],
+  ["POST /usage","Idempotent per job. Must accept non-Slurm shapes."],
+  ["GET /resources/{r}/entitlements?since=","<b>The systems-facing read.</b> Cursor-paged, revision-stamped."],
+  ["POST /resources/{r}/provisioning-state","What the agent actually did."],
+  ["POST /allocations/{id}/lifecycle","activate, grace, expire, inactivate, reactivate."]
  ]},
- portal:{base:"backend-for-frontend",sub:"Holds sessions, drafts and UI preferences. Nothing another system would ever query.",rows:[
-  ["Forbidden — LDAP writes","No direct LDAP write, ever. Not even “just for groups.”"],
-  ["Forbidden — shadow user table","No local user table shadowing the registry."],
-  ["Forbidden — portal-only rules","If the portal enforces a rule, an API must enforce it too. Machine paths bypass the portal entirely."],
-  ["Forbidden — required in machine flows","If AMIE provisioning can only complete through a portal screen, portal availability becomes every resource's availability."],
-  ["Profile and identity","GET/PATCH /identity/v1/people/{id}. Replaces identity.ncsa.illinois.edu/manage, where the free-text organization problem originates."],
-  ["Collaborator add/remove","PUT /ledger/v1/allocations/{id}/members/{pid}. Replaces four lane-dependent tools."],
-  ["Balance and usage","GET /ledger/v1/allocations/{id}. Replaces computing deltas from ldapsearch; XRAS cannot display current values."],
-  ["Allocation request","XRAS submit embed or API. <b>Unresolved:</b> embedding XRAS and reimplementing submission are very different projects with different owners."],
-  ["Match review queue","Admin surface for several-candidate matches. Replaces manual duplicate repair by BUSIT."]
+ portal:{base:"backend-for-frontend",sub:"Sessions and drafts only. Nothing another system would query.",rows:[
+  ["No LDAP writes","Ever. Not even for groups."],
+  ["No shadow user table","The registry is the record."],
+  ["No portal-only rules","Machine paths bypass the portal entirely."],
+  ["Never required in a machine flow","Otherwise portal uptime becomes every resource's uptime."],
+  ["Profile and identity","Replaces the identity self-service page."],
+  ["Collaborators","Replaces four lane-dependent tools."],
+  ["Balance and usage","Replaces computing deltas from ldapsearch."],
+  ["Allocation request","Embed XRAS or rebuild submission. <b>Unresolved.</b>"]
  ]},
- resource:{base:"tiers 0 to 3",sub:"The pull is the contract; events are an optimization that may be lost. An agent that has not reconciled by pull within its interval is non-compliant even if it is handling events correctly.",rows:[
-  ["Tier 0 — mirror only","Reads LDAP exactly as today. Gets correct identity and charge-group data, no balance, no quota push, no feedback."],
-  ["Tier 1 — reconciling","Polls the entitlement snapshot and diffs. Gets authoritative entitlements, quotas, expiry and grace."],
-  ["Tier 2 — event-driven","Adds an event subscription for latency. Still must reconcile on a schedule."],
-  ["Tier 3 — full participant","Adds usage and provisioning-state reporting. Live balances and real enforcement."],
-  ["Agent rule — converge","Given a snapshot, produce the state it implies. An agent that replays a change log drifts and cannot self-heal."],
-  ["Agent rule — fail closed","An unresolvable UID conflict is a deferral and an alert, never a guess."],
-  ["Agent rule — re-runnable","Radiant's acctd is run by hand today. The replacement must be safe on a schedule."],
-  ["LDAP — single writer","Only the mirror agent binds with write access. Every other write credential is revoked."],
-  ["LDAP — declared mapping","A published, versioned attribute map. No undeclared attributes."],
-  ["LDAP — validated enums","accountStatus becomes a validated set. One malformed value with a trailing space exists in production."],
-  ["LDAP — no resource OUs","Nine per-resource OU pairs collapse into one tree. ou=vforge survives decommission; ou=bailey appears in no documentation."],
-  ["LDAP — published lag","Each mirror emits a freshness timestamp. There are at least four undocumented cadences today."]
+ resource:{base:"tiers 0–3",sub:"The pull is the contract. Events are an optimization that may be lost.",rows:[
+  ["Tier 0","Reads LDAP as today. Correct identity data, nothing else."],
+  ["Tier 1","Polls the entitlement snapshot and diffs."],
+  ["Tier 2","Adds events for latency. Still reconciles on a schedule."],
+  ["Tier 3","Adds usage and provisioning-state reporting."],
+  ["Converge, don't replay","An agent that replays a change log drifts and cannot self-heal."],
+  ["Fail closed","A UID conflict is a deferral and an alert, never a guess."],
+  ["Re-runnable","One agent is run by hand today. The replacement runs on a schedule."],
+  ["LDAP: one writer","Every other write credential is revoked."],
+  ["LDAP: declared map","Published and versioned. No undeclared attributes."],
+  ["LDAP: validated enums","One malformed status value is in production right now."],
+  ["LDAP: no resource OUs","Nine OU pairs collapse. One survives a decommission; one is undocumented."],
+  ["LDAP: published lag","At least four undocumented sync cadences today."]
  ]},
- external:{base:"adapters",sub:"Adapters translate; they never decide. Each is a separate deployable with its own replay state, so a failure degrades one lane rather than the program.",rows:[
-  ["XRAS → CiLedger","On approval, create the project or allocation with a typed external ref. Back out: current balance, so reviewers stop computing deltas from ldapsearch."],
-  ["AMIE → CiLedger","Packet to match to project, or awaiting_identity plus a tracked invitation. Packets are acknowledged, never silently queued."],
-  ["CiLedger → ACCESS usage","Separate ACCESS integration from AMIE, with its own key and test-then-production gate."],
-  ["Screening","clear, hold or deny plus a decision id. Must work with a manual fallback that writes the same record, since the API automation is unfunded."],
-  ["Campus AD → Registry","Inbound org-identity source. Writes into the registry, never into LDAP. Currently a PHP daily script on Savannah."],
-  ["CiLedger → Billing","Reads usage and customer assignments. Today the quantity cell is hand-edited per assignment each month — the clearest automation win in the program."],
-  ["Jira SUP","Ticket on a deferral, a screening hold or a match review. 955 tickets a year are already auto-filed by AMIE."],
-  ["Unowned policy question","NSF Important Notice 149 is enforced. When ACCESS terminates an identity and the person still holds a live NCSA award, nothing defines what happens locally."]
+ external:{base:"adapters",sub:"Adapters translate. They never decide.",rows:[
+  ["XRAS → Ledger","Typed reference in. Current balance back out."],
+  ["AMIE → Ledger","Match, or park plus a tracked invitation. Packets acknowledged, not queued."],
+  ["Ledger → ACCESS usage","Separate integration from AMIE, own key and gate."],
+  ["Screening","Clear, hold or deny. Must work with a manual fallback."],
+  ["Campus AD → Registry","Inbound org identities. Never writes LDAP."],
+  ["Ledger → Billing","Today the quantity cell is hand-typed monthly. Clearest automation win."],
+  ["Jira","Ticket on deferral, hold or match review."],
+  ["Unowned","When ACCESS terminates an identity and a live NCSA award remains, nothing defines what happens."]
  ]}
 };
 (function(){
   var body=document.getElementById("epbody");
   function show(k){
     var a=API[k];
-    document.getElementById("ro4-step").textContent="Base";
     document.getElementById("ro4-txt").childNodes[0].nodeValue=a.base;
     document.getElementById("ro4-sub").textContent=a.sub;
     body.innerHTML=a.rows.map(function(r){return '<tr><td class="m">'+r[0]+'</td><td>'+r[1]+'</td></tr>'}).join("");
@@ -901,12 +886,12 @@ var API={
   show("identity");
 })();
 
-/* ===================== slide 5 : tiers ===================== */
+/* ===================== slide 5 ===================== */
 var TIERS=[
- ["Tier 0","Mirror only","Reads LDAP, exactly as today.","Builds nothing. Gets correct identity and charge-group data — and no balance, no quota push, no state feedback. A resource may sit here indefinitely; no phase is gated on the slowest one.","ICCP · Nightingale · anything without engineering capacity"],
- ["Tier 1","Reconciling","Runs an agent that polls the entitlement snapshot and diffs against local state.","Gets authoritative entitlements, quotas, expiry and grace. This is where the manual-step inventory starts to shrink — Radiant's hand-run acctd, partial deactivation by stored procedure.","Most resources, eventually"],
- ["Tier 2","Event-driven","Tier 1 plus an event subscription.","Near-real-time provisioning. The pull is still the contract: an agent that has not reconciled within its interval is non-compliant even if its event handling is perfect.","Delta · DeltaAI"],
- ["Tier 3","Full participant","Tier 2 plus usage and provisioning-state reporting.","Live balances, real enforcement, and CiLedger knowing whether an entitlement is actually in effect. This is where the value is, and Delta is the only credible first adopter.","Delta first"]
+ ["Tier 0","Mirror only","Reads LDAP, as today.","Builds nothing. Correct identity and group data. No balance, no quota, no feedback. A resource can sit here indefinitely.","ICCP · Nightingale · anything without capacity"],
+ ["Tier 1","Reconciling","Polls the entitlement snapshot and diffs.","Authoritative entitlements, quotas, expiry, grace. Where the manual-step list starts shrinking.","Most resources, eventually"],
+ ["Tier 2","Event-driven","Adds an event subscription.","Near-real-time. The pull is still the contract — no reconcile, non-compliant.","Delta · DeltaAI"],
+ ["Tier 3","Full participant","Adds usage and state reporting.","Live balances, real enforcement, and the ledger knowing provisioning actually landed. Where the value is.","Delta first"]
 ];
 (function(){
   var wrap=document.getElementById("tiers"); if(!wrap) return;
@@ -927,24 +912,24 @@ var TIERS=[
   wrap.children[0].click();
 })();
 
-/* ===================== slide 6 : phases ===================== */
+/* ===================== slide 6 ===================== */
 var CLASSES=["Identity records","POSIX UID/GID","Kerberos","Groups","Allocations","Quotas and usage","LDAP"];
 var PHASES=[
- {n:"Reconcile",d:"No new systems. Resolve the 40 duplicate uidNumber sets and 158 duplicate-email clusters, settle the UID minter, finish organization normalization, define the accountStatus mapping against production.",
-  v:["IDDS + LDAP","contested","id-mq queue","Savannah tools","IDDS","IDDS","de facto authority"],c:["old","old","old","old","old","old","old"],
-  val:"If it stops here: the data is correct and several known defects are closed. Worth doing whether or not anything else happens."},
- {n:"Ledger facade",d:"CiLedger stands up as a read-only facade over IDDS. No new store, no writes. Resources start reading one documented entitlement API instead of scoped ldapsearch. Delta goes to Tier 1 first.",
-  v:["IDDS + LDAP","Identity Registry","id-mq queue","Savannah tools","IDDS, read via CiLedger","IDDS","de facto authority"],c:["old","new","old","old","mid","old","old"],
-  val:"If it stops here: resources have one read interface, and XRAS can finally display current allocation values."},
- {n:"Registry for new identities",d:"The registry is deployed and backfilled, and routes new enrollments only. Portal enrollment replaces identity.ncsa.illinois.edu. Existing identities keep working unchanged. id-mq retires once the registry owns Kerberos writes.",
-  v:["Registry for new, LDAP for old","Identity Registry","Credential Services","Identity Registry","IDDS, read via CiLedger","IDDS","de facto authority"],c:["mid","new","new","new","mid","old","old"],
-  val:"If it stops here: the worst piece of infrastructure in the estate is gone, and new identities stop adding duplicates."},
- {n:"Flip allocation authority",d:"CiLedger becomes the writer; IDDS becomes its mirror, then retires. acctd callouts are replaced per-resource by provisioning agents, one resource at a time. Delta first, Radiant early, ICCP last or never.",
-  v:["Identity Registry","Identity Registry","Credential Services","Identity Registry","CiLedger","CiLedger","mirror in progress"],c:["new","new","new","new","new","new","mid"],
-  val:"This is where the cost is. The temptation will be to stop at phase 1 and declare progress — approximately what happened after 2020."},
- {n:"Demote LDAP, unbundle Savannah",d:"LDAP becomes a pure projection with a single writer and resource OUs collapse. Savannah's three IAM jobs rehome: AD sync to an inbound connector, Covered Entity Manager to a registry group, Invoice Tool to a billing adapter reading CiLedger usage.",
-  v:["Identity Registry","Identity Registry","Credential Services","Identity Registry","CiLedger","CiLedger","projection only"],c:["new","new","new","new","new","new","new"],
-  val:"Target state reached. Nothing writes to LDAP but the mirror agent, and nobody has to know which of nine OUs a user lives in."}
+ {n:"Reconcile",d:"No new systems. Fix the duplicate UIDs and emails, settle the minter, normalize organization, define the status mapping.",
+  v:["IDDS + LDAP","contested","queue","group tools","IDDS","IDDS","de facto authority"],c:["old","old","old","old","old","old","old"],
+  val:"Stops here: the data is correct and several known defects close. Worth doing regardless."},
+ {n:"Ledger facade",d:"The ledger API stands up read-only over IDDS. No new store. Resources read one documented interface instead of scoped ldapsearch.",
+  v:["IDDS + LDAP","Registry","queue","group tools","IDDS, read via Ledger","IDDS","de facto authority"],c:["old","new","old","old","mid","old","old"],
+  val:"Stops here: one read interface, and XRAS can finally show current values."},
+ {n:"Registry for new identities",d:"Registry deployed and backfilled. New enrollments route through it; existing identities are untouched. The old message queue retires.",
+  v:["Registry for new","Registry","Credential Services","Registry","IDDS, read via Ledger","IDDS","de facto authority"],c:["mid","new","new","new","mid","old","old"],
+  val:"Stops here: the worst infrastructure in the estate is gone and new duplicates stop appearing."},
+ {n:"Flip allocation authority",d:"The ledger becomes the writer. IDDS becomes its mirror, then retires. Provisioning agents replace the old callouts, one resource at a time.",
+  v:["Registry","Registry","Credential Services","Registry","Ledger","Ledger","mirror in progress"],c:["new","new","new","new","new","new","mid"],
+  val:"Where the cost is. The temptation is to stop at phase 1 and call it progress."},
+ {n:"Demote LDAP",d:"LDAP becomes a pure projection with one writer. Resource OUs collapse. The three jobs the old ticketing app does are rehomed.",
+  v:["Registry","Registry","Credential Services","Registry","Ledger","Ledger","projection only"],c:["new","new","new","new","new","new","new"],
+  val:"Target state. Nothing writes LDAP but the mirror agent."}
 ];
 (function(){
   var sl=document.getElementById("phase"); if(!sl) return;
@@ -968,37 +953,37 @@ var PHASES=[
   sl.addEventListener("input",draw); draw();
 })();
 
-/* ===================== slide 7 : questions ===================== */
+/* ===================== slide 7 ===================== */
 var QS=[
- ["Is CiLedger something we will actually build, or a box on a whiteboard?","If nobody is going to replace IDDS, phases 3 and 4 are fiction and this should be a plan for improving IDDS instead.","Program sponsor"],
- ["Why would this succeed where the 2020 IAM Working Group did not?","It reached substantially the same conclusions — LDAP plus COmanage, an administrative API, groups tied to allocations — and did not ship.","Sponsor + IAM team"],
- ["Is the membership boundary rule wrong?","Glasgow's 2020 objection, that separating identity from allocations creates unnecessary complexity, applies directly to it. If he is right, two contracts collapse together.","Tolbert + Glasgow"],
- ["Does the pull-based entitlement API work at Delta's scale?","Reconcile intervals, page sizes and cold-start cost against roughly 38,000 identities are unmodelled.","Delta engineering"],
- ["Can LDAP actually be demoted?","Unknown consumers read it anonymously from any NCSA IP and nobody has an inventory. If that inventory is unobtainable, principle 1 may be undeliverable.","IAM team"],
- ["Is the portal scope honest?","All UI in the portal, plus six intake paths, plus ICCP's investor portal, plus the ACCESS portal, is a multi-year product, not a component.","Sponsor"],
- ["Does the tiering let every resource stay at Tier 0 forever?","It is designed so no resource blocks the program. The risk is that nothing moves past Tier 0 and the program ships a facade.","Resource owners"],
- ["Can systems authenticate by anything but Kerberos?","Nathan's own question. If SSH certificates and OIDC are viable, federated-first enrollment gets much simpler. If not, principle 5 is constrained hard.","IAM team + Security"],
- ["Is mandatory reconcile-plus-events over-engineering?","It roughly doubles consumer work. The case for it: every current NCSA sync already has a reconcile bolted on after the fact.","Resource owners"],
- ["What is factually wrong here?","Much of the current-state detail comes from discovery reading rather than from the people who run these systems. Corrections are more useful than agreement.","Everyone"]
+ ["Is the ledger something we will build, or a box on a whiteboard?","If IDDS is not being replaced, phases 3 and 4 are fiction.","Sponsor"],
+ ["Why would this succeed where the 2020 effort did not?","It reached the same conclusions and did not ship.","Sponsor"],
+ ["Is the membership boundary rule wrong?","The 2020 objection — that splitting identity from allocations adds complexity — lands here.","Identity + allocations"],
+ ["Does the pull API work at Delta's scale?","Reconcile intervals and cold start against ~38,000 identities are unmodelled.","Delta engineering"],
+ ["Can LDAP actually be demoted?","Unknown consumers read it anonymously. No inventory exists.","IAM team"],
+ ["Is the portal scope honest?","One portal plus six intake paths plus two external portals is a multi-year product.","Sponsor"],
+ ["Does tiering let everyone stay at Tier 0 forever?","Nothing is blocked. Nothing is forced either.","Resource owners"],
+ ["Can systems authenticate by anything but Kerberos?","If SSH certs and OIDC work, federated-first gets much simpler.","IAM + Security"],
+ ["Is reconcile-plus-events over-engineering?","It doubles consumer work. Every current sync has a reconcile bolted on after the fact.","Resource owners"],
+ ["What is factually wrong here?","Most of this comes from reading, not from the people who run these systems.","Everyone"]
 ];
 (function(){
   var w=document.getElementById("qlist"); if(!w) return;
   QS.forEach(function(q,i){
     var d=document.createElement("div"); d.className="qrow";
-    d.innerHTML='<span class="qn">'+("0"+(i+1)).slice(-2)+'</span><div><div class="qt">'+q[0]+'</div><div class="qs">'+q[1]+'</div><span class="owner">candidate owner: '+q[2]+'</span></div>';
+    d.innerHTML='<span class="qn">'+("0"+(i+1)).slice(-2)+'</span><div><div class="qt">'+q[0]+'</div><div class="qs">'+q[1]+'</div><span class="owner">owner: '+q[2]+'</span></div>';
     w.appendChild(d);
   });
 })();
 
 /* ===================== shell ===================== */
 var NOTES=[
- {h:"Open on the picture, not the principles.",p:["Let the diagram sit for a beat. The dashed line is the whole idea: left of it is truth, right of it is copies. Everything NCSA argues about today is a disagreement about which side something is on.","Run “AMIE, no identity” if the room is sceptical — 757 outstanding packets is the fact that lands."],o:["“This is just a redraw of Nathan's board.” Yes, plus the boundary rule and the return path. Say so."]},
- {h:"The price column is the actual agenda.",p:["Nobody argues with the five principles. They argue with the price, and the price is mostly data governance, not code."],o:["“We already agreed to these in 2020.” Correct, and that is question 2."]},
- {h:"Let people click their own row.",p:["The right-hand column is what their team does today. It is more persuasive than any summary."],o:["“Quotas already work.” They do. That row is marked already automated on purpose — it shows the table is not a hit list."]},
- {h:"Do not read the endpoints aloud.",p:["Point at three: POST /match returning a candidate list, GET /people/{pid}/allocations, and POST /provisioning-state. Those three are the real design content."],o:["“Why wrap COmanage in our own API?” Fair. It is a real cost. The answer is swap-ability, and it is arguable."]},
- {h:"Tiering is the political design, not the technical one.",p:["It exists so no resource team can block the program and none can be blamed for it either. Say that out loud; people respect the honesty."],o:["“So nobody has to do anything?” Correct, and that is question 7."]},
- {h:"Drag slowly. Stop at phase 1.",p:["Phase 1 is cheap and visible. Phase 3 is where the money is. Ask directly whether the program can commit to phase 3 — if not, do 0 and 1 as standalone improvements and drop the rest."],o:["“Why not dual-write during the flip?” Because that is how these migrations die. One writer per class at every moment."]},
- {h:"End on question 10, not question 1.",p:["The ask is corrections, not approval. Name the three people whose objection would change the design most and ask them in the room."],o:[]}
+ {h:"Open on the picture.",p:["Let it sit. The dashed line is the whole idea: left is truth, right is copies.","Run the AMIE trace if the room is sceptical. 757 outstanding packets is the fact that lands."],o:["“This is just a redraw.” Mostly, plus the boundary rule and the return path."]},
+ {h:"The price column is the agenda.",p:["Nobody argues with the principles. They argue with the prices, and the prices are data governance."],o:["“We agreed to this in 2020.” Correct. That is question 2."]},
+ {h:"Let people click their own row.",p:["The right-hand column is what their team does today. More persuasive than any summary."],o:["“Quotas already work.” They do. Marked automated on purpose."]},
+ {h:"Do not read the endpoints out.",p:["Point at three: the candidate list, allocations by person, and provisioning-state. That is the design content."],o:["“Why wrap it in our own API?” Real cost. The answer is swap-ability, and it is arguable."]},
+ {h:"Tiering is political design.",p:["It exists so no team can block the program and none can be blamed. Say that out loud."],o:["“So nobody has to do anything?” Correct. Question 7."]},
+ {h:"Drag slowly. Stop at phase 1.",p:["Ask directly whether we can commit to phase 3. If not, do 0 and 1 standalone and drop the rest."],o:["“Why not dual-write?” Because that is how these migrations die."]},
+ {h:"End on question 10.",p:["The ask is corrections, not approval. Name the three people whose objection would change the design most."],o:[]}
 ];
 
 var slides=Array.prototype.slice.call(document.querySelectorAll(".slide"));
