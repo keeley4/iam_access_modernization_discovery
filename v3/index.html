@@ -353,6 +353,9 @@ body.notes-on .notes{transform:none}
 .cmp .rtx{font-family:"IBM Plex Mono",monospace;font-size:9.5px;fill:var(--identity)}
 
 .sv-auth{fill:var(--surface);stroke:currentColor;stroke-width:1.5}
+.sv-openq{font-family:"IBM Plex Mono",monospace;font-size:10px;fill:var(--manual);letter-spacing:.02em}
+.opennote{font-family:var(--f-mono);font-size:11px;line-height:1.55;color:var(--ink-2);margin:10px 0 0;max-width:92ch}
+.opennote b{color:var(--manual);font-weight:500}
 .sv-der{fill:var(--surface);stroke:var(--open);stroke-width:1.5;stroke-dasharray:5 4}
 .node .sv-box.lit,.node .sv-auth.lit,.node .sv-der.lit{stroke:var(--auto);stroke-width:3;fill:var(--auto-bg);stroke-dasharray:none}
 .edge{stroke:currentColor;stroke-width:1.6;fill:none;transition:stroke .2s,stroke-width .2s}
@@ -402,15 +405,36 @@ table.ep td.m b{color:var(--identity);font-weight:500}
     <div class="spacer"></div>
     <button class="tbtn" id="jbtn">Jump<kbd>J</kbd></button>
   </header>
-  <div class="prog"><i id="progi"></i></div>
 
   <div class="main">
     <nav class="rail" id="rail" aria-label="Chapters"></nav>
     <main class="stage" id="stage">
 
+      <!-- ============ 0 ============ -->
+      <section class="slide" data-t="What this decides">
+        <p class="eyebrow">01 · Why we are in the room</p>
+        <h1 class="claim">What these meetings decide.</h1>
+        <p class="dek">One page for anyone who does not run one of these systems.</p>
+
+        <div class="grid g2">
+          <div class="card"><h4>What is being decided</h4><p>Which system is authoritative for each fact &#8212; identity, allocation, entitlement &#8212; and what everything else is then allowed to be. Nothing here commits to a product, a cost, a date or an order of work.</p></div>
+          <div class="card"><h4>What stays the same</h4><p>Intake stays in XRAS and AMIE. Allocation review and award decisions are unchanged. Resources keep their own provisioning behaviour. Anything that only reads LDAP keeps working.</p></div>
+          <div class="card"><h4>Out of scope here</h4><p>Implementation, migration phases and sequencing, API specifications, adoption tiers, cost and staffing. Those follow the boundary; they do not set it.</p></div>
+          <div class="card hi"><h4>What deferring costs</h4><p>Every fact left open keeps its current answer by default, and the current answer is the fragmented one. Deferring is a vote for today&#8217;s model, not a neutral position.</p></div>
+        </div>
+
+        <h2 class="sec">Four decisions that need an owner who is not an engineer</h2>
+        <div class="qlist">
+          <div class="qrow"><span class="qn">01</span><div><div class="qt">Scope &#8212; which identity domains are in.</div><div class="qs">NCSA Kerberos, campus NetID, campus AD, ACCESS ID, Globus and Google all reach resources today. ICCP runs on campus identity and is not under acctd. &#8220;One front door&#8221; stays false until someone rules on which of these are in.</div></div></div>
+          <div class="qrow"><span class="qn">02</span><div><div class="qt">Amending IAM Policy v1.3.</div><div class="qs">The policy defaults resources to NCSA identities only, requires CISO approval for linked identities, and requires Internal Infrastructure Board approval for new interfaces to IdM services. A federated target state needs the policy amended, not worked around.</div></div></div>
+          <div class="qrow"><span class="qn">03</span><div><div class="qt">Authority to close access-creating tools.</div><div class="qs">Thirteen tools or paths can create or change access. A single portal is a decommissioning programme with owners and dates, not an architecture choice.</div></div></div>
+          <div class="qrow"><span class="qn">04</span><div><div class="qt">XRAS continuity past 30 April 2027.</div><div class="qs">The award funding XRAS ends then, with no announced successor. If intake has to move, the allocations-source decision comes before the portal decision.</div></div></div>
+        </div>
+      </section>
+
       <!-- ============ 1 ============ -->
       <section class="slide" data-t="The model">
-        <p class="eyebrow">01 · The model</p>
+        <p class="eyebrow">02 · The model</p>
         <h1 class="claim">Is this the right picture?</h1>
         <p class="dek">Run a flow to see where things move.</p>
 
@@ -419,7 +443,8 @@ table.ep td.m b{color:var(--identity);font-weight:500}
             <button class="pill run go" id="f-identity">▶ New identity</button>
             <button class="pill run go" id="f-xras">▶ XRAS award</button>
             <button class="pill run rv" id="f-amie">▶ AMIE, no identity</button>
-            <button class="pill run ex" id="f-usage">↩ Usage return</button>
+            <button class="pill run rv" id="f-usage">↩ State return</button>
+            <button class="pill run ex" id="f-revoke">▶ Access ends</button>
             <button class="pill stop" id="f-reset">Reset</button>
           </div>
           <div class="cgroup"><b>Isolate</b>
@@ -437,16 +462,12 @@ table.ep td.m b{color:var(--identity);font-weight:500}
 
         <figure>
           <div class="figwrap">
-<svg id="ideal" viewBox="0 0 1200 490" role="img" aria-label="Target architecture. Researchers reach a portal; external systems reach integration adapters. Both call two authorities: an identity registry that owns people, groups and POSIX identifiers, and CiLedger that owns projects, allocations, quotas and usage. Credential services hold Kerberos and OIDC. Right of a dashed authority boundary sit derived projections: an LDAP mirror with a single writer, and per-resource provisioning agents. Resources consume both, and report usage back to CiLedger.">
+<svg id="ideal" viewBox="0 0 1200 490" role="img" aria-label="Target architecture. Researchers reach a portal; external systems reach integration adapters. Both call two authorities: an identity registry that owns people, groups and POSIX identifiers, and an allocation record that owns projects, allocations, quotas and usage. Credential services hold Kerberos and OIDC. Right of a dashed authority boundary sit derived projections: an LDAP mirror with a single writer, and per-resource provisioning agents. Resources consume both, and report usage and provisioning state back to the allocation record.">
             <defs>
               <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="currentColor"/></marker>
               <marker id="arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="var(--identity)"/></marker>
             </defs>
 
-            <text class="sv-hdr" x="275" y="18" text-anchor="middle">1 &#183; Front door</text>
-            <text class="sv-hdr" x="700" y="18" text-anchor="middle">2 &#183; Authorities (systems of record)</text>
-            <text class="sv-hdr" x="1040" y="18" text-anchor="middle">3 &#183; Derived</text>
-            <line class="sv-line" x1="20" y1="30" x2="1180" y2="30" stroke-width="1" opacity=".3"/>
 
             <g data-layer="derived" class="lay">
               <path class="bnd" d="M 905 44 V 388"/>
@@ -469,16 +490,15 @@ table.ep td.m b{color:var(--identity);font-weight:500}
             </g>
 
             <text class="sv-lab" x="866" y="90" text-anchor="middle">mirror</text>
-            <text class="sv-lab" x="866" y="290" text-anchor="middle">entitlements</text>
+            <text class="sv-lab" x="888" y="290" text-anchor="middle">entitlements</text>
             <text class="sv-lab" x="1158" y="250" text-anchor="end">read only</text>
-            <text class="sv-lab" x="630" y="392">usage and provisioning state</text>
+            <text class="sv-lab" x="630" y="392">provisioning state (usage already returns)</text>
             <text class="sv-lab" x="282" y="404">invitation when no local identity exists</text>
 
             <g class="node lay" data-layer="intake" id="n-people">
               <rect class="sv-box" x="40" y="78" width="210" height="64" rx="5"/>
               <text class="sv-name" x="145" y="105" text-anchor="middle">Researchers, PIs</text>
-              <text class="sv-sub"  x="145" y="124" text-anchor="middle">one front door, not thirteen</text>
-            </g>
+              </g>
             <g class="node lay" data-layer="intake" id="n-ext">
               <rect class="sv-box" x="40" y="290" width="210" height="64" rx="5"/>
               <text class="sv-name" x="145" y="317" text-anchor="middle">External systems</text>
@@ -498,25 +518,27 @@ table.ep td.m b{color:var(--identity);font-weight:500}
             <g class="node lay" data-layer="authority" id="n-reg">
               <rect class="sv-auth" x="570" y="58" width="260" height="82" rx="5"/>
               <text class="sv-name" x="700" y="86" text-anchor="middle">Identity Registry</text>
-              <text class="sv-sub"  x="700" y="106" text-anchor="middle">people &#183; groups &#183; POSIX IDs</text>
-              <text class="sv-sub"  x="700" y="124" text-anchor="middle">COmanage Registry</text>
+              <text class="sv-sub"  x="700" y="106" text-anchor="middle">people &#183; groups</text>
+              <text class="sv-openq" x="700" y="124" text-anchor="middle">open: registry product &#183; UID minting</text>
             </g>
             <g class="node lay" data-layer="authority" id="n-cred">
-              <rect class="sv-auth" x="570" y="170" width="260" height="56" rx="5"/>
-              <text class="sv-name" x="700" y="196" text-anchor="middle">Credential Services</text>
-              <text class="sv-sub"  x="700" y="214" text-anchor="middle">Kerberos KDC &#183; OIDC &#183; SSH CA</text>
+              <rect class="sv-auth" x="570" y="170" width="260" height="74" rx="5"/>
+              <text class="sv-name" x="700" y="192" text-anchor="middle">Credential Services</text>
+              <text class="sv-sub"  x="700" y="212" text-anchor="middle">Kerberos KDC &#183; OIDC</text>
+              <text class="sv-openq" x="700" y="230" text-anchor="middle">open: federation posture</text>
             </g>
             <g class="node lay" data-layer="authority" id="n-led">
               <rect class="sv-auth" x="570" y="258" width="260" height="82" rx="5"/>
-              <text class="sv-name" x="700" y="286" text-anchor="middle">CiLedger</text>
+              <text class="sv-name" x="700" y="286" text-anchor="middle">Allocation record</text>
               <text class="sv-sub"  x="700" y="306" text-anchor="middle">projects &#183; allocations &#183; quotas &#183; usage</text>
-              <text class="sv-sub"  x="700" y="324" text-anchor="middle">replaces IDDS and acctd</text>
+              <text class="sv-sub"  x="700" y="324" text-anchor="middle">allocation store survives · acctd does not</text>
             </g>
 
             <g class="node lay" data-layer="derived" id="n-ldap">
-              <rect class="sv-der" x="940" y="78" width="200" height="64" rx="5"/>
-              <text class="sv-name" x="1040" y="105" text-anchor="middle">LDAP mirror</text>
-              <text class="sv-sub"  x="1040" y="124" text-anchor="middle">one writer &#183; no resource OUs</text>
+              <rect class="sv-der" x="940" y="78" width="200" height="74" rx="5"/>
+              <text class="sv-name" x="1040" y="102" text-anchor="middle">LDAP mirror</text>
+              <text class="sv-sub"  x="1040" y="120" text-anchor="middle">one writer</text>
+              <text class="sv-openq" x="1040" y="138" text-anchor="middle">open: resource OUs</text>
             </g>
             <g class="node lay" data-layer="derived" id="n-agents">
               <rect class="sv-der" x="940" y="290" width="200" height="64" rx="5"/>
@@ -533,14 +555,43 @@ table.ep td.m b{color:var(--identity);font-weight:500}
             <span><i style="background:var(--ink)"></i>authoritative</span>
             <span><i style="background:var(--open)"></i>derived</span>
             <span><i style="background:var(--identity)"></i>return path</span>
-            <span><i style="background:var(--auto)"></i>active in the trace</span>
+            <span><i style="background:var(--manual)"></i>open decision</span>
           </div>
+          <p class="opennote"><b>Open on the face of this diagram.</b> IDDS mints UIDs and GIDs today; where they are minted in the end state is unsettled. The registry product (build, COmanage, or subscribe to CILogon), the federation posture, and whether the per-resource OUs are removed are all open, and IAM Policy v1.3 currently states the opposite of the federation drawing.</p>
         </figure>
+
+        <h2 class="sec">The 17 allocatable resources &#8212; what each would have to do</h2>
+        <p class="calcnote" style="margin:0 0 9px;max-width:92ch">Blank means nobody has established it. Column three decides whether the LDAP mirror is temporary or permanent. Column four decides how thin the entitlement contract has to be.</p>
+        <div class="epwrap">
+          <table class="ep">
+            <thead><tr><th>Resource</th><th>Resource OU in LDAP today</th><th>Could read an entitlement API</th><th>Local rules that may not be centrally expressible</th></tr></thead>
+            <tbody>
+              <tr><td class="m"><b>Delta</b></td><td class="m">yes &#183; delta_</td><td></td><td>Slurm banking hard-blocks over balance; 30-day grace; no storage-only allocations</td></tr>
+              <tr><td class="m"><b>DeltaAI</b></td><td class="m">no</td><td></td><td>Manual provisioning steps documented</td></tr>
+              <tr><td class="m"><b>Radiant</b></td><td class="m">yes &#183; radiant_</td><td></td><td>acctd run by hand rather than on cron; 4-letter project code issued manually; billing reconciled by hand</td></tr>
+              <tr><td class="m"><b>Taiga</b></td><td class="m">no</td><td></td><td>Four authorisation front doors depending on allocation provenance; campus AD groups can govern access directly</td></tr>
+              <tr><td class="m"><b>Granite</b></td><td class="m">yes &#183; granite_</td><td></td><td>Quota model of 25,000 inodes per TB</td></tr>
+              <tr><td class="m"><b>Nightingale / ACHE</b></td><td class="m">no</td><td></td><td>HIPAA training, Covered Entity membership, manager and HIPAA Liaison approval, VPN and bastion hop, session limits</td></tr>
+              <tr><td class="m"><b>ICCP</b></td><td class="m">no</td><td></td><td>Campus NetID and Illinois Duo; not under acctd (SUP-25234); investor portal manages groups; over-allocation demotes rather than blocks</td></tr>
+              <tr><td class="m"><b>Hydro</b></td><td class="m">yes &#183; hydro_</td><td></td><td>Auto-provisioned from XRAS; opportunity closed 30 Jun 2025</td></tr>
+              <tr><td class="m"><b>Jade</b></td><td class="m">no</td><td></td><td>Email intake only</td></tr>
+              <tr><td class="m"><b>Harbor</b></td><td class="m">no</td><td></td><td>No XRAS path and no Illinois Computes path; access inherited from a compute allocation</td></tr>
+              <tr><td class="m"><b>HAL</b></td><td class="m">no</td><td></td><td>Campus identity gates the request, NCSA identity grants access; ITAR-restricted group for HAL-DGX; manual first-login init</td></tr>
+              <tr><td class="m"><b>ICRN (CORI)</b></td><td class="m">no</td><td></td><td>CILogon to campus identity; treats CILogon as source of truth for UID/GID</td></tr>
+              <tr><td class="m"><b>Holli</b></td><td class="m">yes &#183; holli_</td><td></td><td></td></tr>
+              <tr><td class="m"><b>Magnus</b></td><td class="m">yes &#183; magnus_</td><td></td><td>Group deliberately contains non-NCSA employees under a partnership agreement</td></tr>
+              <tr><td class="m"><b>TGI RAILS</b></td><td class="m">yes &#183; tgirails_</td><td></td><td>External consortium approves the requester before NCSA issues identity; up to 20% reachable via Open Science Grid</td></tr>
+              <tr><td class="m"><b>Illinois HTC</b></td><td class="m">no</td><td></td><td>HTCondor, outside the Slurm metering chain; open beta with no funded staff</td></tr>
+              <tr><td class="m"><b>mForge</b></td><td class="m">no</td><td></td><td>External clinical partner group</td></tr>
+              </tbody>
+          </table>
+        </div>
+        <p class="opennote">Two further resource OUs sit in the directory and are not on this list: <b>vforge</b> persists after decommissioning, and <b>bailey</b> appears in no documentation.</p>
       </section>
 
       <!-- ============ 2 ============ -->
       <section class="slide" data-t="Is this correct?">
-        <p class="eyebrow">02 · Current state</p>
+        <p class="eyebrow">03 · Current state</p>
         <h1 class="claim">Is this correct?</h1>
         <p class="dek">Six systems carry the current state. Select one to compare it with the proposal.</p>
 
@@ -570,9 +621,9 @@ table.ep td.m b{color:var(--identity);font-weight:500}
 
       <!-- ============ 3 ============ -->
       <section class="slide" data-t="Confirm or reject">
-        <p class="eyebrow">03 · The ask</p>
-        <h1 class="claim">Seven statements. Confirm or reject each.</h1>
-        <p class="dek">Nothing below is a plan. They are claims about the end state. Click one for why it matters.</p>
+        <p class="eyebrow">04 · The ask</p>
+        <h1 class="claim">Eight statements. Confirm or reject each.</h1>
+        <p class="dek">Claims about the end state. Click one for why it matters.</p>
 
         <div class="qlist" id="clist"></div>
 
@@ -594,9 +645,8 @@ table.ep td.m b{color:var(--identity);font-weight:500}
 </div>
 
 <footer class="foot">
-  <span class="pos" id="pos">01</span>
   <div class="dots" id="dots"></div>
-  <span class="hint"><kbd>←</kbd><kbd>→</kbd> move · <kbd>1</kbd>–<kbd>4</kbd> trace · <kbd>J</kbd> jump</span>
+  <span class="hint"><kbd>←</kbd><kbd>→</kbd> move · <kbd>1</kbd>–<kbd>5</kbd> trace · <kbd>J</kbd> jump</span>
 </footer>
 
 <script>
@@ -627,16 +677,23 @@ var FLOWS={
   ]},
   amie:{name:"AMIE packet, no local identity",cls:"warn",steps:[
     ["n-ext,e-ext,n-adapt","Packet","A packet arrives for an ACCESS project. No local person matches."],
-    ["n-led,e-a-led","Park","The project is held in a named state rather than queued silently."],
+    ["n-led,e-a-led","Park","The project is held in a named state with an owner and a clock. PIs are already emailed today, sometimes repeatedly \u2014 what is missing is enforcement and pruning, not notification."],
     ["n-reg,e-bus","Check","The allocation record asks the registry whether this person already exists."],
     ["n-portal,e-invite","Invite","An invitation is issued and tracked."],
     ["n-reg","Resolve or close","Accepted, it activates. Expired, it closes. Today nothing closes them."]
   ]},
-  usage:{name:"Usage return",cls:"bad",steps:[
-    ["n-res","Jobs run","Usage accumulates on the resource."],
-    ["n-led,e-usage","Report","Usage and provisioning state go back to the allocation record."],
+  revoke:{name:"Access ends",cls:"bad",steps:[
+    ["n-ext,e-ext,n-adapt","Trigger","Three triggers, one path: a person leaves NCSA, an award expires, or ACCESS inactivates a user who still holds a live local award."],
+    ["n-led,e-a-led","End the entitlement","The entitlement ends in the allocation record, with the reason kept. Today an XRAS end date is enforced nowhere."],
+    ["n-reg,e-bus","Suspend the identity","Suspension is pushed, not waited for. Today Kerberos, LDAP and Duo are three stores, and Duo is deliberately never deprovisioned."],
+    ["n-agents,e-led-ag,n-res,e-ag-res","Converge and confirm","Each resource removes local state and says so. Today exit automation skips charge groups and exempts owners and maintainers \u2014 the highest privilege is the least automatic."],
+    ["n-ldap,e-reg-ld","Mirror","The mirror follows. Grant is minutes to hours today; revocation is days to never. Closing that gap is the point of this trace."]
+  ]},
+  usage:{name:"Provisioning-state return",cls:"warn",steps:[
+    ["n-res","Jobs run","Usage accumulates on the resource, and local provisioning state drifts from what was granted."],
+    ["n-led,e-usage","Report","Usage already returns today, through Slurm, parselogs, send-jobs and jobd. Provisioning state does not."],
     ["n-led","Balance","The balance is derived from the ledger, not reconstructed."],
-    ["n-ext","Forward","What belongs to ACCESS goes back out. This return path is the main addition to the picture."]
+    ["n-ext","Forward","What belongs to ACCESS goes back out, as it does today. The addition here is the provisioning-state return, not the usage return."]
   ]}
 };
 
@@ -664,7 +721,7 @@ function play(key){
     setTimeout(next, STEP);
   })();
 }
-["identity","xras","amie","usage"].forEach(function(k){
+["identity","xras","amie","usage","revoke"].forEach(function(k){
   var b=document.getElementById("f-"+k); if(b) b.addEventListener("click",function(){play(k)});
 });
 document.getElementById("f-reset").addEventListener("click",function(){
@@ -683,7 +740,7 @@ Array.prototype.forEach.call(document.querySelectorAll(".pill.lyr"),function(p){
     var L={intake:["Front door","One portal for people, one adapter layer for machines."],
            authority:["Authorities","Two systems of record. Everything else can be rebuilt from these."],
            derived:["Projections","No truth of their own. One writer each."],
-           resources:["Resources","Seventeen allocatable resources."]}[p.dataset.layer];
+           resources:["Resources",""]}[p.dataset.layer];
     setRead("",L[0],L[1]);
   });
 });
@@ -706,7 +763,7 @@ var SYS={
   now:["Several writers","LDAP","Unknown readers"],
   prop:["Identity record","Mirror agent","LDAP (read only)"], auth:0,
   nowTx:"The authorization substrate. 29 OUs, including nine per-resource People and Groups pairs. Several independent writers. accountStatus carries five values against two or three documented. Readable without authentication from any NCSA IP, so the full set of consumers is unknown.",
-  propTx:"A projection with a single writer and a declared attribute map. It holds nothing that does not exist upstream. Anything that only reads LDAP is unaffected.",
+  propTx:"A projection with a single writer and a declared attribute map. It holds nothing that does not exist upstream. Anything that only reads LDAP is unaffected. Note: the LDAP rebuild running through 2027 keeps per-resource replicas carrying allocation state. This proposal removes those OUs. The two plans need reconciling.",
   ask:"Open question: which LDAP consumers are unaccounted for, and what breaks if a value stops being writable there?"},
  ident:{
   now:["Identity page","Redis queue","Kerberos KDC"],
@@ -715,15 +772,15 @@ var SYS={
   propTx:"Credentials are issued behind the identity record. The message queue does not appear in the proposal at all.",
   ask:"Open question: can systems authenticate by anything other than Kerberos, or must a Kerberos password exist for every identity?"},
  savannah:{
-  now:["Campus AD","Savannah","LDAP · ACHE · invoices"],
+  now:["Campus AD","Savannah","LDAP sync · ACHE · invoices"],
   prop:["Campus AD","Identity record","LDAP"], auth:1,
-  nowTx:"Three unrelated functions in one place: the campus AD to NCSA LDAP sync, the covered-entity record behind Nightingale and ACHE access, and the invoice tool whose quantities are typed in by hand each cycle.",
-  propTx:"Those three become separate inputs and outputs. AD is an inbound identity source, covered-entity membership is an attribute, and billing reads usage from the allocation record.",
-  ask:"Open question: is there a fourth function here that has been missed?"},
+  nowTx:"Four unrelated IAM functions in one place: the campus AD to NCSA LDAP sync; the sync script that writes identity attributes from IDDS into the main LDAP OU, which makes Savannah one of the two writers into the directory; the covered-entity record behind Nightingale and ACHE access; and the invoice tool whose quantities are typed in by hand each cycle.",
+  propTx:"These become separate inputs and outputs. AD is an inbound identity source, the identity sync becomes the mirror agent, covered-entity membership is an attribute, and billing reads usage from the allocation record.",
+  ask:"Open question: what else is in here?"},
  intake:{
   now:["Six intake paths","XRAS / AMIE","Manual step","Resource"],
   prop:["Intake","Adapter","Allocation record","Resource"], auth:2,
-  nowTx:"Six documented allocation methods. Configured in XRAS does not mean integrated \u2014 some resources capture and report only, with a person doing the downstream work. AMIE packets block when no local identity exists; 757 are outstanding across 179 projects, the oldest 1,017 days.",
+  nowTx:"Six documented allocation methods. Configured in XRAS does not mean integrated \u2014 some resources capture and report only, with a person doing the downstream work. AMIE packets block when no local identity exists, and no later packet for that project is honoured until one is created. PIs are emailed, sometimes repeatedly; nothing prunes the backlog. 757 packets are outstanding across 179 projects, the oldest 1,017 days.",
   propTx:"Both are adapters into the allocation record. Intake stays where it is. What changes is that an award lands in one record, and a missing identity becomes a tracked state rather than a stalled packet.",
   ask:"Open question: what in the intake path does the proposal fail to capture?"}
 };
@@ -783,13 +840,14 @@ var SYS={
 
 /* ===================== slide 3 ===================== */
 var CLAIMS=[
- ["Identity and groups have exactly one authority.","Today identity records are written independently in at least three places, which is how 158 duplicate-email clusters and 40 duplicate UID sets exist."],
+ ["Identity and groups have exactly one authority.","Two writers reach NCSA LDAP today: a sync script in Savannah writes identity attributes into the main OU, and acctd writes allocation state into the resource OUs. The 158 duplicate-email clusters and 40 duplicate UID sets come from the thirteen paths that can create an account, not from the directory writers."],
  ["Allocations have exactly one authority.","Today the allocation record and the authorization that follows from it live in different systems with no documented reconciliation."],
  ["LDAP holds nothing that does not exist upstream.","This is the claim with the widest blast radius. It is also the one nobody can fully assess, because the set of LDAP consumers is unknown."],
  ["All human interaction happens in one portal.","Thirteen tools or paths can create or change access today. This claim is only true if most of them close."],
  ["Allocation membership belongs to the allocation record, not the group system.","Membership is both a group fact and an allocation fact. Putting it in one place means group owners cannot edit allocation-backed groups by hand."],
- ["Resources read entitlements on a schedule rather than waiting to be told.","Every current sync mechanism has a reconcile bolted on after the fact. This makes the reconcile the contract instead of the fallback."],
- ["Usage and provisioning state flow back to the allocation record.","Nothing does this today, which is why nobody can answer whether an entitlement actually took effect on a resource."]
+ ["Resources converge on entitlements on a schedule rather than waiting to be told.","Every current sync mechanism has a reconcile bolted on after the fact. This makes the reconcile the contract instead of the fallback \u2014 and makes the schedule the floor on how fast anything can change."],
+ ["Suspend and revoke are a separate push that does not inherit the convergence schedule.","Grant is minutes to hours today; revocation is days to never. If revocation rides the same schedule as convergence, that gap is designed in rather than closed."],
+ ["Provisioning state flows back to the allocation record.","Usage already returns today, through Slurm, parselogs, send-jobs and jobd, and it works. Provisioning state does not: nothing records whether an entitlement actually took effect on a resource."]
 ];
 (function(){
   var w=document.getElementById("clist"); if(!w) return;
@@ -808,8 +866,8 @@ var CLAIMS=[
 /* ===================== shell ===================== */
 var slides=Array.prototype.slice.call(document.querySelectorAll(".slide"));
 var railEl=document.getElementById("rail"), dots=document.getElementById("dots"),
-    jgrid=document.getElementById("jgrid"), pos=document.getElementById("pos"),
-    progi=document.getElementById("progi");
+    jgrid=document.getElementById("jgrid");
+var MODEL=1;
 var cur=0;
 function label(i){ return ("0"+(i+1)).slice(-2); }
 railEl.insertAdjacentHTML("beforeend",'<h3>Chapters</h3>');
@@ -842,11 +900,9 @@ function go(i){
   slides[cur].classList.add("on");
   railBtns[cur].setAttribute("aria-current","true");
   dotBtns[cur].classList.add("on");
-  pos.textContent=label(cur);
-  progi.style.width=((cur+1)/slides.length*100)+"%";
   document.getElementById("stage").scrollTop=0;
   railBtns[cur].scrollIntoView({block:"nearest"});
-  if(cur!==0){ gen++; running=false; }
+  if(cur!==MODEL){ gen++; running=false; }
 }
 function closeOv(){ document.body.classList.remove("jump-on"); }
 document.getElementById("jbtn").addEventListener("click",function(){ document.body.classList.toggle("jump-on"); });
@@ -862,9 +918,9 @@ document.addEventListener("keydown",function(e){
   else if(k==="Home"){ e.preventDefault(); go(0); }
   else if(k==="End"){ e.preventDefault(); go(slides.length-1); }
   else if(k==="j"||k==="J"){ document.body.classList.toggle("jump-on"); }
-  else if(cur===0 && !running && (k==="1"||k==="2"||k==="3"||k==="4")){
+  else if(cur===MODEL && !running && (k==="1"||k==="2"||k==="3"||k==="4"||k==="5")){
     e.preventDefault();
-    play(["identity","xras","amie","usage"][+k-1]);
+    play(["identity","xras","amie","usage","revoke"][+k-1]);
   }
 });
 
