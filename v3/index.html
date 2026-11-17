@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ideal State — IAM and Portal</title>
-<meta name="description" content="Target architecture for NCSA identity, allocations and portal: two authorities, one portal, LDAP demoted to a mirror.">
+<meta name="description" content="Target architecture for NCSA identity, allocations and portal: identity and award are owned, entitlement is not.">
 <meta name="author" content="NCSA">
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light dark">
@@ -386,7 +386,16 @@ table.ep td.m b{color:var(--identity);font-weight:500}
 .phval.new{background:var(--auto-bg);color:var(--auto)}
 .phval.mid{background:var(--surface-2);color:var(--ink-3)}
 .qlist{counter-reset:q;margin-top:4px}
-.qrow{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--rule);align-items:start}
+.qrow{display:grid;grid-template-columns:30px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--rule);align-items:start}
+.vote{display:flex;gap:6px;padding-top:1px}
+.vote button{font-family:var(--f-mono);font-size:12px;width:32px;height:26px;padding:0;border:1px solid var(--rule-2);background:var(--surface);border-radius:3px;cursor:pointer;color:var(--ink-3);line-height:1}
+.vote button:hover{border-color:var(--ink);color:var(--ink)}
+.vote button.on.y{background:var(--auto);border-color:var(--auto);color:#fff}
+.vote button.on.n{background:var(--break);border-color:var(--break);color:#fff}
+.tally{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);margin-top:12px;letter-spacing:.03em}
+.tally b{color:var(--ink);font-weight:500}
+.readout .step i{display:block;font-style:normal;color:var(--ink-3);opacity:.75;margin-top:3px;font-variant-numeric:tabular-nums}
+#ro.live{cursor:pointer}
 .qrow .qn{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);padding-top:2px}
 .qrow .qt{font-size:14px;line-height:1.45;font-weight:600}
 .qrow .qs{font-size:12.5px;line-height:1.45;color:var(--ink-2);margin-top:3px}
@@ -455,7 +464,7 @@ table.ep td.m b{color:var(--identity);font-weight:500}
         </div>
 
         <div class="readout" id="ro">
-          <span class="step" id="ro-step">Ready</span>
+          <span class="step" id="ro-step">Ready<i id="ro-n"></i></span>
           <p class="txt" id="ro-txt">Run a flow, or isolate a layer.</p>
         </div>
 
@@ -589,9 +598,9 @@ table.ep td.m b{color:var(--identity);font-weight:500}
       </section>
 
       <!-- ============ 2 ============ -->
-      <section class="slide" data-t="Is this correct?">
+      <section class="slide" data-t="Current state">
         <p class="eyebrow">03 · Current state</p>
-        <h1 class="claim">Is this correct?</h1>
+        <h1 class="claim">Did we get today right?</h1>
         <p class="dek">Select a system.</p>
 
         <div class="ctrls">
@@ -621,7 +630,7 @@ table.ep td.m b{color:var(--identity);font-weight:500}
       <!-- ============ 3 ============ -->
       <section class="slide" data-t="Confirm or reject">
         <p class="eyebrow">04 · The ask</p>
-        <h1 class="claim">Eight statements. Confirm or reject each.</h1>
+        <h1 class="claim">Nine statements. Confirm or reject each.</h1>
         <p class="dek">Click one for why it matters.</p>
 
         <div class="qlist" id="clist"></div>
@@ -645,19 +654,17 @@ table.ep td.m b{color:var(--identity);font-weight:500}
 
 <footer class="foot">
   <div class="dots" id="dots"></div>
-  <span class="hint"><kbd>←</kbd><kbd>→</kbd> move · <kbd>1</kbd>–<kbd>5</kbd> trace · <kbd>J</kbd> jump</span>
+  <span class="hint"><kbd>←</kbd><kbd>→</kbd> move · <kbd>1</kbd>–<kbd>5</kbd> trace &#183; <kbd>space</kbd> step · <kbd>J</kbd> jump</span>
 </footer>
 
 <script>
 (function(){
 "use strict";
-var RM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-var STEP = RM ? 2200 : 5200;
-
 /* ===================== slide 1 ===================== */
 var svg=document.getElementById("ideal");
 var roS=document.getElementById("ro-step"), roT=document.getElementById("ro-txt"), roEl=document.getElementById("ro");
-var gen=0, running=false;
+var roN=document.getElementById("ro-n");
+var CUR=null, IDX=0;
 
 var FLOWS={
   identity:{name:"New identity",cls:"ok",steps:[
@@ -704,27 +711,28 @@ function lightIds(ids){
     else { var b=el.querySelector("rect"); if(b) b.classList.add("lit"); }
   });
 }
-function setRead(cls,step,txt){
+function setRead(cls,step,txt,n){
   roEl.className="readout"+(cls?" "+cls:"");
-  roS.textContent=step; roT.innerHTML=txt;
+  roS.textContent=step; roS.appendChild(roN); roN.textContent=n||"";
+  roT.innerHTML=txt;
 }
-function play(key){
-  var f=FLOWS[key]; if(!f) return;
-  gen++; var my=gen; running=true; clearLit();
-  var i=0;
-  (function next(){
-    if(my!==gen) return;
-    if(i>=f.steps.length){ running=false; setRead(f.cls,"Done",f.name+"."); return; }
-    var s=f.steps[i++];
-    lightIds(s[0]); setRead(f.cls,s[1],s[2]);
-    setTimeout(next, STEP);
-  })();
+function show(){
+  var f=CUR; if(!f) return;
+  var last=f.steps.length;
+  clearLit();
+  for(var j=0;j<=Math.min(IDX,last-1);j++) lightIds(f.steps[j][0]);
+  if(IDX>=last){ setRead(f.cls,"Done",f.name+".",last+" / "+last); return; }
+  var s=f.steps[IDX];
+  setRead(f.cls,s[1],s[2],(IDX+1)+" / "+last);
 }
+function play(key){ var f=FLOWS[key]; if(!f) return; CUR=f; IDX=0; show(); roEl.classList.add("live"); }
+function advance(d){ if(!CUR) return; IDX=Math.max(0,Math.min(CUR.steps.length,IDX+d)); show(); }
+roEl.addEventListener("click",function(){ if(CUR) advance(1); });
 ["identity","xras","amie","usage","revoke"].forEach(function(k){
   var b=document.getElementById("f-"+k); if(b) b.addEventListener("click",function(){play(k)});
 });
 document.getElementById("f-reset").addEventListener("click",function(){
-  gen++; running=false; clearLit(); svg.classList.remove("iso");
+  CUR=null; IDX=0; clearLit(); roEl.classList.remove("live"); svg.classList.remove("iso");
   Array.prototype.forEach.call(document.querySelectorAll(".pill.lyr"),function(p){p.setAttribute("aria-pressed","false")});
   setRead("","Ready","Run a flow, or isolate a layer.");
 });
@@ -761,7 +769,7 @@ var SYS={
  ldap:{
   now:["Several writers","LDAP","Unknown readers"],
   prop:["Identity record","Mirror agent","LDAP (read only)"], auth:0,
-  nowTx:"The authorization substrate. 29 OUs, nine of them per-resource People/Groups pairs. accountStatus carries five values against two or three documented. Readable unauthenticated from any NCSA IP, so the consumer set is unknown.",
+  nowTx:"The authorization substrate. 29 OUs, nine of them per-resource People/Groups pairs. Several writers, no stated precedence. accountStatus carries five values against two or three documented. Readable unauthenticated from any NCSA IP, so the consumer set is unknown.",
   propTx:"A projection: one writer, a declared attribute map, nothing that is not upstream. LDAP-only readers are unaffected. Conflict: the 2027 LDAP rebuild keeps per-resource replicas carrying allocation state; this removes those OUs.",
   ask:"Which consumers are unaccounted for? What breaks if a value stops being writable?"},
  ident:{
@@ -839,8 +847,9 @@ var SYS={
 
 /* ===================== slide 3 ===================== */
 var CLAIMS=[
- ["Identity and groups have exactly one authority.","Two writers reach LDAP: Savannah's sync script into the main OU, acctd into the resource OUs. The 158 duplicate-email clusters and 40 duplicate UID sets come from the thirteen account-creation paths."],
+ ["Identity and groups have exactly one authority.","Two writers carry IDDS state into LDAP: Savannah's sync script into the main OU, acctd into the resource OUs. Group tools and the campus-AD sync write as well. The 158 duplicate-email clusters and 40 duplicate UID sets come from the thirteen account-creation paths."],
  ["Allocations have exactly one authority.","The allocation record and the authorization derived from it sit in different systems, with no documented reconciliation."],
+ ["Entitlement is a named layer with one owner.","Identity and award each have an owner; what joins them has none. This picture puts entitlement in the allocation record. The alternatives are a service of its own, or per-resource rules that cannot be expressed centrally. The 2020 recommendations named this interface and left it undefined."],
  ["LDAP holds nothing that does not exist upstream.","Widest blast radius, and unassessable as posed: the LDAP consumer set is unknown. This one needs a census, not a vote."],
  ["All human interaction happens in one portal.","Thirteen tools can create or change access. True only if most of them close \u2014 a sponsor decision."],
  ["Allocation membership belongs to the allocation record, not the group system.","Membership is both a group fact and an allocation fact. One home means group owners lose hand-editing of allocation-backed groups."],
@@ -850,16 +859,35 @@ var CLAIMS=[
 ];
 (function(){
   var w=document.getElementById("clist"); if(!w) return;
+  var V=new Array(CLAIMS.length).fill(0);
+  var tally=document.createElement("p"); tally.className="tally"; tally.id="tally";
+  function drawTally(){
+    var y=V.filter(function(x){return x===1}).length, n=V.filter(function(x){return x===-1}).length;
+    tally.innerHTML='<b>'+y+'</b> confirmed &#183; <b>'+n+'</b> rejected &#183; <b>'+(V.length-y-n)+'</b> open';
+  }
   CLAIMS.forEach(function(c,i){
     var d=document.createElement("div"); d.className="qrow"; d.style.cursor="pointer";
-    d.innerHTML='<span class="qn">'+("0"+(i+1)).slice(-2)+'</span><div><div class="qt">'+c[0]+'</div></div>';
+    d.innerHTML='<span class="qn">'+("0"+(i+1)).slice(-2)+'</span><div><div class="qt">'+c[0]+'</div></div>'+
+      '<span class="vote"><button type="button" class="y" aria-label="Confirm">\u2713</button><button type="button" class="n" aria-label="Reject">\u2715</button></span>';
     d.addEventListener("click",function(){
       Array.prototype.forEach.call(w.children,function(x){x.style.background=""});
       d.style.background="var(--surface-2)";
       document.getElementById("ro3-txt").textContent=c[1];
     });
+    var bs=d.querySelectorAll(".vote button");
+    [1,-1].forEach(function(val,k){
+      bs[k].addEventListener("click",function(e){
+        e.stopPropagation();
+        V[i]=(V[i]===val)?0:val;
+        bs[0].classList.toggle("on",V[i]===1);
+        bs[1].classList.toggle("on",V[i]===-1);
+        drawTally();
+      });
+    });
     w.appendChild(d);
   });
+  w.parentNode.insertBefore(tally,w.nextSibling);
+  drawTally();
 })();
 
 /* ===================== shell ===================== */
@@ -901,7 +929,7 @@ function go(i){
   dotBtns[cur].classList.add("on");
   document.getElementById("stage").scrollTop=0;
   railBtns[cur].scrollIntoView({block:"nearest"});
-  if(cur!==MODEL){ gen++; running=false; }
+  if(cur!==MODEL){ CUR=null; IDX=0; roEl.classList.remove("live"); }
 }
 function closeOv(){ document.body.classList.remove("jump-on"); }
 document.getElementById("jbtn").addEventListener("click",function(){ document.body.classList.toggle("jump-on"); });
@@ -917,7 +945,8 @@ document.addEventListener("keydown",function(e){
   else if(k==="Home"){ e.preventDefault(); go(0); }
   else if(k==="End"){ e.preventDefault(); go(slides.length-1); }
   else if(k==="j"||k==="J"){ document.body.classList.toggle("jump-on"); }
-  else if(cur===MODEL && !running && (k==="1"||k==="2"||k==="3"||k==="4"||k==="5")){
+  else if(cur===MODEL && k===" " && CUR){ e.preventDefault(); advance(e.shiftKey?-1:1); }
+  else if(cur===MODEL && (k==="1"||k==="2"||k==="3"||k==="4"||k==="5")){
     e.preventDefault();
     play(["identity","xras","amie","usage","revoke"][+k-1]);
   }
