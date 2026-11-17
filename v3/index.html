@@ -401,7 +401,7 @@ table.ep td.m b{color:var(--identity);font-weight:500}
 <div class="app">
   <header class="topbar">
     <div class="brand">Target state</div>
-    <div class="meta">Draft for confirmation · 16 Nov 2026</div>
+    <div class="meta">Draft for confirmation · 17 Nov 2026</div>
     <div class="spacer"></div>
     <button class="tbtn" id="jbtn">Jump<kbd>J</kbd></button>
   </header>
@@ -414,21 +414,20 @@ table.ep td.m b{color:var(--identity);font-weight:500}
       <section class="slide" data-t="What this decides">
         <p class="eyebrow">01 · Why we are in the room</p>
         <h1 class="claim">What these meetings decide.</h1>
-        <p class="dek">One page for anyone who does not run one of these systems.</p>
-
+        
         <div class="grid g2">
-          <div class="card"><h4>What is being decided</h4><p>Which system is authoritative for each fact &#8212; identity, allocation, entitlement &#8212; and what everything else is then allowed to be. Nothing here commits to a product, a cost, a date or an order of work.</p></div>
-          <div class="card"><h4>What stays the same</h4><p>Intake stays in XRAS and AMIE. Allocation review and award decisions are unchanged. Resources keep their own provisioning behaviour. Anything that only reads LDAP keeps working.</p></div>
-          <div class="card"><h4>Out of scope here</h4><p>Implementation, migration phases and sequencing, API specifications, adoption tiers, cost and staffing. Those follow the boundary; they do not set it.</p></div>
-          <div class="card hi"><h4>What deferring costs</h4><p>Every fact left open keeps its current answer by default, and the current answer is the fragmented one. Deferring is a vote for today&#8217;s model, not a neutral position.</p></div>
+          <div class="card"><h4>What is being decided</h4><p>Which system owns each fact: identity, allocation, entitlement. No product, cost or date is decided here.</p></div>
+          <div class="card"><h4>What stays the same</h4><p>XRAS and AMIE intake. Award decisions. Per-resource provisioning behaviour. Anything that only reads LDAP.</p></div>
+          <div class="card"><h4>Out of scope here</h4><p>Implementation, phasing, API specs, adoption tiers, cost, staffing.</p></div>
+          <div class="card hi"><h4>What deferring costs</h4><p>An undecided fact keeps today&#8217;s answer. Today&#8217;s answer is the fragmented one.</p></div>
         </div>
 
-        <h2 class="sec">Four decisions that need an owner who is not an engineer</h2>
+        <h2 class="sec">Four decisions no engineer can make</h2>
         <div class="qlist">
-          <div class="qrow"><span class="qn">01</span><div><div class="qt">Scope &#8212; which identity domains are in.</div><div class="qs">NCSA Kerberos, campus NetID, campus AD, ACCESS ID, Globus and Google all reach resources today. ICCP runs on campus identity and is not under acctd. &#8220;One front door&#8221; stays false until someone rules on which of these are in.</div></div></div>
-          <div class="qrow"><span class="qn">02</span><div><div class="qt">Amending IAM Policy v1.3.</div><div class="qs">The policy defaults resources to NCSA identities only, requires CISO approval for linked identities, and requires Internal Infrastructure Board approval for new interfaces to IdM services. A federated target state needs the policy amended, not worked around.</div></div></div>
-          <div class="qrow"><span class="qn">03</span><div><div class="qt">Authority to close access-creating tools.</div><div class="qs">Thirteen tools or paths can create or change access. A single portal is a decommissioning programme with owners and dates, not an architecture choice.</div></div></div>
-          <div class="qrow"><span class="qn">04</span><div><div class="qt">XRAS continuity past 30 April 2027.</div><div class="qs">The award funding XRAS ends then, with no announced successor. If intake has to move, the allocations-source decision comes before the portal decision.</div></div></div>
+          <div class="qrow"><span class="qn">01</span><div><div class="qt">Which identity domains are in scope.</div><div class="qs">Six reach resources today: NCSA Kerberos, NetID, campus AD, ACCESS ID, Globus, Google. ICCP runs on NetID, outside acctd.</div></div></div>
+          <div class="qrow"><span class="qn">02</span><div><div class="qt">Amending IAM Policy v1.3.</div><div class="qs">NCSA identities only by default; CISO approval for linked identities; IIB approval for new IdM interfaces. Federation needs it amended.</div></div></div>
+          <div class="qrow"><span class="qn">03</span><div><div class="qt">Authority to close access-creating tools.</div><div class="qs">Thirteen tools can create or change access. Closing them needs owners and dates.</div></div></div>
+          <div class="qrow"><span class="qn">04</span><div><div class="qt">XRAS continuity past 30 April 2027.</div><div class="qs">The award funding XRAS ends then, no announced successor. If intake moves, that decision precedes the portal.</div></div></div>
         </div>
       </section>
 
@@ -493,7 +492,7 @@ table.ep td.m b{color:var(--identity);font-weight:500}
             <text class="sv-lab" x="888" y="290" text-anchor="middle">entitlements</text>
             <text class="sv-lab" x="1158" y="250" text-anchor="end">read only</text>
             <text class="sv-lab" x="630" y="392">provisioning state (usage already returns)</text>
-            <text class="sv-lab" x="282" y="404">invitation when no local identity exists</text>
+            <text class="sv-lab" x="282" y="404">invitation when no local identity</text>
 
             <g class="node lay" data-layer="intake" id="n-people">
               <rect class="sv-box" x="40" y="78" width="210" height="64" rx="5"/>
@@ -548,7 +547,7 @@ table.ep td.m b{color:var(--identity);font-weight:500}
             <g class="node lay" data-layer="resources" id="n-res">
               <rect class="sv-box" x="300" y="410" width="840" height="60" rx="5"/>
               <text class="sv-name" x="720" y="437" text-anchor="middle">Resources &#8212; Delta &#183; DeltaAI &#183; Radiant &#183; Taiga &#183; Granite &#183; Nightingale &#183; ICCP</text>
-              <text class="sv-sub"  x="720" y="456" text-anchor="middle">17 allocatable resources &#183; some read LDAP only, some read the allocation record directly</text>
+              <text class="sv-sub"  x="720" y="456" text-anchor="middle">17 resources &#183; some read LDAP only, some read the allocation record</text>
             </g>
           </svg>          </div>
           <div class="legend">
@@ -557,43 +556,43 @@ table.ep td.m b{color:var(--identity);font-weight:500}
             <span><i style="background:var(--identity)"></i>return path</span>
             <span><i style="background:var(--manual)"></i>open decision</span>
           </div>
-          <p class="opennote"><b>Open on the face of this diagram.</b> IDDS mints UIDs and GIDs today; where they are minted in the end state is unsettled. The registry product (build, COmanage, or subscribe to CILogon), the federation posture, and whether the per-resource OUs are removed are all open, and IAM Policy v1.3 currently states the opposite of the federation drawing.</p>
+          <p class="opennote"><b>Open.</b> IDDS mints UIDs and GIDs today; the end state is unsettled. Registry product, federation posture and resource-OU removal are undecided. IAM Policy v1.3 says the opposite of the federation drawing.</p>
         </figure>
 
-        <h2 class="sec">The 17 allocatable resources &#8212; what each would have to do</h2>
-        <p class="calcnote" style="margin:0 0 9px;max-width:92ch">Blank means nobody has established it. Column three decides whether the LDAP mirror is temporary or permanent. Column four decides how thin the entitlement contract has to be.</p>
+        <h2 class="sec">The 17 allocatable resources</h2>
+        <p class="calcnote" style="margin:0 0 9px;max-width:92ch">Blank means unestablished. Column three decides whether the mirror is temporary. Column four decides how thin the entitlement contract is.</p>
         <div class="epwrap">
           <table class="ep">
             <thead><tr><th>Resource</th><th>Resource OU in LDAP today</th><th>Could read an entitlement API</th><th>Local rules that may not be centrally expressible</th></tr></thead>
             <tbody>
-              <tr><td class="m"><b>Delta</b></td><td class="m">yes &#183; delta_</td><td></td><td>Slurm banking hard-blocks over balance; 30-day grace; no storage-only allocations</td></tr>
-              <tr><td class="m"><b>DeltaAI</b></td><td class="m">no</td><td></td><td>Manual provisioning steps documented</td></tr>
-              <tr><td class="m"><b>Radiant</b></td><td class="m">yes &#183; radiant_</td><td></td><td>acctd run by hand rather than on cron; 4-letter project code issued manually; billing reconciled by hand</td></tr>
-              <tr><td class="m"><b>Taiga</b></td><td class="m">no</td><td></td><td>Four authorisation front doors depending on allocation provenance; campus AD groups can govern access directly</td></tr>
-              <tr><td class="m"><b>Granite</b></td><td class="m">yes &#183; granite_</td><td></td><td>Quota model of 25,000 inodes per TB</td></tr>
-              <tr><td class="m"><b>Nightingale / ACHE</b></td><td class="m">no</td><td></td><td>HIPAA training, Covered Entity membership, manager and HIPAA Liaison approval, VPN and bastion hop, session limits</td></tr>
-              <tr><td class="m"><b>ICCP</b></td><td class="m">no</td><td></td><td>Campus NetID and Illinois Duo; not under acctd (SUP-25234); investor portal manages groups; over-allocation demotes rather than blocks</td></tr>
+              <tr><td class="m"><b>Delta</b></td><td class="m">yes &#183; delta_</td><td></td><td>Slurm banking hard-blocks; 30-day grace; no storage-only</td></tr>
+              <tr><td class="m"><b>DeltaAI</b></td><td class="m">no</td><td></td><td>Manual provisioning steps</td></tr>
+              <tr><td class="m"><b>Radiant</b></td><td class="m">yes &#183; radiant_</td><td></td><td>acctd run by hand; project code by hand; billing reconciled by hand</td></tr>
+              <tr><td class="m"><b>Taiga</b></td><td class="m">no</td><td></td><td>Four front doors by provenance; campus AD groups can govern access</td></tr>
+              <tr><td class="m"><b>Granite</b></td><td class="m">yes &#183; granite_</td><td></td><td>25,000 inodes per TB</td></tr>
+              <tr><td class="m"><b>Nightingale / ACHE</b></td><td class="m">no</td><td></td><td>HIPAA training, Covered Entity, two approvers, VPN and bastion, session limits</td></tr>
+              <tr><td class="m"><b>ICCP</b></td><td class="m">no</td><td></td><td>NetID and Illinois Duo; outside acctd (SUP-25234); investor portal; over-allocation demotes</td></tr>
               <tr><td class="m"><b>Hydro</b></td><td class="m">yes &#183; hydro_</td><td></td><td>Auto-provisioned from XRAS; opportunity closed 30 Jun 2025</td></tr>
               <tr><td class="m"><b>Jade</b></td><td class="m">no</td><td></td><td>Email intake only</td></tr>
-              <tr><td class="m"><b>Harbor</b></td><td class="m">no</td><td></td><td>No XRAS path and no Illinois Computes path; access inherited from a compute allocation</td></tr>
-              <tr><td class="m"><b>HAL</b></td><td class="m">no</td><td></td><td>Campus identity gates the request, NCSA identity grants access; ITAR-restricted group for HAL-DGX; manual first-login init</td></tr>
-              <tr><td class="m"><b>ICRN (CORI)</b></td><td class="m">no</td><td></td><td>CILogon to campus identity; treats CILogon as source of truth for UID/GID</td></tr>
+              <tr><td class="m"><b>Harbor</b></td><td class="m">no</td><td></td><td>No XRAS or IC path; access inherited from a compute allocation</td></tr>
+              <tr><td class="m"><b>HAL</b></td><td class="m">no</td><td></td><td>NetID gates the request, NCSA identity grants; ITAR group for HAL-DGX; manual first login</td></tr>
+              <tr><td class="m"><b>ICRN (CORI)</b></td><td class="m">no</td><td></td><td>CILogon to campus identity; CILogon is UID/GID truth</td></tr>
               <tr><td class="m"><b>Holli</b></td><td class="m">yes &#183; holli_</td><td></td><td></td></tr>
-              <tr><td class="m"><b>Magnus</b></td><td class="m">yes &#183; magnus_</td><td></td><td>Group deliberately contains non-NCSA employees under a partnership agreement</td></tr>
-              <tr><td class="m"><b>TGI RAILS</b></td><td class="m">yes &#183; tgirails_</td><td></td><td>External consortium approves the requester before NCSA issues identity; up to 20% reachable via Open Science Grid</td></tr>
-              <tr><td class="m"><b>Illinois HTC</b></td><td class="m">no</td><td></td><td>HTCondor, outside the Slurm metering chain; open beta with no funded staff</td></tr>
+              <tr><td class="m"><b>Magnus</b></td><td class="m">yes &#183; magnus_</td><td></td><td>Group contains non-NCSA employees by agreement</td></tr>
+              <tr><td class="m"><b>TGI RAILS</b></td><td class="m">yes &#183; tgirails_</td><td></td><td>Consortium approves before NCSA issues identity; up to 20% via OSG</td></tr>
+              <tr><td class="m"><b>Illinois HTC</b></td><td class="m">no</td><td></td><td>HTCondor, outside the Slurm metering chain; open beta, unstaffed</td></tr>
               <tr><td class="m"><b>mForge</b></td><td class="m">no</td><td></td><td>External clinical partner group</td></tr>
               </tbody>
           </table>
         </div>
-        <p class="opennote">Two further resource OUs sit in the directory and are not on this list: <b>vforge</b> persists after decommissioning, and <b>bailey</b> appears in no documentation.</p>
+        <p class="opennote">Two more OUs exist: <b>vforge</b> persists after decommissioning, <b>bailey</b> appears in no documentation.</p>
       </section>
 
       <!-- ============ 2 ============ -->
       <section class="slide" data-t="Is this correct?">
         <p class="eyebrow">03 · Current state</p>
         <h1 class="claim">Is this correct?</h1>
-        <p class="dek">Six systems carry the current state. Select one to compare it with the proposal.</p>
+        <p class="dek">Select a system.</p>
 
         <div class="ctrls">
           <div class="cgroup"><b>System</b>
@@ -623,7 +622,7 @@ table.ep td.m b{color:var(--identity);font-weight:500}
       <section class="slide" data-t="Confirm or reject">
         <p class="eyebrow">04 · The ask</p>
         <h1 class="claim">Eight statements. Confirm or reject each.</h1>
-        <p class="dek">Claims about the end state. Click one for why it matters.</p>
+        <p class="dek">Click one for why it matters.</p>
 
         <div class="qlist" id="clist"></div>
 
@@ -662,38 +661,38 @@ var gen=0, running=false;
 
 var FLOWS={
   identity:{name:"New identity",cls:"ok",steps:[
-    ["n-people,e-people,n-portal","Arrive","One front door for people. The portal never sees a Kerberos password."],
-    ["n-reg,e-p-reg","Match","The registry decides whether this person already exists, and returns candidates rather than failing."],
+    ["n-people,e-people,n-portal","Arrive","The portal never sees a Kerberos password."],
+    ["n-reg,e-p-reg","Match","The registry returns match candidates instead of failing."],
     ["n-reg","Mint","One minter for the username and POSIX UID."],
-    ["n-cred,e-reg-cr","Credential","Credentials are issued behind the registry, not by a separate queue."],
-    ["n-ldap,e-reg-ld,n-res,e-ld-res","Mirror","LDAP is written by one agent. Resources that only read LDAP keep working unchanged."]
+    ["n-cred,e-reg-cr","Credential","Credentials issue behind the registry. No queue."],
+    ["n-ldap,e-reg-ld,n-res,e-ld-res","Mirror","One agent writes LDAP. LDAP-only resources keep working."]
   ]},
   xras:{name:"XRAS award",cls:"ok",steps:[
-    ["n-ext,e-ext,n-adapt","Approved","The decision comes out of XRAS into an adapter."],
-    ["n-led,e-a-led","Record","The allocation is recorded once, with a typed reference back to the XRAS request."],
+    ["n-ext,e-ext,n-adapt","Approved","XRAS decides. An adapter carries it."],
+    ["n-led,e-a-led","Record","Recorded once, with a typed reference to the XRAS request."],
     ["n-led","Screen","Screening happens before activation."],
-    ["n-agents,e-led-ag","Converge","The resource reads the entitlement and makes local state match it."],
+    ["n-agents,e-led-ag","Converge","The resource reads the entitlement and matches local state."],
     ["n-res,e-ag-res","Report","The resource says what it actually did."]
   ]},
   amie:{name:"AMIE packet, no local identity",cls:"warn",steps:[
     ["n-ext,e-ext,n-adapt","Packet","A packet arrives for an ACCESS project. No local person matches."],
-    ["n-led,e-a-led","Park","The project is held in a named state with an owner and a clock. PIs are already emailed today, sometimes repeatedly \u2014 what is missing is enforcement and pruning, not notification."],
-    ["n-reg,e-bus","Check","The allocation record asks the registry whether this person already exists."],
+    ["n-led,e-a-led","Park","Held in a named state, with an owner and a clock. PIs are emailed today; nothing prunes."],
+    ["n-reg,e-bus","Check","The allocation record asks the registry for a match."],
     ["n-portal,e-invite","Invite","An invitation is issued and tracked."],
     ["n-reg","Resolve or close","Accepted, it activates. Expired, it closes. Today nothing closes them."]
   ]},
   revoke:{name:"Access ends",cls:"bad",steps:[
-    ["n-ext,e-ext,n-adapt","Trigger","Three triggers, one path: a person leaves NCSA, an award expires, or ACCESS inactivates a user who still holds a live local award."],
-    ["n-led,e-a-led","End the entitlement","The entitlement ends in the allocation record, with the reason kept. Today an XRAS end date is enforced nowhere."],
-    ["n-reg,e-bus","Suspend the identity","Suspension is pushed, not waited for. Today Kerberos, LDAP and Duo are three stores, and Duo is deliberately never deprovisioned."],
-    ["n-agents,e-led-ag,n-res,e-ag-res","Converge and confirm","Each resource removes local state and says so. Today exit automation skips charge groups and exempts owners and maintainers \u2014 the highest privilege is the least automatic."],
-    ["n-ldap,e-reg-ld","Mirror","The mirror follows. Grant is minutes to hours today; revocation is days to never. Closing that gap is the point of this trace."]
+    ["n-ext,e-ext,n-adapt","Trigger","Staff exit, award expiry, or ACCESS inactivating a live local user."],
+    ["n-led,e-a-led","End the entitlement","Ends in the allocation record, reason kept. XRAS end dates are enforced nowhere today."],
+    ["n-reg,e-bus","Suspend the identity","Pushed, not polled. Kerberos, LDAP and Duo are three stores; Duo is never deprovisioned."],
+    ["n-agents,e-led-ag,n-res,e-ag-res","Converge and confirm","Each resource removes local state and confirms. Exit automation skips charge groups and exempts owners."],
+    ["n-ldap,e-reg-ld","Mirror","Grant: minutes to hours. Revoke: days to never."]
   ]},
   usage:{name:"Provisioning-state return",cls:"warn",steps:[
-    ["n-res","Jobs run","Usage accumulates on the resource, and local provisioning state drifts from what was granted."],
-    ["n-led,e-usage","Report","Usage already returns today, through Slurm, parselogs, send-jobs and jobd. Provisioning state does not."],
-    ["n-led","Balance","The balance is derived from the ledger, not reconstructed."],
-    ["n-ext","Forward","What belongs to ACCESS goes back out, as it does today. The addition here is the provisioning-state return, not the usage return."]
+    ["n-res","Jobs run","Local state drifts from what was granted."],
+    ["n-led,e-usage","Report","Usage already returns via jobd. Provisioning state does not."],
+    ["n-led","Balance","Balance derives from the ledger."],
+    ["n-ext","Forward","ACCESS usage goes back out, as today. Only the state return is new."]
   ]}
 };
 
@@ -738,7 +737,7 @@ Array.prototype.forEach.call(document.querySelectorAll(".pill.lyr"),function(p){
     p.setAttribute("aria-pressed","true"); svg.classList.add("iso");
     Array.prototype.forEach.call(svg.querySelectorAll('.lay[data-layer="'+p.dataset.layer+'"]'),function(g){g.classList.add("sel")});
     var L={intake:["Front door","One portal for people, one adapter layer for machines."],
-           authority:["Authorities","Two systems of record. Everything else can be rebuilt from these."],
+           authority:["Authorities","Two systems of record. Everything else rebuilds from these."],
            derived:["Projections","No truth of their own. One writer each."],
            resources:["Resources",""]}[p.dataset.layer];
     setRead("",L[0],L[1]);
@@ -750,39 +749,39 @@ var SYS={
  idds:{
   now:["XRAS / AMIE","IDDS","ACCTD","LDAP"],
   prop:["Adapter","Allocation record","Resource agent","Resource"], auth:1, ret:[3,1],
-  nowTx:"System of record for allocations, quotas and usage. There is no projects table \u2014 a project is a charge number, with metadata in a versioned requests table inherited from the XSEDE central database. State is held on (project, resource) and (project, resource, login) tuples, never on the project alone. People, citizenship and organizations are modelled here too.",
-  propTx:"Stays the allocation system of record, with projects as first-class objects rather than charge numbers. The tuple state model survives unchanged. The identity-side data moves to the identity record rather than being held in two places.",
-  ask:"Open question: what does IDDS hold today that the proposal has no home for?"},
+  nowTx:"System of record for allocations, quotas, usage. No projects table \u2014 a project is a charge number; metadata sits in a versioned requests table inherited from XSEDE. State lives on (project, resource) and (project, resource, login) tuples, never the project alone. People, citizenship and organizations are modelled here too.",
+  propTx:"Stays the allocation system of record. Projects become first-class objects. The tuple state model survives. Identity data moves to the identity record.",
+  ask:"What does IDDS hold today that this has no home for?"},
  acctd:{
   now:["IDDS","ACCTD cron","per-resource OU","Resource"],
   prop:["Allocation record","Resource agent","Resource"], auth:0, ret:[2,0],
-  nowTx:"Trigger-driven and cron-driven off IDDS. Writes allocation state into per-resource LDAP OUs through per-resource callout plugins. Access comes only through charge-group membership. Runs hourly at minute 5, staggered per cluster, plus an OU sync every ten minutes and two undocumented twice-daily jobs.",
-  propTx:"The allocation record publishes entitlements; a per-resource agent reads them and makes local state match. The agent reports back what it actually did, which has no equivalent today.",
-  ask:"Open question: which ACCTD behaviours are load-bearing and absent from the proposal?"},
+  nowTx:"Trigger- and cron-driven off IDDS. Writes allocation state into per-resource LDAP OUs via callout plugins. Access comes only through charge-group membership. Hourly at minute 5, staggered per cluster; OU sync every ten minutes; two undocumented twice-daily jobs.",
+  propTx:"The allocation record publishes entitlements; a per-resource agent converges local state and reports what it did. No equivalent today.",
+  ask:"Which ACCTD behaviours are load-bearing and missing here?"},
  ldap:{
   now:["Several writers","LDAP","Unknown readers"],
   prop:["Identity record","Mirror agent","LDAP (read only)"], auth:0,
-  nowTx:"The authorization substrate. 29 OUs, including nine per-resource People and Groups pairs. Several independent writers. accountStatus carries five values against two or three documented. Readable without authentication from any NCSA IP, so the full set of consumers is unknown.",
-  propTx:"A projection with a single writer and a declared attribute map. It holds nothing that does not exist upstream. Anything that only reads LDAP is unaffected. Note: the LDAP rebuild running through 2027 keeps per-resource replicas carrying allocation state. This proposal removes those OUs. The two plans need reconciling.",
-  ask:"Open question: which LDAP consumers are unaccounted for, and what breaks if a value stops being writable there?"},
+  nowTx:"The authorization substrate. 29 OUs, nine of them per-resource People/Groups pairs. accountStatus carries five values against two or three documented. Readable unauthenticated from any NCSA IP, so the consumer set is unknown.",
+  propTx:"A projection: one writer, a declared attribute map, nothing that is not upstream. LDAP-only readers are unaffected. Conflict: the 2027 LDAP rebuild keeps per-resource replicas carrying allocation state; this removes those OUs.",
+  ask:"Which consumers are unaccounted for? What breaks if a value stops being writable?"},
  ident:{
   now:["Identity page","Redis queue","Kerberos KDC"],
   prop:["Portal","Identity record","Credentials"], auth:1,
-  nowTx:"Account creation, password reset and deletion flow through a Redis message queue, with a listener process and a one-minute cron as the acknowledged safety net. The identity self-service page carries a free-text organization field.",
-  propTx:"Credentials are issued behind the identity record. The message queue does not appear in the proposal at all.",
-  ask:"Open question: can systems authenticate by anything other than Kerberos, or must a Kerberos password exist for every identity?"},
+  nowTx:"Account creation, password reset and deletion run through a Redis queue, a listener process, and a one-minute cron as the acknowledged safety net. Organization is free text.",
+  propTx:"Credentials issue behind the identity record. The queue is gone — already being retired under SVCPLAN-8726.",
+  ask:"Must every identity have a Kerberos password?"},
  savannah:{
   now:["Campus AD","Savannah","LDAP sync · ACHE · invoices"],
   prop:["Campus AD","Identity record","LDAP"], auth:1,
-  nowTx:"Four unrelated IAM functions in one place: the campus AD to NCSA LDAP sync; the sync script that writes identity attributes from IDDS into the main LDAP OU, which makes Savannah one of the two writers into the directory; the covered-entity record behind Nightingale and ACHE access; and the invoice tool whose quantities are typed in by hand each cycle.",
-  propTx:"These become separate inputs and outputs. AD is an inbound identity source, the identity sync becomes the mirror agent, covered-entity membership is an attribute, and billing reads usage from the allocation record.",
-  ask:"Open question: what else is in here?"},
+  nowTx:"Four unrelated IAM functions: campus AD to NCSA LDAP sync; the IDDS to main-OU identity sync, which makes Savannah one of the directory’s two writers; the covered-entity record behind Nightingale and ACHE; the invoice tool, quantities typed by hand each cycle.",
+  propTx:"Four separate things. AD is an inbound source, the identity sync becomes the mirror agent, covered-entity is an attribute, billing reads usage from the allocation record.",
+  ask:"What else is in here?"},
  intake:{
   now:["Six intake paths","XRAS / AMIE","Manual step","Resource"],
   prop:["Intake","Adapter","Allocation record","Resource"], auth:2,
-  nowTx:"Six documented allocation methods. Configured in XRAS does not mean integrated \u2014 some resources capture and report only, with a person doing the downstream work. AMIE packets block when no local identity exists, and no later packet for that project is honoured until one is created. PIs are emailed, sometimes repeatedly; nothing prunes the backlog. 757 packets are outstanding across 179 projects, the oldest 1,017 days.",
-  propTx:"Both are adapters into the allocation record. Intake stays where it is. What changes is that an award lands in one record, and a missing identity becomes a tracked state rather than a stalled packet.",
-  ask:"Open question: what in the intake path does the proposal fail to capture?"}
+  nowTx:"Six documented allocation methods. Configured in XRAS is not integrated: some resources capture and report only, a person does the rest. AMIE packets block with no local identity, and nothing later is honoured until one exists. PIs are emailed; nothing prunes. 757 packets, 179 projects, oldest 1,017 days.",
+  propTx:"Both become adapters into the allocation record. Intake stays. An award lands in one record; a missing identity becomes a tracked state.",
+  ask:"What in the intake path does this miss?"}
 };
 (function(){
   var NS="http://www.w3.org/2000/svg";
@@ -840,14 +839,14 @@ var SYS={
 
 /* ===================== slide 3 ===================== */
 var CLAIMS=[
- ["Identity and groups have exactly one authority.","Two writers reach NCSA LDAP today: a sync script in Savannah writes identity attributes into the main OU, and acctd writes allocation state into the resource OUs. The 158 duplicate-email clusters and 40 duplicate UID sets come from the thirteen paths that can create an account, not from the directory writers."],
- ["Allocations have exactly one authority.","Today the allocation record and the authorization that follows from it live in different systems with no documented reconciliation."],
- ["LDAP holds nothing that does not exist upstream.","This is the claim with the widest blast radius. It is also the one nobody can fully assess, because the set of LDAP consumers is unknown."],
- ["All human interaction happens in one portal.","Thirteen tools or paths can create or change access today. This claim is only true if most of them close."],
- ["Allocation membership belongs to the allocation record, not the group system.","Membership is both a group fact and an allocation fact. Putting it in one place means group owners cannot edit allocation-backed groups by hand."],
- ["Resources converge on entitlements on a schedule rather than waiting to be told.","Every current sync mechanism has a reconcile bolted on after the fact. This makes the reconcile the contract instead of the fallback \u2014 and makes the schedule the floor on how fast anything can change."],
- ["Suspend and revoke are a separate push that does not inherit the convergence schedule.","Grant is minutes to hours today; revocation is days to never. If revocation rides the same schedule as convergence, that gap is designed in rather than closed."],
- ["Provisioning state flows back to the allocation record.","Usage already returns today, through Slurm, parselogs, send-jobs and jobd, and it works. Provisioning state does not: nothing records whether an entitlement actually took effect on a resource."]
+ ["Identity and groups have exactly one authority.","Two writers reach LDAP: Savannah's sync script into the main OU, acctd into the resource OUs. The 158 duplicate-email clusters and 40 duplicate UID sets come from the thirteen account-creation paths."],
+ ["Allocations have exactly one authority.","The allocation record and the authorization derived from it sit in different systems, with no documented reconciliation."],
+ ["LDAP holds nothing that does not exist upstream.","Widest blast radius, and unassessable as posed: the LDAP consumer set is unknown. This one needs a census, not a vote."],
+ ["All human interaction happens in one portal.","Thirteen tools can create or change access. True only if most of them close \u2014 a sponsor decision."],
+ ["Allocation membership belongs to the allocation record, not the group system.","Membership is both a group fact and an allocation fact. One home means group owners lose hand-editing of allocation-backed groups."],
+ ["Resources converge on a schedule rather than waiting to be told.","Every current sync has a reconcile bolted on afterwards. This makes reconcile the contract, and the schedule the floor on how fast anything changes."],
+ ["Suspend and revoke are pushed, not scheduled.","Grant: minutes to hours. Revoke: days to never. On one schedule, that gap is designed in."],
+ ["Provisioning state flows back to the allocation record.","Usage already returns via jobd, and works. Provisioning state does not \u2014 nothing records whether an entitlement took effect."]
 ];
 (function(){
   var w=document.getElementById("clist"); if(!w) return;
