@@ -426,12 +426,12 @@ table.ep td.m b{color:var(--identity);font-weight:500}
         
         <div class="grid g2">
           <div class="card"><h4>What is being decided</h4><p>Which system owns each fact: identity, allocation, entitlement. No product, cost or date is decided here.</p></div>
-          <div class="card"><h4>What stays the same</h4><p>XRAS and AMIE intake. Award decisions. Per-resource provisioning behaviour. Anything that only reads LDAP.</p></div>
-          <div class="card"><h4>Out of scope here</h4><p>Implementation, phasing, API specs, adoption tiers, cost, staffing.</p></div>
+          <div class="card"><h4>What stays the same</h4><p>XRAS and AMIE intake. Award decisions. Per-resource provisioning behaviour. Anything reading identity attributes from LDAP.</p></div>
+          <div class="card"><h4>Out of scope here</h4><p>Implementation, API specs, timeline, staffing.</p></div>
           <div class="card hi"><h4>What deferring costs</h4><p>An undecided fact keeps today&#8217;s answer. Today&#8217;s answer is the fragmented one.</p></div>
         </div>
 
-        <h2 class="sec">Four decisions no engineer can make</h2>
+        <h2 class="sec">Four decisions this room cannot settle</h2>
         <div class="qlist">
           <div class="qrow"><span class="qn">01</span><div><div class="qt">Which identity domains are in scope.</div><div class="qs">Six reach resources today: NCSA Kerberos, NetID, campus AD, ACCESS ID, Globus, Google. ICCP runs on NetID, outside acctd.</div></div></div>
           <div class="qrow"><span class="qn">02</span><div><div class="qt">Amending IAM Policy v1.3.</div><div class="qs">NCSA identities only by default; CISO approval for linked identities; IIB approval for new IdM interfaces. Federation needs it amended.</div></div></div>
@@ -581,7 +581,6 @@ table.ep td.m b{color:var(--identity);font-weight:500}
               <tr><td class="m"><b>Granite</b></td><td class="m">yes &#183; granite_</td><td></td><td>25,000 inodes per TB</td></tr>
               <tr><td class="m"><b>Nightingale / ACHE</b></td><td class="m">no</td><td></td><td>HIPAA training, Covered Entity, two approvers, VPN and bastion, session limits</td></tr>
               <tr><td class="m"><b>ICCP</b></td><td class="m">no</td><td></td><td>NetID and Illinois Duo; outside acctd (SUP-25234); investor portal; over-allocation demotes</td></tr>
-              <tr><td class="m"><b>Hydro</b></td><td class="m">yes &#183; hydro_</td><td></td><td>Auto-provisioned from XRAS; opportunity closed 30 Jun 2025</td></tr>
               <tr><td class="m"><b>Jade</b></td><td class="m">no</td><td></td><td>Email intake only</td></tr>
               <tr><td class="m"><b>Harbor</b></td><td class="m">no</td><td></td><td>No XRAS or IC path; access inherited from a compute allocation</td></tr>
               <tr><td class="m"><b>HAL</b></td><td class="m">no</td><td></td><td>NetID gates the request, NCSA identity grants; ITAR group for HAL-DGX; manual first login</td></tr>
@@ -589,19 +588,20 @@ table.ep td.m b{color:var(--identity);font-weight:500}
               <tr><td class="m"><b>Holli</b></td><td class="m">yes &#183; holli_</td><td></td><td></td></tr>
               <tr><td class="m"><b>Magnus</b></td><td class="m">yes &#183; magnus_</td><td></td><td>Group contains non-NCSA employees by agreement</td></tr>
               <tr><td class="m"><b>TGI RAILS</b></td><td class="m">yes &#183; tgirails_</td><td></td><td>Consortium approves before NCSA issues identity; up to 20% via OSG</td></tr>
+              <tr><td class="m"><b>Bailey</b></td><td class="m">yes &#183; bailey_</td><td></td><td>NGA system; consortium model as TGI RAILS</td></tr>
               <tr><td class="m"><b>Illinois HTC</b></td><td class="m">no</td><td></td><td>HTCondor, outside the Slurm metering chain; open beta, unstaffed</td></tr>
               <tr><td class="m"><b>mForge</b></td><td class="m">no</td><td></td><td>External clinical partner group</td></tr>
               </tbody>
           </table>
         </div>
-        <p class="opennote">Two more OUs exist: <b>vforge</b> persists after decommissioning, <b>bailey</b> appears in no documentation.</p>
+        <p class="opennote">Two more OUs persist after decommissioning: <b>hydro</b> and <b>vforge</b>.</p>
       </section>
 
       <!-- ============ 2 ============ -->
       <section class="slide" data-t="Current state">
         <p class="eyebrow">03 · Current state</p>
         <h1 class="claim">Did we get today right?</h1>
-        <p class="dek">Select a system.</p>
+        <p class="dek">Current state as discovery found it.</p>
 
         <div class="ctrls">
           <div class="cgroup"><b>System</b>
@@ -630,15 +630,23 @@ table.ep td.m b{color:var(--identity);font-weight:500}
       <!-- ============ 3 ============ -->
       <section class="slide" data-t="Confirm or reject">
         <p class="eyebrow">04 · The ask</p>
-        <h1 class="claim">Nine statements. Confirm or reject each.</h1>
-        <p class="dek">Click one for why it matters.</p>
+        <h1 class="claim">Eleven assertions to confirm or reject.</h1>
 
         <div class="qlist" id="clist"></div>
 
         <div class="readout" id="ro3" style="margin-top:14px">
           <span class="step">Why</span>
-          <p class="txt" id="ro3-txt">Pick a statement.</p>
+          <p class="txt" id="ro3-txt">Confirmed means we build on it. Rejected means the picture changes.</p>
         </div>
+
+        <h2 class="sec">Four answers that need data, not a vote</h2>
+        <div class="qlist">
+          <div class="qrow"><span class="qn">01</span><div><div class="qt">Who reads LDAP, and which of them read a resource OU.</div><div class="qs">Assertion 04 cannot be confirmed without this. LDAP is readable unauthenticated from any NCSA IP, so the consumer set is unknown. Needed: which hosts bind, which applications query, and which read allocation state out of a resource OU rather than identity attributes.</div></div></div>
+          <div class="qrow"><span class="qn">02</span><div><div class="qt">How many groups are allocation-backed rather than owner-managed.</div><div class="qs">Assertions 03 and 06 turn on this split. The counts exist: 3,865 charge groups against 218 grp_, 152 prj_ and 91 org_. What is missing is which of the owner-managed groups actually gate resource access.</div></div></div>
+          <div class="qrow"><span class="qn">03</span><div><div class="qt">Which services require Kerberos.</div><div class="qs">The federation posture on the diagram is open because of this. If SSH certificates and OIDC cover the real dependencies, federated-first enrolment is straightforward. If a Kerberos password must exist for every identity, it is not.</div></div></div>
+          <div class="qrow"><span class="qn">04</span><div><div class="qt">What each resource would have to change to stop reading a resource OU.</div><div class="qs">This sizes the one change with the widest blast radius. The column in the table above is deliberately empty — it is for the owners to fill.</div></div></div>
+        </div>
+        <p class="opennote">None of these are votes. Each is a short piece of work with an owner, and each unblocks an assertion above.</p>
       </section>
 
     </main>
@@ -851,11 +859,13 @@ var CLAIMS=[
  ["Allocations have exactly one authority.","The allocation record and the authorization derived from it sit in different systems, with no documented reconciliation."],
  ["Entitlement is a named layer with one owner.","Identity and award each have an owner; what joins them has none. This picture puts entitlement in the allocation record. The alternatives are a service of its own, or per-resource rules that cannot be expressed centrally. The 2020 recommendations named this interface and left it undefined."],
  ["LDAP holds nothing that does not exist upstream.","Widest blast radius, and unassessable as posed: the LDAP consumer set is unknown. This one needs a census, not a vote."],
- ["All human interaction happens in one portal.","Thirteen tools can create or change access. True only if most of them close \u2014 a sponsor decision."],
+ ["No system other than the portal writes identity or allocation data.","Thirteen tools can create or change access. Posed this way it is decidable; \u201call interaction in one portal\u201d is not, because it stays false until most of those close."],
  ["Allocation membership belongs to the allocation record, not the group system.","Membership is both a group fact and an allocation fact. One home means group owners lose hand-editing of allocation-backed groups."],
  ["Resources converge on a schedule rather than waiting to be told.","Every current sync has a reconcile bolted on afterwards. This makes reconcile the contract, and the schedule the floor on how fast anything changes."],
  ["Suspend and revoke are pushed, not scheduled.","Grant: minutes to hours. Revoke: days to never. On one schedule, that gap is designed in."],
- ["Provisioning state flows back to the allocation record.","Usage already returns via jobd, and works. Provisioning state does not \u2014 nothing records whether an entitlement took effect."]
+ ["Provisioning state flows back to the allocation record.","Usage already returns via jobd, and works. Provisioning state does not \u2014 nothing records whether an entitlement took effect."],
+ ["The boundary is NCSA-operated resources. ICCP is outside it.","ICCP runs NetID and Illinois Duo, sits outside acctd, and manages groups in its own investor portal. In or out changes the identity domains in scope, the size of the portal, and who has to agree to the rest."],
+ ["One allocation model covers compute and storage.","Storage is allocated through four front doors by provenance, and Delta forbids storage-only allocations. A compute-shaped model either absorbs storage or concedes a second model."]
 ];
 (function(){
   var w=document.getElementById("clist"); if(!w) return;
